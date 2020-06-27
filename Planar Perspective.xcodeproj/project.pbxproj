@@ -1,0 +1,691 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F2129881249B08B400C98F32 /* PlayerBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2129880249B08B400C98F32 /* PlayerBuilder.swift */; };
+		F2129883249D492800C98F32 /* ContactHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2129882249D492800C98F32 /* ContactHandler.swift */; };
+		F2473F7524A2EBEE00EF3142 /* GoalBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2473F7424A2EBEE00EF3142 /* GoalBuilder.swift */; };
+		F2553B302473374C0089F132 /* LevelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2553B2F2473374C0089F132 /* LevelView.swift */; };
+		F2553B32247338560089F132 /* GraphicsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2553B31247338560089F132 /* GraphicsHandler.swift */; };
+		F2553B34247339370089F132 /* DrawItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2553B33247339370089F132 /* DrawItem.swift */; };
+		F2553B36247339DE0089F132 /* Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2553B35247339DE0089F132 /* Builder.swift */; };
+		F2553B3924733A430089F132 /* LineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2553B3824733A430089F132 /* LineBuilder.swift */; };
+		F2553B3B24733AEA0089F132 /* Plane.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2553B3A24733AEA0089F132 /* Plane.swift */; };
+		F2578891249300EB00ACCD26 /* LogicHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2578890249300EB00ACCD26 /* LogicHandler.swift */; };
+		F28179C02495D4D800EC9243 /* MotionBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28179BF2495D4D800EC9243 /* MotionBuilder.swift */; };
+		F28179C22496B64400EC9243 /* MotionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28179C12496B64400EC9243 /* MotionHandler.swift */; };
+		F285C54E248730630030D75A /* CompressionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F285C54D248730630030D75A /* CompressionHandler.swift */; };
+		F2A057AD2491C64C005342D1 /* TransitionCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A057AC2491C64C005342D1 /* TransitionCompiler.swift */; };
+		F2A057AF2491CA8C005342D1 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A057AE2491CA8C005342D1 /* State.swift */; };
+		F2A057B12491CF68005342D1 /* InputHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A057B02491CF68005342D1 /* InputHandler.swift */; };
+		F2CF9AE524705C8E008397E6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CF9AE424705C8E008397E6 /* AppDelegate.swift */; };
+		F2CF9AE724705C8E008397E6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CF9AE624705C8E008397E6 /* SceneDelegate.swift */; };
+		F2CF9AE924705C8E008397E6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CF9AE824705C8E008397E6 /* ViewController.swift */; };
+		F2CF9AEC24705C8E008397E6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F2CF9AEA24705C8E008397E6 /* Main.storyboard */; };
+		F2CF9AEE24705C8F008397E6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F2CF9AED24705C8F008397E6 /* Assets.xcassets */; };
+		F2CF9AF124705C8F008397E6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F2CF9AEF24705C8F008397E6 /* LaunchScreen.storyboard */; };
+		F2CF9AFC24705C8F008397E6 /* Planar_PerspectiveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CF9AFB24705C8F008397E6 /* Planar_PerspectiveTests.swift */; };
+		F2CF9B0724705C90008397E6 /* Planar_PerspectiveUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CF9B0624705C90008397E6 /* Planar_PerspectiveUITests.swift */; };
+		F2D92156248894F4007809F7 /* RenderHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D92155248894F4007809F7 /* RenderHandler.swift */; };
+		F2D92158248B13DF007809F7 /* StaticCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D92157248B13DF007809F7 /* StaticCompiler.swift */; };
+		F2D9215A248B13F4007809F7 /* Compiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D92159248B13F4007809F7 /* Compiler.swift */; };
+		F2D9215C2490444F007809F7 /* ProjectionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D9215B2490444F007809F7 /* ProjectionHandler.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F2CF9AF824705C8F008397E6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F2CF9AD924705C8E008397E6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F2CF9AE024705C8E008397E6;
+			remoteInfo = "Planar Perspective";
+		};
+		F2CF9B0324705C8F008397E6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F2CF9AD924705C8E008397E6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F2CF9AE024705C8E008397E6;
+			remoteInfo = "Planar Perspective";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		F2129880249B08B400C98F32 /* PlayerBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerBuilder.swift; sourceTree = "<group>"; };
+		F2129882249D492800C98F32 /* ContactHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactHandler.swift; sourceTree = "<group>"; };
+		F2473F7424A2EBEE00EF3142 /* GoalBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalBuilder.swift; sourceTree = "<group>"; };
+		F2553B2F2473374C0089F132 /* LevelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelView.swift; sourceTree = "<group>"; };
+		F2553B31247338560089F132 /* GraphicsHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphicsHandler.swift; sourceTree = "<group>"; };
+		F2553B33247339370089F132 /* DrawItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawItem.swift; sourceTree = "<group>"; };
+		F2553B35247339DE0089F132 /* Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder.swift; sourceTree = "<group>"; };
+		F2553B3824733A430089F132 /* LineBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineBuilder.swift; sourceTree = "<group>"; };
+		F2553B3A24733AEA0089F132 /* Plane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plane.swift; sourceTree = "<group>"; };
+		F2578890249300EB00ACCD26 /* LogicHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicHandler.swift; sourceTree = "<group>"; };
+		F28179BF2495D4D800EC9243 /* MotionBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionBuilder.swift; sourceTree = "<group>"; };
+		F28179C12496B64400EC9243 /* MotionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionHandler.swift; sourceTree = "<group>"; };
+		F285C54D248730630030D75A /* CompressionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionHandler.swift; sourceTree = "<group>"; };
+		F2A057AC2491C64C005342D1 /* TransitionCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionCompiler.swift; sourceTree = "<group>"; };
+		F2A057AE2491CA8C005342D1 /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = State.swift; path = "Planar Perspective/Level/State.swift"; sourceTree = SOURCE_ROOT; };
+		F2A057B02491CF68005342D1 /* InputHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHandler.swift; sourceTree = "<group>"; };
+		F2CF9AE124705C8E008397E6 /* Planar Perspective.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Planar Perspective.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2CF9AE424705C8E008397E6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		F2CF9AE624705C8E008397E6 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		F2CF9AE824705C8E008397E6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		F2CF9AEB24705C8E008397E6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		F2CF9AED24705C8F008397E6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F2CF9AF024705C8F008397E6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		F2CF9AF224705C8F008397E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F2CF9AF724705C8F008397E6 /* Planar PerspectiveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Planar PerspectiveTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2CF9AFB24705C8F008397E6 /* Planar_PerspectiveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Planar_PerspectiveTests.swift; sourceTree = "<group>"; };
+		F2CF9AFD24705C8F008397E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F2CF9B0224705C8F008397E6 /* Planar PerspectiveUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Planar PerspectiveUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2CF9B0624705C90008397E6 /* Planar_PerspectiveUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Planar_PerspectiveUITests.swift; sourceTree = "<group>"; };
+		F2CF9B0824705C90008397E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F2D92155248894F4007809F7 /* RenderHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderHandler.swift; sourceTree = "<group>"; };
+		F2D92157248B13DF007809F7 /* StaticCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticCompiler.swift; sourceTree = "<group>"; };
+		F2D92159248B13F4007809F7 /* Compiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compiler.swift; sourceTree = "<group>"; };
+		F2D9215B2490444F007809F7 /* ProjectionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectionHandler.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F2CF9ADE24705C8E008397E6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2CF9AF424705C8F008397E6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2CF9AFF24705C8F008397E6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F24ABBBD249ED13900DCA774 /* Level */ = {
+			isa = PBXGroup;
+			children = (
+				F2553B2F2473374C0089F132 /* LevelView.swift */,
+				F2A057AE2491CA8C005342D1 /* State.swift */,
+				F2553B3A24733AEA0089F132 /* Plane.swift */,
+				F2D92155248894F4007809F7 /* RenderHandler.swift */,
+				F285C54D248730630030D75A /* CompressionHandler.swift */,
+				F2D9215B2490444F007809F7 /* ProjectionHandler.swift */,
+				F28179C12496B64400EC9243 /* MotionHandler.swift */,
+				F2A057B02491CF68005342D1 /* InputHandler.swift */,
+				F2129882249D492800C98F32 /* ContactHandler.swift */,
+				F2578890249300EB00ACCD26 /* LogicHandler.swift */,
+				F2553B31247338560089F132 /* GraphicsHandler.swift */,
+				F2553B3724733A310089F132 /* Builders */,
+			);
+			path = Level;
+			sourceTree = "<group>";
+		};
+		F2553B3724733A310089F132 /* Builders */ = {
+			isa = PBXGroup;
+			children = (
+				F2553B33247339370089F132 /* DrawItem.swift */,
+				F2D92159248B13F4007809F7 /* Compiler.swift */,
+				F2D92157248B13DF007809F7 /* StaticCompiler.swift */,
+				F2A057AC2491C64C005342D1 /* TransitionCompiler.swift */,
+				F2553B35247339DE0089F132 /* Builder.swift */,
+				F2553B3824733A430089F132 /* LineBuilder.swift */,
+				F28179BF2495D4D800EC9243 /* MotionBuilder.swift */,
+				F2473F7424A2EBEE00EF3142 /* GoalBuilder.swift */,
+				F2129880249B08B400C98F32 /* PlayerBuilder.swift */,
+			);
+			path = Builders;
+			sourceTree = "<group>";
+		};
+		F2CF9AD824705C8E008397E6 = {
+			isa = PBXGroup;
+			children = (
+				F2CF9AE324705C8E008397E6 /* Planar Perspective */,
+				F2CF9AFA24705C8F008397E6 /* Planar PerspectiveTests */,
+				F2CF9B0524705C8F008397E6 /* Planar PerspectiveUITests */,
+				F2CF9AE224705C8E008397E6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F2CF9AE224705C8E008397E6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F2CF9AE124705C8E008397E6 /* Planar Perspective.app */,
+				F2CF9AF724705C8F008397E6 /* Planar PerspectiveTests.xctest */,
+				F2CF9B0224705C8F008397E6 /* Planar PerspectiveUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F2CF9AE324705C8E008397E6 /* Planar Perspective */ = {
+			isa = PBXGroup;
+			children = (
+				F2CF9AE424705C8E008397E6 /* AppDelegate.swift */,
+				F2CF9AE624705C8E008397E6 /* SceneDelegate.swift */,
+				F2CF9AE824705C8E008397E6 /* ViewController.swift */,
+				F2CF9AEA24705C8E008397E6 /* Main.storyboard */,
+				F24ABBBD249ED13900DCA774 /* Level */,
+				F2CF9AED24705C8F008397E6 /* Assets.xcassets */,
+				F2CF9AEF24705C8F008397E6 /* LaunchScreen.storyboard */,
+				F2CF9AF224705C8F008397E6 /* Info.plist */,
+			);
+			path = "Planar Perspective";
+			sourceTree = "<group>";
+		};
+		F2CF9AFA24705C8F008397E6 /* Planar PerspectiveTests */ = {
+			isa = PBXGroup;
+			children = (
+				F2CF9AFB24705C8F008397E6 /* Planar_PerspectiveTests.swift */,
+				F2CF9AFD24705C8F008397E6 /* Info.plist */,
+			);
+			path = "Planar PerspectiveTests";
+			sourceTree = "<group>";
+		};
+		F2CF9B0524705C8F008397E6 /* Planar PerspectiveUITests */ = {
+			isa = PBXGroup;
+			children = (
+				F2CF9B0624705C90008397E6 /* Planar_PerspectiveUITests.swift */,
+				F2CF9B0824705C90008397E6 /* Info.plist */,
+			);
+			path = "Planar PerspectiveUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F2CF9AE024705C8E008397E6 /* Planar Perspective */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F2CF9B0B24705C90008397E6 /* Build configuration list for PBXNativeTarget "Planar Perspective" */;
+			buildPhases = (
+				F2CF9ADD24705C8E008397E6 /* Sources */,
+				F2CF9ADE24705C8E008397E6 /* Frameworks */,
+				F2CF9ADF24705C8E008397E6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Planar Perspective";
+			productName = "Planar Perspective";
+			productReference = F2CF9AE124705C8E008397E6 /* Planar Perspective.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F2CF9AF624705C8F008397E6 /* Planar PerspectiveTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F2CF9B0E24705C90008397E6 /* Build configuration list for PBXNativeTarget "Planar PerspectiveTests" */;
+			buildPhases = (
+				F2CF9AF324705C8F008397E6 /* Sources */,
+				F2CF9AF424705C8F008397E6 /* Frameworks */,
+				F2CF9AF524705C8F008397E6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F2CF9AF924705C8F008397E6 /* PBXTargetDependency */,
+			);
+			name = "Planar PerspectiveTests";
+			productName = "Planar PerspectiveTests";
+			productReference = F2CF9AF724705C8F008397E6 /* Planar PerspectiveTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		F2CF9B0124705C8F008397E6 /* Planar PerspectiveUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F2CF9B1124705C90008397E6 /* Build configuration list for PBXNativeTarget "Planar PerspectiveUITests" */;
+			buildPhases = (
+				F2CF9AFE24705C8F008397E6 /* Sources */,
+				F2CF9AFF24705C8F008397E6 /* Frameworks */,
+				F2CF9B0024705C8F008397E6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F2CF9B0424705C8F008397E6 /* PBXTargetDependency */,
+			);
+			name = "Planar PerspectiveUITests";
+			productName = "Planar PerspectiveUITests";
+			productReference = F2CF9B0224705C8F008397E6 /* Planar PerspectiveUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F2CF9AD924705C8E008397E6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1100;
+				LastUpgradeCheck = 1100;
+				ORGANIZATIONNAME = "Anderson, Todd W.";
+				TargetAttributes = {
+					F2CF9AE024705C8E008397E6 = {
+						CreatedOnToolsVersion = 11.0;
+					};
+					F2CF9AF624705C8F008397E6 = {
+						CreatedOnToolsVersion = 11.0;
+						TestTargetID = F2CF9AE024705C8E008397E6;
+					};
+					F2CF9B0124705C8F008397E6 = {
+						CreatedOnToolsVersion = 11.0;
+						TestTargetID = F2CF9AE024705C8E008397E6;
+					};
+				};
+			};
+			buildConfigurationList = F2CF9ADC24705C8E008397E6 /* Build configuration list for PBXProject "Planar Perspective" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F2CF9AD824705C8E008397E6;
+			productRefGroup = F2CF9AE224705C8E008397E6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F2CF9AE024705C8E008397E6 /* Planar Perspective */,
+				F2CF9AF624705C8F008397E6 /* Planar PerspectiveTests */,
+				F2CF9B0124705C8F008397E6 /* Planar PerspectiveUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F2CF9ADF24705C8E008397E6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F2CF9AF124705C8F008397E6 /* LaunchScreen.storyboard in Resources */,
+				F2CF9AEE24705C8F008397E6 /* Assets.xcassets in Resources */,
+				F2CF9AEC24705C8E008397E6 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2CF9AF524705C8F008397E6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2CF9B0024705C8F008397E6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F2CF9ADD24705C8E008397E6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F2578891249300EB00ACCD26 /* LogicHandler.swift in Sources */,
+				F2D92156248894F4007809F7 /* RenderHandler.swift in Sources */,
+				F2473F7524A2EBEE00EF3142 /* GoalBuilder.swift in Sources */,
+				F2A057B12491CF68005342D1 /* InputHandler.swift in Sources */,
+				F2D9215C2490444F007809F7 /* ProjectionHandler.swift in Sources */,
+				F2553B34247339370089F132 /* DrawItem.swift in Sources */,
+				F2553B3B24733AEA0089F132 /* Plane.swift in Sources */,
+				F2553B32247338560089F132 /* GraphicsHandler.swift in Sources */,
+				F2A057AD2491C64C005342D1 /* TransitionCompiler.swift in Sources */,
+				F2D9215A248B13F4007809F7 /* Compiler.swift in Sources */,
+				F2129883249D492800C98F32 /* ContactHandler.swift in Sources */,
+				F285C54E248730630030D75A /* CompressionHandler.swift in Sources */,
+				F2553B36247339DE0089F132 /* Builder.swift in Sources */,
+				F2D92158248B13DF007809F7 /* StaticCompiler.swift in Sources */,
+				F2553B3924733A430089F132 /* LineBuilder.swift in Sources */,
+				F2CF9AE924705C8E008397E6 /* ViewController.swift in Sources */,
+				F2A057AF2491CA8C005342D1 /* State.swift in Sources */,
+				F28179C02495D4D800EC9243 /* MotionBuilder.swift in Sources */,
+				F2553B302473374C0089F132 /* LevelView.swift in Sources */,
+				F2CF9AE524705C8E008397E6 /* AppDelegate.swift in Sources */,
+				F28179C22496B64400EC9243 /* MotionHandler.swift in Sources */,
+				F2129881249B08B400C98F32 /* PlayerBuilder.swift in Sources */,
+				F2CF9AE724705C8E008397E6 /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2CF9AF324705C8F008397E6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F2CF9AFC24705C8F008397E6 /* Planar_PerspectiveTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2CF9AFE24705C8F008397E6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F2CF9B0724705C90008397E6 /* Planar_PerspectiveUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F2CF9AF924705C8F008397E6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F2CF9AE024705C8E008397E6 /* Planar Perspective */;
+			targetProxy = F2CF9AF824705C8F008397E6 /* PBXContainerItemProxy */;
+		};
+		F2CF9B0424705C8F008397E6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F2CF9AE024705C8E008397E6 /* Planar Perspective */;
+			targetProxy = F2CF9B0324705C8F008397E6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		F2CF9AEA24705C8E008397E6 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F2CF9AEB24705C8E008397E6 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		F2CF9AEF24705C8F008397E6 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F2CF9AF024705C8F008397E6 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		F2CF9B0924705C90008397E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F2CF9B0A24705C90008397E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F2CF9B0C24705C90008397E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = C5824JC6LG;
+				INFOPLIST_FILE = "Planar Perspective/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.RAJAPP.Planar-Perspective";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F2CF9B0D24705C90008397E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = C5824JC6LG;
+				INFOPLIST_FILE = "Planar Perspective/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.RAJAPP.Planar-Perspective";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F2CF9B0F24705C90008397E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = C5824JC6LG;
+				INFOPLIST_FILE = "Planar PerspectiveTests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.RAJAPP.Planar-PerspectiveTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Planar Perspective.app/Planar Perspective";
+			};
+			name = Debug;
+		};
+		F2CF9B1024705C90008397E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = C5824JC6LG;
+				INFOPLIST_FILE = "Planar PerspectiveTests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.RAJAPP.Planar-PerspectiveTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Planar Perspective.app/Planar Perspective";
+			};
+			name = Release;
+		};
+		F2CF9B1224705C90008397E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = C5824JC6LG;
+				INFOPLIST_FILE = "Planar PerspectiveUITests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.RAJAPP.Planar-PerspectiveUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Planar Perspective";
+			};
+			name = Debug;
+		};
+		F2CF9B1324705C90008397E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = C5824JC6LG;
+				INFOPLIST_FILE = "Planar PerspectiveUITests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.RAJAPP.Planar-PerspectiveUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Planar Perspective";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F2CF9ADC24705C8E008397E6 /* Build configuration list for PBXProject "Planar Perspective" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2CF9B0924705C90008397E6 /* Debug */,
+				F2CF9B0A24705C90008397E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F2CF9B0B24705C90008397E6 /* Build configuration list for PBXNativeTarget "Planar Perspective" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2CF9B0C24705C90008397E6 /* Debug */,
+				F2CF9B0D24705C90008397E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F2CF9B0E24705C90008397E6 /* Build configuration list for PBXNativeTarget "Planar PerspectiveTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2CF9B0F24705C90008397E6 /* Debug */,
+				F2CF9B1024705C90008397E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F2CF9B1124705C90008397E6 /* Build configuration list for PBXNativeTarget "Planar PerspectiveUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2CF9B1224705C90008397E6 /* Debug */,
+				F2CF9B1324705C90008397E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F2CF9AD924705C8E008397E6 /* Project object */;
+}
