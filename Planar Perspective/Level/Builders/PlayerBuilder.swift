@@ -20,7 +20,7 @@ class PlayerBuilder: Builder {
     func build(from transform: Transform) -> [DrawItem] {
         let pos: CGPoint = transform(Polygon(vertices: [level.position])).vertices[0].flatten()
         loc = pos
-        return [DrawItem.CIRCLE(pos, 10.0, .init(srgbRed: 0, green: 0, blue: 0, alpha: 1))]
+        return [DrawItem.CIRCLE(pos, 10.0, .init(srgbRed: 0, green: 0, blue: 0, alpha: 1), 2)]
     }
     
     func location() -> CGPoint {

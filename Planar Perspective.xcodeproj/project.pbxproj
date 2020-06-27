@@ -35,6 +35,7 @@
 		F2D92158248B13DF007809F7 /* StaticCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D92157248B13DF007809F7 /* StaticCompiler.swift */; };
 		F2D9215A248B13F4007809F7 /* Compiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D92159248B13F4007809F7 /* Compiler.swift */; };
 		F2D9215C2490444F007809F7 /* ProjectionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D9215B2490444F007809F7 /* ProjectionHandler.swift */; };
+		F4ECA39D24A7846300CCB385 /* Level.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4ECA39C24A7846300CCB385 /* Level.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,7 +72,7 @@
 		F2A057AC2491C64C005342D1 /* TransitionCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionCompiler.swift; sourceTree = "<group>"; };
 		F2A057AE2491CA8C005342D1 /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = State.swift; path = "Planar Perspective/Level/State.swift"; sourceTree = SOURCE_ROOT; };
 		F2A057B02491CF68005342D1 /* InputHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHandler.swift; sourceTree = "<group>"; };
-		F2CF9AE124705C8E008397E6 /* Planar Perspective.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Planar Perspective.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2CF9AE124705C8E008397E6 /* Perspective.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perspective.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2CF9AE424705C8E008397E6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F2CF9AE624705C8E008397E6 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		F2CF9AE824705C8E008397E6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -89,6 +90,7 @@
 		F2D92157248B13DF007809F7 /* StaticCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticCompiler.swift; sourceTree = "<group>"; };
 		F2D92159248B13F4007809F7 /* Compiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compiler.swift; sourceTree = "<group>"; };
 		F2D9215B2490444F007809F7 /* ProjectionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectionHandler.swift; sourceTree = "<group>"; };
+		F4ECA39C24A7846300CCB385 /* Level.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Level.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,7 +166,7 @@
 		F2CF9AE224705C8E008397E6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F2CF9AE124705C8E008397E6 /* Planar Perspective.app */,
+				F2CF9AE124705C8E008397E6 /* Perspective.app */,
 				F2CF9AF724705C8F008397E6 /* Planar PerspectiveTests.xctest */,
 				F2CF9B0224705C8F008397E6 /* Planar PerspectiveUITests.xctest */,
 			);
@@ -177,6 +179,7 @@
 				F2CF9AE424705C8E008397E6 /* AppDelegate.swift */,
 				F2CF9AE624705C8E008397E6 /* SceneDelegate.swift */,
 				F2CF9AE824705C8E008397E6 /* ViewController.swift */,
+				F4ECA39C24A7846300CCB385 /* Level.swift */,
 				F2CF9AEA24705C8E008397E6 /* Main.storyboard */,
 				F24ABBBD249ED13900DCA774 /* Level */,
 				F2CF9AED24705C8F008397E6 /* Assets.xcassets */,
@@ -221,7 +224,7 @@
 			);
 			name = "Planar Perspective";
 			productName = "Planar Perspective";
-			productReference = F2CF9AE124705C8E008397E6 /* Planar Perspective.app */;
+			productReference = F2CF9AE124705C8E008397E6 /* Perspective.app */;
 			productType = "com.apple.product-type.application";
 		};
 		F2CF9AF624705C8F008397E6 /* Planar PerspectiveTests */ = {
@@ -341,6 +344,7 @@
 				F2A057B12491CF68005342D1 /* InputHandler.swift in Sources */,
 				F2D9215C2490444F007809F7 /* ProjectionHandler.swift in Sources */,
 				F2553B34247339370089F132 /* DrawItem.swift in Sources */,
+				F4ECA39D24A7846300CCB385 /* Level.swift in Sources */,
 				F2553B3B24733AEA0089F132 /* Plane.swift in Sources */,
 				F2553B32247338560089F132 /* GraphicsHandler.swift in Sources */,
 				F2A057AD2491C64C005342D1 /* TransitionCompiler.swift in Sources */,
@@ -538,7 +542,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.RAJAPP.Planar-Perspective";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Perspective;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -556,7 +560,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.RAJAPP.Planar-Perspective";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Perspective;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

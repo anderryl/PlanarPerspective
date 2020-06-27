@@ -38,14 +38,15 @@ class StaticCompiler: Compiler {
         let location = player.location()
         let dx = level.frame.width / 2 - location.x
         let dy = level.frame.height / 2 - location.y
+        let translation = CGAffineTransform(translationX: dx, y: dy)
         for item in items {
             switch item {
-            case .CIRCLE(let position, let radius, let color):
-                translated.append(.CIRCLE(CGPoint(x: position.x + dx, y: position.y + dy), radius, color))
-            case .RECTANGLE(let position, let size, let color):
-                translated.append(.RECTANGLE(CGPoint(x: position.x + dx, y: position.y + dy), size, color))
-            case .LINE(let origin, let outpost, let color):
-                translated.append(.LINE(CGPoint(x: origin.x + dx, y: origin.y + dy), CGPoint(x: outpost.x + dx, y: outpost.y + dy), color))
+            case .CIRCLE(let position, let radius, let color, let layer):
+                translated.append(.CIRCLE(position.applying(translation), radius, color, layer))
+            case .RECTANGLE(let position, let size, let color, let layer):
+                translated.append(.RECTANGLE(position.applying(translation), size, color, layer))
+            case .LINE(let origin, let outpost, let color, let layer):
+                translated.append(.LINE(origin.applying(translation), outpost.applying(translation), color, layer))
             default:
                 break
             }

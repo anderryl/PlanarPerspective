@@ -37,7 +37,7 @@ typealias TransformFactory = (_ phase: CGFloat) -> (_ vertice: Polygon) -> Polyg
 
 typealias Transform = (_ polygon: Polygon) -> Polygon
                                                
-struct Vertex: Hashable {
+struct Vertex: Codable, Hashable {
     var x: CGFloat
     var y: CGFloat
     var z: CGFloat
@@ -49,7 +49,7 @@ struct Vertex: Hashable {
 
 typealias Position = Vertex
 
-struct Polygon: Hashable {
+struct Polygon: Codable, Hashable {
     var vertices: [Vertex]
     
     func lines() -> [Line] {
@@ -73,7 +73,7 @@ struct Polygon: Hashable {
     }
 }
 
-struct Edge {
+struct Edge: Codable {
     var origin: Vertex
     var outpost: Vertex
     

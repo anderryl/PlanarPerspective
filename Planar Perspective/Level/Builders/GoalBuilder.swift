@@ -21,6 +21,6 @@ class GoalBuilder: Builder {
         let lines = flat.lines()
         let one = lines.first!.origin
         let two = lines.first!.outpost
-        return [.RECTANGLE(one, CGSize(width: two.x - one.x, height: two.y - one.y), .init(srgbRed: 0, green: 1, blue: 0, alpha: 1))]
+        return [.RECTANGLE(one, CGSize(width: two.x - one.x, height: two.y - one.y), .init(srgbRed: 0, green: 1, blue: 0, alpha: 1), 1)]
     }
 }

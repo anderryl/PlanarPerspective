@@ -122,10 +122,10 @@ class MotionBuilder: Builder {
         //Compile DrawItems in both colors
         var lines: [DrawItem] = []
         for line in blacks {
-            lines.append(.LINE(line.origin, line.outpost, .init(srgbRed: 0, green: 0, blue: 0, alpha: 1)))
+            lines.append(.LINE(line.origin, line.outpost, .init(srgbRed: 0, green: 0, blue: 0, alpha: 1), 2))
         }
         for line in reds {
-            lines.append(.LINE(line.origin, line.outpost, .init(srgbRed: 1, green: 0, blue: 0, alpha: 1)))
+            lines.append(.LINE(line.origin, line.outpost, .init(srgbRed: 1, green: 0, blue: 0, alpha: 1), 2))
         }
         return lines
     }

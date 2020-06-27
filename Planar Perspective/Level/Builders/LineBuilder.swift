@@ -18,7 +18,7 @@ class LineBuilder: Builder {
     func  build(from transform: Transform) -> [DrawItem] {
         var ret: [DrawItem] = []
         for line in level.compression!.compress(with: transform, reverse: false) {
-            ret.append(.LINE(line.origin, line.outpost, .init(srgbRed: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)))
+            ret.append(.LINE(line.origin, line.outpost, .init(srgbRed: 0.0, green: 0.0, blue: 0.0, alpha: 1.0), 0))
         }
         return ret
     }

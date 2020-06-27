@@ -63,10 +63,10 @@ class TransitionCompiler: Compiler {
         let slide = CGAffineTransform(translationX: dx, y: dy)
         for item in items {
             switch item {
-            case .CIRCLE(let center, let radius, let color):
+            case .CIRCLE(let center, let radius, let color, let layer):
                 let position = center.applying(rot).applying(slide)
-                translated.append(.CIRCLE(position, radius, color))
-            case .RECTANGLE(let position, let size, let color):
+                translated.append(.CIRCLE(position, radius, color, layer))
+            case .RECTANGLE(let position, let size, let color, let layer):
                 var edges: [CGPoint] = []
                 let initial: [CGPoint] = [CGPoint(x: position.x, y: position.y), CGPoint(x: position.x, y: position.y + size.height), CGPoint(x: position.x + size.width, y: position.y + size.height), CGPoint(x: position.x + size.width, y: position.y), CGPoint(x: position.x, y: position.y)]
                 for i in 0 ... 4 {
@@ -74,9 +74,9 @@ class TransitionCompiler: Compiler {
                 }
                 let path = CGMutablePath()
                 path.addLines(between: edges)
-                translated.append(.PATH(path, color))
-            case .LINE(let origin, let outpost, let color):
-                translated.append(.LINE(origin.applying(rot).applying(slide), outpost.applying(rot).applying(slide), color))
+                translated.append(.PATH(path, color, layer))
+            case .LINE(let origin, let outpost, let color, let layer):
+                translated.append(.LINE(origin.applying(rot).applying(slide), outpost.applying(rot).applying(slide), color, layer))
             default:
                 break
             }
