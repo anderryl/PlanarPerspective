@@ -15,7 +15,7 @@ class ViewController: UIViewController {
         let level = LevelView.init(frame: view.frame)
         view.addSubview(level)
     }
-
+    //Loads a level by name
     func loadLevel(called name: String) -> Level {
         let data = getFileData(filename: name)!
         print(NSString(data: data, encoding: 1)!)
