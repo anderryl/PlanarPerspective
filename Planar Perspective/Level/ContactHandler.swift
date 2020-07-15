@@ -38,14 +38,21 @@ class ContactHandler {
     }
     
     private func contact(between line: Line, and player: Line) -> [CGPoint] {
-        let pmag = player.origin | player.outpost
-        let pvecx = (player.outpost.x - player.origin.x) * radius / pmag
-        let pvecy = (player.outpost.y - player.origin.y) * radius / pmag
-        let translated = Line(origin: CGPoint(x: line.origin.x - pvecx, y: line.origin.y - pvecy), outpost: CGPoint(x: line.outpost.x - pvecx, y: line.outpost.y - pvecy))
+        //Translate the line perpindicular to its own direction by one radius
+        let lmag = line.origin | line.outpost
+        let lvecx = (line.outpost.x - line.origin.x) * radius / lmag
+        let lvecy = (line.outpost.y - line.origin.y) * radius / lmag
+        let translatedOne = Line(origin: CGPoint(x: line.origin.x - lvecy, y: line.origin.y + lvecx), outpost: CGPoint(x: line.outpost.x - lvecy, y: line.outpost.y + lvecx))
+        let translatedTwo = Line(origin: CGPoint(x: line.origin.x + lvecy, y: line.origin.y - lvecx), outpost: CGPoint(x: line.outpost.x + lvecy, y: line.outpost.y - lvecx))
         var ret: [CGPoint] = []
-        if let intersection = intersection(between: translated, and: player) {
+        //Check translated lines against the player line
+        if let intersection = intersection(between: translatedOne, and: player) {
             ret.append(intersection)
         }
+        if let intersection = intersection(between: translatedTwo, and: player) {
+            ret.append(intersection)
+        }
+        //Check player line against line endpoints
         ret.append(contentsOf: caps(of: line.origin, against: player))
         ret.append(contentsOf: caps(of: line.outpost, against: player))
         return ret

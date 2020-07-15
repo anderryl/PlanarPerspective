@@ -108,25 +108,30 @@ class MotionBuilder: Builder {
         }
         
         //Build test path
+        //Compile DrawItems in both colors
+        var items: [DrawItem] = []
         var reds: [Line] = []
         if test != nil {
             if let contact = level.contact.findContact(from: path.last!, to: test!) {
                 blacks.append(contentsOf: dotline(from: path.last!, to: contact))
                 reds.append(contentsOf: dotline(from: contact, to: test!))
+                items.append(.CIRCLE(contact, 10, .init(srgbRed: 1, green: 0, blue: 0, alpha: 0.5), 3))
+                items.append(.CIRCLE(test!, 10, .init(srgbRed: 1, green: 0, blue: 0, alpha: 0.5), 3))
             }
             else {
                 blacks.append(contentsOf: dotline(from: path.last!, to: test!))
+                items.append(.CIRCLE(test!, 10, .init(srgbRed: 0, green: 0, blue: 0, alpha: 0.5), 3))
             }
         }
-        
-        //Compile DrawItems in both colors
-        var lines: [DrawItem] = []
+        else {
+            items.append(.CIRCLE(queue.last!, 10, .init(srgbRed: 0, green: 0, blue: 0, alpha: 0.5), 3))
+        }
         for line in blacks {
-            lines.append(.LINE(line.origin, line.outpost, .init(srgbRed: 0, green: 0, blue: 0, alpha: 1), 2))
+            items.append(.LINE(line.origin, line.outpost, .init(srgbRed: 0, green: 0, blue: 0, alpha: 1), 2))
         }
         for line in reds {
-            lines.append(.LINE(line.origin, line.outpost, .init(srgbRed: 1, green: 0, blue: 0, alpha: 1), 2))
+            items.append(.LINE(line.origin, line.outpost, .init(srgbRed: 1, green: 0, blue: 0, alpha: 1), 2))
         }
-        return lines
+        return items
     }
 }
