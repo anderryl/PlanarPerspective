@@ -214,9 +214,9 @@ class ProjectionHandler {
     static func unfold(point: CGPoint, onto position: Position, from plane: Plane) -> Vertex {
         switch plane {
         case .TOP:
-            return Vertex(x: point.x, y: position.y, z: -point.y)
-        case .BOTTOM:
             return Vertex(x: point.x, y: position.y, z: point.y)
+        case .BOTTOM:
+            return Vertex(x: point.x, y: position.y, z: -point.y)
         case .LEFT:
             return Vertex(x: position.x, y: point.y, z: -point.x)
         case .RIGHT:
