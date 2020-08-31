@@ -22,7 +22,6 @@ class TransitionCompiler: Compiler {
     internal var player: PlayerBuilder
     internal var goal: GoalBuilder
     
-    
     init(level: LevelView, initial: Plane, final: Plane, length: Int) {
         self.level = level
         self.initial = initial

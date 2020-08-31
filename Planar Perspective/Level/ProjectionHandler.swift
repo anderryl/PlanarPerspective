@@ -129,7 +129,7 @@ class ProjectionHandler {
             func transform(_ polygon: Polygon) -> Polygon {
                 var vertices: [Vertex] = []
                 for vertex in polygon.vertices {
-                    let new = Vertex(x: vertex.x, y: vertex.z, z: vertex.y)
+                    let new = Vertex(x: vertex.x, y: vertex.z, z: -vertex.y)
                     vertices.append(new)
                 }
                 return Polygon(vertices: vertices)
@@ -139,7 +139,7 @@ class ProjectionHandler {
             func transform(_ polygon: Polygon) -> Polygon {
                 var vertices: [Vertex] = []
                 for vertex in polygon.vertices {
-                    let new = Vertex(x: vertex.x, y: -vertex.z, z: -vertex.y)
+                    let new = Vertex(x: vertex.x, y: -vertex.z, z: vertex.y)
                     vertices.append(new)
                 }
                 return Polygon(vertices: vertices)
@@ -191,10 +191,10 @@ class ProjectionHandler {
     static func compress(vertex: Vertex, onto plane: Plane) -> Vertex {
         switch plane {
         case .TOP:
-            let new = Vertex(x: vertex.x, y: vertex.z, z: vertex.y)
+            let new = Vertex(x: vertex.x, y: vertex.z, z: -vertex.y)
             return new
         case .BOTTOM:
-            let new = Vertex(x: vertex.x, y: -vertex.z, z: -vertex.y)
+            let new = Vertex(x: vertex.x, y: -vertex.z, z: vertex.y)
             return new
         case .LEFT:
             let new = Vertex(x: -vertex.z, y: vertex.y, z: vertex.x)
@@ -214,9 +214,9 @@ class ProjectionHandler {
     static func unfold(point: CGPoint, onto position: Position, from plane: Plane) -> Vertex {
         switch plane {
         case .TOP:
-            return Vertex(x: point.x, y: position.y, z: point.y)
-        case .BOTTOM:
             return Vertex(x: point.x, y: position.y, z: -point.y)
+        case .BOTTOM:
+            return Vertex(x: point.x, y: position.y, z: point.y)
         case .LEFT:
             return Vertex(x: position.x, y: point.y, z: -point.x)
         case .RIGHT:
