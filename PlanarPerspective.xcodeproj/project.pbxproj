@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7A2DC85225068D55006CB549 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A2DC85125068D55006CB549 /* State.swift */; };
 		F2129881249B08B400C98F32 /* PlayerBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2129880249B08B400C98F32 /* PlayerBuilder.swift */; };
 		F2129883249D492800C98F32 /* ContactHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2129882249D492800C98F32 /* ContactHandler.swift */; };
 		F2473F7524A2EBEE00EF3142 /* GoalBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2473F7424A2EBEE00EF3142 /* GoalBuilder.swift */; };
@@ -21,7 +22,6 @@
 		F28179C22496B64400EC9243 /* MotionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28179C12496B64400EC9243 /* MotionHandler.swift */; };
 		F285C54E248730630030D75A /* CompressionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F285C54D248730630030D75A /* CompressionHandler.swift */; };
 		F2A057AD2491C64C005342D1 /* TransitionCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A057AC2491C64C005342D1 /* TransitionCompiler.swift */; };
-		F2A057AF2491CA8C005342D1 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A057AE2491CA8C005342D1 /* State.swift */; };
 		F2A057B12491CF68005342D1 /* InputHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A057B02491CF68005342D1 /* InputHandler.swift */; };
 		F2CF9AE524705C8E008397E6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CF9AE424705C8E008397E6 /* AppDelegate.swift */; };
 		F2CF9AE724705C8E008397E6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CF9AE624705C8E008397E6 /* SceneDelegate.swift */; };
@@ -56,6 +56,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7A2DC85125068D55006CB549 /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
 		F2129880249B08B400C98F32 /* PlayerBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerBuilder.swift; sourceTree = "<group>"; };
 		F2129882249D492800C98F32 /* ContactHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactHandler.swift; sourceTree = "<group>"; };
 		F2473F7424A2EBEE00EF3142 /* GoalBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalBuilder.swift; sourceTree = "<group>"; };
@@ -70,7 +71,6 @@
 		F28179C12496B64400EC9243 /* MotionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionHandler.swift; sourceTree = "<group>"; };
 		F285C54D248730630030D75A /* CompressionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionHandler.swift; sourceTree = "<group>"; };
 		F2A057AC2491C64C005342D1 /* TransitionCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionCompiler.swift; sourceTree = "<group>"; };
-		F2A057AE2491CA8C005342D1 /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = State.swift; path = "Planar Perspective/Level/State.swift"; sourceTree = SOURCE_ROOT; };
 		F2A057B02491CF68005342D1 /* InputHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHandler.swift; sourceTree = "<group>"; };
 		F2CF9AE124705C8E008397E6 /* Perspective.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perspective.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2CF9AE424705C8E008397E6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -80,10 +80,10 @@
 		F2CF9AED24705C8F008397E6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F2CF9AF024705C8F008397E6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F2CF9AF224705C8F008397E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		F2CF9AF724705C8F008397E6 /* Planar PerspectiveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Planar PerspectiveTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2CF9AF724705C8F008397E6 /* PlanarPerspectiveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PlanarPerspectiveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2CF9AFB24705C8F008397E6 /* Planar_PerspectiveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Planar_PerspectiveTests.swift; sourceTree = "<group>"; };
 		F2CF9AFD24705C8F008397E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		F2CF9B0224705C8F008397E6 /* Planar PerspectiveUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Planar PerspectiveUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2CF9B0224705C8F008397E6 /* PlanarPerspectiveUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PlanarPerspectiveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2CF9B0624705C90008397E6 /* Planar_PerspectiveUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Planar_PerspectiveUITests.swift; sourceTree = "<group>"; };
 		F2CF9B0824705C90008397E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F2D92155248894F4007809F7 /* RenderHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderHandler.swift; sourceTree = "<group>"; };
@@ -122,7 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				F2553B2F2473374C0089F132 /* LevelView.swift */,
-				F2A057AE2491CA8C005342D1 /* State.swift */,
+				7A2DC85125068D55006CB549 /* State.swift */,
 				F2553B3A24733AEA0089F132 /* Plane.swift */,
 				F2D92155248894F4007809F7 /* RenderHandler.swift */,
 				F285C54D248730630030D75A /* CompressionHandler.swift */,
@@ -156,9 +156,9 @@
 		F2CF9AD824705C8E008397E6 = {
 			isa = PBXGroup;
 			children = (
-				F2CF9AE324705C8E008397E6 /* Planar Perspective */,
-				F2CF9AFA24705C8F008397E6 /* Planar PerspectiveTests */,
-				F2CF9B0524705C8F008397E6 /* Planar PerspectiveUITests */,
+				F2CF9AE324705C8E008397E6 /* PlanarPerspective */,
+				F2CF9AFA24705C8F008397E6 /* PlanarPerspectiveTests */,
+				F2CF9B0524705C8F008397E6 /* PlanarPerspectiveUITests */,
 				F2CF9AE224705C8E008397E6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -167,13 +167,13 @@
 			isa = PBXGroup;
 			children = (
 				F2CF9AE124705C8E008397E6 /* Perspective.app */,
-				F2CF9AF724705C8F008397E6 /* Planar PerspectiveTests.xctest */,
-				F2CF9B0224705C8F008397E6 /* Planar PerspectiveUITests.xctest */,
+				F2CF9AF724705C8F008397E6 /* PlanarPerspectiveTests.xctest */,
+				F2CF9B0224705C8F008397E6 /* PlanarPerspectiveUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		F2CF9AE324705C8E008397E6 /* Planar Perspective */ = {
+		F2CF9AE324705C8E008397E6 /* PlanarPerspective */ = {
 			isa = PBXGroup;
 			children = (
 				F2CF9AE424705C8E008397E6 /* AppDelegate.swift */,
@@ -186,33 +186,33 @@
 				F2CF9AEF24705C8F008397E6 /* LaunchScreen.storyboard */,
 				F2CF9AF224705C8F008397E6 /* Info.plist */,
 			);
-			path = "Planar Perspective";
+			path = PlanarPerspective;
 			sourceTree = "<group>";
 		};
-		F2CF9AFA24705C8F008397E6 /* Planar PerspectiveTests */ = {
+		F2CF9AFA24705C8F008397E6 /* PlanarPerspectiveTests */ = {
 			isa = PBXGroup;
 			children = (
 				F2CF9AFB24705C8F008397E6 /* Planar_PerspectiveTests.swift */,
 				F2CF9AFD24705C8F008397E6 /* Info.plist */,
 			);
-			path = "Planar PerspectiveTests";
+			path = PlanarPerspectiveTests;
 			sourceTree = "<group>";
 		};
-		F2CF9B0524705C8F008397E6 /* Planar PerspectiveUITests */ = {
+		F2CF9B0524705C8F008397E6 /* PlanarPerspectiveUITests */ = {
 			isa = PBXGroup;
 			children = (
 				F2CF9B0624705C90008397E6 /* Planar_PerspectiveUITests.swift */,
 				F2CF9B0824705C90008397E6 /* Info.plist */,
 			);
-			path = "Planar PerspectiveUITests";
+			path = PlanarPerspectiveUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		F2CF9AE024705C8E008397E6 /* Planar Perspective */ = {
+		F2CF9AE024705C8E008397E6 /* PlanarPerspective */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F2CF9B0B24705C90008397E6 /* Build configuration list for PBXNativeTarget "Planar Perspective" */;
+			buildConfigurationList = F2CF9B0B24705C90008397E6 /* Build configuration list for PBXNativeTarget "PlanarPerspective" */;
 			buildPhases = (
 				F2CF9ADD24705C8E008397E6 /* Sources */,
 				F2CF9ADE24705C8E008397E6 /* Frameworks */,
@@ -222,14 +222,14 @@
 			);
 			dependencies = (
 			);
-			name = "Planar Perspective";
+			name = PlanarPerspective;
 			productName = "Planar Perspective";
 			productReference = F2CF9AE124705C8E008397E6 /* Perspective.app */;
 			productType = "com.apple.product-type.application";
 		};
-		F2CF9AF624705C8F008397E6 /* Planar PerspectiveTests */ = {
+		F2CF9AF624705C8F008397E6 /* PlanarPerspectiveTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F2CF9B0E24705C90008397E6 /* Build configuration list for PBXNativeTarget "Planar PerspectiveTests" */;
+			buildConfigurationList = F2CF9B0E24705C90008397E6 /* Build configuration list for PBXNativeTarget "PlanarPerspectiveTests" */;
 			buildPhases = (
 				F2CF9AF324705C8F008397E6 /* Sources */,
 				F2CF9AF424705C8F008397E6 /* Frameworks */,
@@ -240,14 +240,14 @@
 			dependencies = (
 				F2CF9AF924705C8F008397E6 /* PBXTargetDependency */,
 			);
-			name = "Planar PerspectiveTests";
+			name = PlanarPerspectiveTests;
 			productName = "Planar PerspectiveTests";
-			productReference = F2CF9AF724705C8F008397E6 /* Planar PerspectiveTests.xctest */;
+			productReference = F2CF9AF724705C8F008397E6 /* PlanarPerspectiveTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		F2CF9B0124705C8F008397E6 /* Planar PerspectiveUITests */ = {
+		F2CF9B0124705C8F008397E6 /* PlanarPerspectiveUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F2CF9B1124705C90008397E6 /* Build configuration list for PBXNativeTarget "Planar PerspectiveUITests" */;
+			buildConfigurationList = F2CF9B1124705C90008397E6 /* Build configuration list for PBXNativeTarget "PlanarPerspectiveUITests" */;
 			buildPhases = (
 				F2CF9AFE24705C8F008397E6 /* Sources */,
 				F2CF9AFF24705C8F008397E6 /* Frameworks */,
@@ -258,9 +258,9 @@
 			dependencies = (
 				F2CF9B0424705C8F008397E6 /* PBXTargetDependency */,
 			);
-			name = "Planar PerspectiveUITests";
+			name = PlanarPerspectiveUITests;
 			productName = "Planar PerspectiveUITests";
-			productReference = F2CF9B0224705C8F008397E6 /* Planar PerspectiveUITests.xctest */;
+			productReference = F2CF9B0224705C8F008397E6 /* PlanarPerspectiveUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -286,7 +286,7 @@
 					};
 				};
 			};
-			buildConfigurationList = F2CF9ADC24705C8E008397E6 /* Build configuration list for PBXProject "Planar Perspective" */;
+			buildConfigurationList = F2CF9ADC24705C8E008397E6 /* Build configuration list for PBXProject "PlanarPerspective" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -299,9 +299,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				F2CF9AE024705C8E008397E6 /* Planar Perspective */,
-				F2CF9AF624705C8F008397E6 /* Planar PerspectiveTests */,
-				F2CF9B0124705C8F008397E6 /* Planar PerspectiveUITests */,
+				F2CF9AE024705C8E008397E6 /* PlanarPerspective */,
+				F2CF9AF624705C8F008397E6 /* PlanarPerspectiveTests */,
+				F2CF9B0124705C8F008397E6 /* PlanarPerspectiveUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -355,12 +355,12 @@
 				F2D92158248B13DF007809F7 /* StaticCompiler.swift in Sources */,
 				F2553B3924733A430089F132 /* LineBuilder.swift in Sources */,
 				F2CF9AE924705C8E008397E6 /* ViewController.swift in Sources */,
-				F2A057AF2491CA8C005342D1 /* State.swift in Sources */,
 				F28179C02495D4D800EC9243 /* MotionBuilder.swift in Sources */,
 				F2553B302473374C0089F132 /* LevelView.swift in Sources */,
 				F2CF9AE524705C8E008397E6 /* AppDelegate.swift in Sources */,
 				F28179C22496B64400EC9243 /* MotionHandler.swift in Sources */,
 				F2129881249B08B400C98F32 /* PlayerBuilder.swift in Sources */,
+				7A2DC85225068D55006CB549 /* State.swift in Sources */,
 				F2CF9AE724705C8E008397E6 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -386,12 +386,12 @@
 /* Begin PBXTargetDependency section */
 		F2CF9AF924705C8F008397E6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = F2CF9AE024705C8E008397E6 /* Planar Perspective */;
+			target = F2CF9AE024705C8E008397E6 /* PlanarPerspective */;
 			targetProxy = F2CF9AF824705C8F008397E6 /* PBXContainerItemProxy */;
 		};
 		F2CF9B0424705C8F008397E6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = F2CF9AE024705C8E008397E6 /* Planar Perspective */;
+			target = F2CF9AE024705C8E008397E6 /* PlanarPerspective */;
 			targetProxy = F2CF9B0324705C8F008397E6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -536,7 +536,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = S3YGJ987U4;
-				INFOPLIST_FILE = "Planar Perspective/Info.plist";
+				INFOPLIST_FILE = PlanarPerspective/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -554,7 +554,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = S3YGJ987U4;
-				INFOPLIST_FILE = "Planar Perspective/Info.plist";
+				INFOPLIST_FILE = PlanarPerspective/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -584,7 +584,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Planar Perspective.app/Planar Perspective";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PlanarPerspective.app/PlanarPerspective";
 			};
 			name = Debug;
 		};
@@ -606,7 +606,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Planar Perspective.app/Planar Perspective";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PlanarPerspective.app/PlanarPerspective";
 			};
 			name = Release;
 		};
@@ -653,7 +653,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		F2CF9ADC24705C8E008397E6 /* Build configuration list for PBXProject "Planar Perspective" */ = {
+		F2CF9ADC24705C8E008397E6 /* Build configuration list for PBXProject "PlanarPerspective" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F2CF9B0924705C90008397E6 /* Debug */,
@@ -662,7 +662,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F2CF9B0B24705C90008397E6 /* Build configuration list for PBXNativeTarget "Planar Perspective" */ = {
+		F2CF9B0B24705C90008397E6 /* Build configuration list for PBXNativeTarget "PlanarPerspective" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F2CF9B0C24705C90008397E6 /* Debug */,
@@ -671,7 +671,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F2CF9B0E24705C90008397E6 /* Build configuration list for PBXNativeTarget "Planar PerspectiveTests" */ = {
+		F2CF9B0E24705C90008397E6 /* Build configuration list for PBXNativeTarget "PlanarPerspectiveTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F2CF9B0F24705C90008397E6 /* Debug */,
@@ -680,7 +680,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F2CF9B1124705C90008397E6 /* Build configuration list for PBXNativeTarget "Planar PerspectiveUITests" */ = {
+		F2CF9B1124705C90008397E6 /* Build configuration list for PBXNativeTarget "PlanarPerspectiveUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F2CF9B1224705C90008397E6 /* Debug */,
