@@ -7,10 +7,12 @@
 //
 
 import Foundation
+import CoreGraphics
 
 class GraphicsHandler {
     unowned var level: LevelView
     var compiler: Compiler
+    var state: Int = 0
     
     init(level: LevelView) {
         self.level = level
@@ -22,6 +24,12 @@ class GraphicsHandler {
         compiler = TransitionCompiler(level: level, initial: initial, final: final, length: 60)
     }
     
+    func registerInvalid(at point: CGPoint) {
+        if let stat = compiler as? StaticCompiler {
+            stat.registerInvalid(at: point)
+        }
+    }
+    
     func build() -> [DrawItem] {
         if compiler is TransitionCompiler {
             if (compiler as! TransitionCompiler).status() {
@@ -29,6 +37,7 @@ class GraphicsHandler {
                 level.state = .REST
             }
         }
-        return compiler.compile()
+        state += 1
+        return compiler.compile(state: state)
     }
 }

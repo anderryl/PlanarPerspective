@@ -16,7 +16,7 @@ class GoalBuilder: Builder {
         self.level = level
     }
     
-    func build(from transform: Transform) -> [DrawItem] {
+    func build(from transform: Transform, state: Int) -> [DrawItem] {
         let flat = transform(Polygon(vertices: [level.goal.origin, level.goal.outpost]))
         let lines = flat.lines()
         let one = lines.first!.origin

@@ -32,15 +32,15 @@ class LogicHandler {
         switch level.state {
         case .REST:
             let pos = ProjectionHandler.compress(vertex: level.position, onto: level.plane)
-            if level.contact.findContact(from: pos.flatten(), to: point) != nil {
-                //Negative feedback
+            if let contact = level.contact.findContact(from: pos.flatten(), to: point) {
+                level.graphics.registerInvalid(at: contact)
                 return
             }
             level.state = .MOTION([point])
             level.motion.input()
         case .MOTION(var queue):
-            if level.contact.findContact(from: queue.last!, to: point) != nil {
-                //Negative feedback
+            if let contact = level.contact.findContact(from: queue.last!, to: point) {
+                level.graphics.registerInvalid(at: contact)
                 return
             }
             queue.append(point)

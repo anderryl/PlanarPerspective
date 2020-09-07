@@ -17,10 +17,32 @@ class PlayerBuilder: Builder {
         self.level = level
     }
     
-    func build(from transform: Transform) -> [DrawItem] {
+    func build(from transform: Transform, state: Int) -> [DrawItem] {
         let pos: CGPoint = transform(Polygon(vertices: [level.position])).vertices[0].flatten()
         loc = pos
-        return [DrawItem.CIRCLE(pos, 10.0, .init(srgbRed: 0, green: 0, blue: 0, alpha: 1), 3)]
+        let base = 10.0
+        let variation = 0.5
+        let rounds = 3
+        let points = 8
+        let speed = 8.0
+        let path: CGMutablePath = CGMutablePath()
+        func place(_ arc: Double) -> CGPoint {
+            let x = cos(arc) * (base + variation * sin(Double(rounds) * arc + Double(state) / speed))
+            let y = sin(arc) * (base + variation * sin(Double(rounds) * arc - Double(state) / speed))
+            return CGPoint(x: CGFloat(x) + pos.x, y: CGFloat(y) + pos.y)
+        }
+        let initial = place(0)
+        path.move(to: initial)
+        var history: [CGPoint] = [initial]
+        for i in 1 ..< points * rounds {
+            let arc = Double(i) / Double(points * rounds) * 3.14159 * 2.0
+            history.append(place(arc))
+        }
+        history.append(initial)
+        path.addLines(between: history)
+        path.closeSubpath()
+        return [DrawItem.PATH(path, .init(srgbRed: 0, green: 0, blue: 0, alpha: 1), 3)]
+        //return [DrawItem.CIRCLE(pos, 10.0, .init(srgbRed: 0, green: 0, blue: 0, alpha: 1), 3)]
     }
     
     func location() -> CGPoint {

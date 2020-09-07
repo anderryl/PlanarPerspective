@@ -43,23 +43,23 @@ class TransitionCompiler: Compiler {
         return false
     }
     
-    func compile() -> [DrawItem] {
+    func compile(state: Int) -> [DrawItem] {
         frame += 1
         let prog = CGFloat(frame) / CGFloat(length)
         var items: [DrawItem] = []
         let transform: Transform = factory(prog)
-        items.append(contentsOf: lines.build(from: transform))
-        items.append(contentsOf: motion.build(from: transform))
-        items.append(contentsOf: player.build(from: transform))
-        items.append(contentsOf: goal.build(from: transform))
+        items.append(contentsOf: lines.build(from: transform, state: state))
+        items.append(contentsOf: motion.build(from: transform, state: state))
+        items.append(contentsOf: player.build(from: transform, state: state))
+        items.append(contentsOf: goal.build(from: transform, state: state))
         
         var translated: [DrawItem] = []
-        let rot: CGAffineTransform = CGAffineTransform(rotationAngle: prog * rotation)
+        var rot: CGAffineTransform = CGAffineTransform(rotationAngle: prog * rotation)
         let location = player.location().applying(rot)
         
         let dx = level.frame.width / 2 - location.x
         let dy = level.frame.height / 2 - location.y
-        let slide = CGAffineTransform(translationX: dx, y: dy)
+        var slide = CGAffineTransform(translationX: dx, y: dy)
         for item in items {
             switch item {
             case .CIRCLE(let center, let radius, let color, let layer):
@@ -76,6 +76,8 @@ class TransitionCompiler: Compiler {
                 translated.append(.PATH(path, color, layer))
             case .LINE(let origin, let outpost, let color, let layer):
                 translated.append(.LINE(origin.applying(rot).applying(slide), outpost.applying(rot).applying(slide), color, layer))
+            case .PATH(let path, let color, let layer):
+                translated.append(.PATH(path.copy(using: &rot)!.copy(using: &slide)!, color, layer))
             default:
                 break
             }

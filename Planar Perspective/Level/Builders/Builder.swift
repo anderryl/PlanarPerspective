@@ -14,5 +14,5 @@ protocol Builder {
     
     init(level: LevelView)
     
-    func build(from: Transform) -> [DrawItem]
+    func build(from: Transform, state: Int) -> [DrawItem]
 }

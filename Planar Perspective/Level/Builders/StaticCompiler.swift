@@ -28,17 +28,21 @@ class StaticCompiler: Compiler {
         goal = GoalBuilder(level: level)
     }
     
-    func compile() -> [DrawItem] {
+    func registerInvalid(at point: CGPoint) {
+        motion.registerInvalid(at: point)
+    }
+    
+    func compile(state: Int) -> [DrawItem] {
         var items: [DrawItem] = []
-        items.append(contentsOf: lines.build(from: transform))
-        items.append(contentsOf: motion.build(from: transform))
-        items.append(contentsOf: player.build(from: transform))
-        items.append(contentsOf: goal.build(from: transform))
+        items.append(contentsOf: lines.build(from: transform, state: state))
+        items.append(contentsOf: motion.build(from: transform, state: state))
+        items.append(contentsOf: player.build(from: transform, state: state))
+        items.append(contentsOf: goal.build(from: transform, state: state))
         var translated: [DrawItem] = []
         let location = player.location()
         let dx = level.frame.width / 2 - location.x
         let dy = level.frame.height / 2 - location.y
-        let translation = CGAffineTransform(translationX: dx, y: dy)
+        var translation = CGAffineTransform(translationX: dx, y: dy)
         for item in items {
             switch item {
             case .CIRCLE(let position, let radius, let color, let layer):
@@ -47,8 +51,8 @@ class StaticCompiler: Compiler {
                 translated.append(.RECTANGLE(position.applying(translation), size, color, layer))
             case .LINE(let origin, let outpost, let color, let layer):
                 translated.append(.LINE(origin.applying(translation), outpost.applying(translation), color, layer))
-            default:
-                break
+            case .PATH(let path, let color, let layer):
+                translated.append(.PATH(path.copy(using: &translation)!, color, layer))
             }
         }
         return translated

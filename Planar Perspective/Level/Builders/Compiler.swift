@@ -9,5 +9,5 @@
 import Foundation
 
 protocol Compiler {
-    func compile() -> [DrawItem]
+    func compile(state: Int) -> [DrawItem]
 }

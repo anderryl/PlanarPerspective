@@ -91,8 +91,13 @@ struct Line {
 typealias Goal = Edge
 
 //Cause it looks like a line segment and line segments have length
-extension CGPoint {
+extension CGPoint: Hashable {
     static func |(_ lhs: CGPoint, _ rhs: CGPoint) -> CGFloat {
         return sqrt(pow(rhs.x - lhs.x, 2.0) + pow(rhs.y - lhs.y, 2.0))
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(x)
+        hasher.combine(y)
     }
 }
