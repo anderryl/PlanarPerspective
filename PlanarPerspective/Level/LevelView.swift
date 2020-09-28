@@ -21,15 +21,22 @@ class LevelView: UIView {
     var input: InputHandler!
     var motion: MotionHandler!
     var contact: ContactHandler!
-    var polygons: [Polygon] = [Polygon(vertices: [Vertex(x: 90, y: 115, z: 77), Vertex(x: 100, y: 135, z: 77), Vertex(x: 100, y: 70, z: 77), Vertex(x: 80, y: 80, z: 77)]), Polygon(vertices: [Vertex(x: 70, y: 125, z: 87), Vertex(x: 90, y: 145, z: 87), Vertex(x: 125, y: 70, z: 87), Vertex(x: 60, y: 80, z: 87)])]
-    var goal: Goal = Goal(origin: Vertex(x: 500, y: 550, z: 600), outpost: Vertex(x: 450, y: 400, z: 350))
+    var polygons: [Polygon]!
+    var goal: Goal!
     var display: CADisplayLink?
     var state: State = .REST
     var plane: Plane = .FRONT
-    var position: Position = Position(x: 200, y: 200, z: 200)
+    var position: Position!
     
-    override init(frame: CGRect) {
+    init(frame: CGRect, level: Level) {
         super.init(frame: frame)
+        var new = Level(polygons: polygons, goal: goal, position: position)
+        let encoder = JSONEncoder()
+        let data = try? encoder.encode(new)
+        
+        polygons = level.polygons
+        goal = level.goal
+        position = level.position
         graphics = GraphicsHandler(level: self)
         renderer = RenderHandler()
         compression = CompressionHandler(level: self)

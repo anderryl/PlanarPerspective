@@ -12,7 +12,7 @@ import UIKit
 class MotionBuilder: Builder {
     var level: LevelView
     private let frames: Int = 50
-    private var invalids: [CGPoint : Double] = [:]
+    private var invalids: [CGPoint : (intensity: Double, origin: CGPoint)] = [:]
     
     required init(level: LevelView) {
         self.level = level
@@ -36,18 +36,27 @@ class MotionBuilder: Builder {
     }
     
     func registerInvalid(at point: CGPoint) {
-        invalids[point] = 1.0
+        var end: CGPoint
+        switch level.state {
+        case .MOTION(let queue):
+            end = queue.last!
+        case .REST:
+            end = ProjectionHandler.compress(vertex: level.position, onto: level.plane).flatten()
+        default:
+            return
+        }
+        invalids[point] = (intensity: 1.0, origin: end)
     }
     
     private func generateInvalids(from position: CGPoint, state: Int) -> [DrawItem] {
         var items: [DrawItem] = []
         
         for fail in invalids.keys {
-            let color: CGColor = .init(srgbRed: 1, green: 0, blue: 0, alpha: CGFloat(invalids[fail]!))
-            items.append(.LINE(position, fail, color, 2))
+            let color: CGColor = .init(srgbRed: 1, green: 0, blue: 0, alpha: CGFloat(invalids[fail]!.intensity))
+            items.append(.LINE(invalids[fail]!.origin, fail, color, 2))
             items.append(fauxPlayer(at: fail, in: color, state: state))
-            if let intensity = invalids[fail], intensity > 0 {
-                invalids[fail] = intensity - 0.02
+            if let intensity = invalids[fail]?.intensity, intensity > 0 {
+                invalids[fail]?.intensity = intensity - 0.02
             }
             else {
                 invalids.removeValue(forKey: fail)

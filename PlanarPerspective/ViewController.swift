@@ -12,9 +12,12 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let level = LevelView.init(frame: view.frame)
-        view.addSubview(level)
+        let level = loadLevel(called: "OriginalTest")
+        let subview = LevelView.init(frame: view.frame, level: level)
+        //LevelView.init(frame: view.frame)
+        view.addSubview(subview)
     }
+    
     //Loads a level by name
     func loadLevel(called name: String) -> Level {
         let data = getFileData(filename: name)!

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		7A2DC85225068D55006CB549 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A2DC85125068D55006CB549 /* State.swift */; };
+		7A3B1BAF25223E6F00227D0C /* ORIGINALTEST.json in Resources */ = {isa = PBXBuildFile; fileRef = 7A3B1BAE25223E6F00227D0C /* ORIGINALTEST.json */; };
+		7AA9361F251B089D00D88952 /* TestLevel.json in Resources */ = {isa = PBXBuildFile; fileRef = 7AA9361E251B089D00D88952 /* TestLevel.json */; };
 		F2129881249B08B400C98F32 /* PlayerBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2129880249B08B400C98F32 /* PlayerBuilder.swift */; };
 		F2129883249D492800C98F32 /* ContactHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2129882249D492800C98F32 /* ContactHandler.swift */; };
 		F2473F7524A2EBEE00EF3142 /* GoalBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2473F7424A2EBEE00EF3142 /* GoalBuilder.swift */; };
@@ -57,6 +59,8 @@
 
 /* Begin PBXFileReference section */
 		7A2DC85125068D55006CB549 /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
+		7A3B1BAE25223E6F00227D0C /* ORIGINALTEST.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ORIGINALTEST.json; sourceTree = "<group>"; };
+		7AA9361E251B089D00D88952 /* TestLevel.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = TestLevel.json; sourceTree = "<group>"; };
 		F2129880249B08B400C98F32 /* PlayerBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerBuilder.swift; sourceTree = "<group>"; };
 		F2129882249D492800C98F32 /* ContactHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactHandler.swift; sourceTree = "<group>"; };
 		F2473F7424A2EBEE00EF3142 /* GoalBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalBuilder.swift; sourceTree = "<group>"; };
@@ -118,6 +122,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7AA9361D251B088800D88952 /* LevelData */ = {
+			isa = PBXGroup;
+			children = (
+				7A3B1BAE25223E6F00227D0C /* ORIGINALTEST.json */,
+				7AA9361E251B089D00D88952 /* TestLevel.json */,
+			);
+			path = LevelData;
+			sourceTree = "<group>";
+		};
 		F24ABBBD249ED13900DCA774 /* Level */ = {
 			isa = PBXGroup;
 			children = (
@@ -181,6 +194,7 @@
 				F2CF9AE824705C8E008397E6 /* ViewController.swift */,
 				F4ECA39C24A7846300CCB385 /* Level.swift */,
 				F2CF9AEA24705C8E008397E6 /* Main.storyboard */,
+				7AA9361D251B088800D88952 /* LevelData */,
 				F24ABBBD249ED13900DCA774 /* Level */,
 				F2CF9AED24705C8F008397E6 /* Assets.xcassets */,
 				F2CF9AEF24705C8F008397E6 /* LaunchScreen.storyboard */,
@@ -312,7 +326,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				F2CF9AF124705C8F008397E6 /* LaunchScreen.storyboard in Resources */,
+				7A3B1BAF25223E6F00227D0C /* ORIGINALTEST.json in Resources */,
 				F2CF9AEE24705C8F008397E6 /* Assets.xcassets in Resources */,
+				7AA9361F251B089D00D88952 /* TestLevel.json in Resources */,
 				F2CF9AEC24705C8E008397E6 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
