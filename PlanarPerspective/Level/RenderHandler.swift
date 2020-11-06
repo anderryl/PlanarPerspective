@@ -9,12 +9,12 @@
 import Foundation
 import UIKit
 
+//Delegate class for rendering the view with each frame
 class RenderHandler {
+    //Called before each frame with DrawItems and a context to draw them into
     func render(items: [DrawItem], context: CGContext?) {
-        var lines: [DrawItem] = []
-        var rectangles: [DrawItem] = []
-        var circles: [DrawItem] = []
-        var paths: [DrawItem] = []
+        
+        //Subfunction to add an item to a layer based on priority
         var layers: [Int : [DrawItem]] = [:]
         func append(item: DrawItem, at priority: Int) {
             if var layer = layers[priority] {
@@ -25,79 +25,26 @@ class RenderHandler {
                 layers[priority] = [item]
             }
         }
+        
+        //Build layers based on priority
         for item in items {
             switch item {
             case .LINE(_, _, _, let layer):
                 append(item: item, at: layer)
-                //lines.append(item)
-                /*context?.addLines(between: [origin, outpost])
-                context?.setStrokeColor(color)
-                context?.setLineCap(.round)
-                context?.setLineWidth(2)
-                context?.strokePath()*/
             case .CIRCLE(_, _, _, let layer):
                 append(item: item, at: layer)
-                //circles.append(item)
-                /*context?.setFillColor(color)
-                context?.fillEllipse(in: CGRect(origin: CGPoint(x: position.x - radius, y: position.y - radius), size: CGSize(width: radius * 2, height: radius * 2)))*/
             case .RECTANGLE(_, _, _, let layer):
                 append(item: item, at: layer)
-                //rectangles.append(item)
-                /*context?.setFillColor(color)
-                context?.fill(CGRect(origin: origin, size: size))*/
             case .PATH(_, _, let layer):
                 append(item: item, at: layer)
-                //paths.append(item)
             }
         }
         
-        /*for line in lines {
-            switch line {
-            case .LINE(let origin, let outpost, let color):
-                context?.addLines(between: [origin, outpost])
-                context?.setStrokeColor(color)
-                context?.setLineCap(.round)
-                context?.setLineWidth(2)
-                context?.strokePath()
-                
-            default:
-                continue
-            }
-        }
-        for circle in circles {
-            switch circle {
-            case .CIRCLE(let position, let radius, let color):
-            context?.setFillColor(color)
-            context?.fillEllipse(in: CGRect(origin: CGPoint(x: position.x - radius, y: position.y - radius), size: CGSize(width: radius * 2, height: radius * 2)))
-                
-            default:
-                continue
-            }
-        }
-        
-        for rectangle in rectangles {
-            switch rectangle {
-            case .RECTANGLE(let origin, let size, let color):
-                context?.setFillColor(color)
-                context?.fill(CGRect(origin: origin, size: size))
-                
-            default:
-                continue
-            }
-        }
-        
-        for path in paths {
-            switch path {
-            case .PATH(let path, let color):
-                context?.addPath(path)
-                context?.setFillColor(color)
-                context?.fillPath()
-            default:
-                continue
-            }
-        }*/
+        //Iterates through priorities drawing higher priorities over lower ones
         for layer in layers.keys.sorted() {
+            //Iterates through each item in a given layer
             for item in layers[layer]! {
+                //Each item type is drawn according to its parameters
                 switch item {
                 case .LINE(let origin, let outpost, let color, _):
                     context?.addLines(between: [origin, outpost])

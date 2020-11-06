@@ -12,17 +12,20 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let level = loadLevel(called: "OriginalTest")
+        //Loads a level from a JSON file
+        let level = loadLevel(called: "Living")
+        //Creates and adds a LevelView subview to the view
         let subview = LevelView.init(frame: view.frame, level: level)
-        //LevelView.init(frame: view.frame)
         view.addSubview(subview)
     }
     
     //Loads a level by name
     func loadLevel(called name: String) -> Level {
+        //Retreives Data
         let data = getFileData(filename: name)!
         print(NSString(data: data, encoding: 1)!)
         let decoder = JSONDecoder()
+        //Loads the data as a Level type
         return try! decoder.decode(Level.self, from: data)
     }
     

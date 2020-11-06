@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 
+//Represents a drawable item
 enum DrawItem {
     case LINE(CGPoint, CGPoint, CGColor, Int)
     case CIRCLE(CGPoint, CGFloat, CGColor, Int)

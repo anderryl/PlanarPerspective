@@ -9,8 +9,10 @@
 import Foundation
 import UIKit
 
+//Utility delegate accessed only statically for functions
 class ProjectionHandler {
     
+    //Creates a Transform factory from a transition
     static func transformation(from one: Plane, to two: Plane) -> (rotation: CGFloat, factory: TransformFactory) {
         let first: Transform = component(of: one)
         //let second: Transform = component(of: two)
@@ -32,7 +34,9 @@ class ProjectionHandler {
         return (rotation: comp.rotation, factory: transform(phase:))
     }
     
+    //Finds the rotated transform of a transition state
     static func partialComponent(from first: Plane, to second: Plane) -> (rotation: CGFloat, transform: Transform) {
+        //Rotates a transform counterclockwise
         func counter(_ transform: @escaping Transform) -> (rotation: CGFloat, transform: Transform) {
             func rotation(polygon: Polygon) -> Polygon {
                 let original = transform(polygon)
@@ -44,6 +48,8 @@ class ProjectionHandler {
             }
             return (rotation: -3.14159 / 2, transform: rotation(polygon:))
         }
+        
+        //Rotates a transform clockwise
         func clockwise(_ transform: @escaping Transform) -> (rotation: CGFloat, transform: Transform) {
             func rotation(polygon: Polygon) -> Polygon {
                 let original = transform(polygon)
@@ -56,6 +62,7 @@ class ProjectionHandler {
             return (rotation: 3.14159 / 2, transform: rotation(polygon:))
         }
         
+        //Rotates a transform a half-revolution
         func flip(_ transform: @escaping Transform) -> (rotation: CGFloat, transform: Transform) {
             func rotation(polygon: Polygon) -> Polygon {
                 let original = transform(polygon)
@@ -67,7 +74,11 @@ class ProjectionHandler {
             }
             return (rotation: 3.14159, rotation(polygon:))
         }
+        
+        //The natural transform of the destination plane
         let comp = component(of: second)
+        
+        //Decides on rotation based on plane combination
         switch second {
         case .TOP:
             switch first {
@@ -123,6 +134,7 @@ class ProjectionHandler {
         }
     }
     
+    //Finds the transform for any given plane
     static func component(of plane: Plane) -> Transform {
         switch plane {
         case .TOP:
@@ -188,6 +200,7 @@ class ProjectionHandler {
         }
     }
     
+    //Compresses a three dimensional vertex into two dimensional point on a given plane
     static func compress(vertex: Vertex, onto plane: Plane) -> Vertex {
         switch plane {
         case .TOP:
@@ -211,6 +224,7 @@ class ProjectionHandler {
         }
     }
     
+    //Unfolds a two dimensional from a given point point into the outstanding coordinate of a given position
     static func unfold(point: CGPoint, onto position: Position, from plane: Plane) -> Vertex {
         switch plane {
         case .TOP:

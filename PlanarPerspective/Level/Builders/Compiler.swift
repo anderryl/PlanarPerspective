@@ -8,6 +8,7 @@
 
 import Foundation
 
+//A compiler capable of compiling nessecary visual elements
 protocol Compiler {
     func compile(state: Int) -> [DrawItem]
 }

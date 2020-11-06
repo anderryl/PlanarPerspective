@@ -8,16 +8,20 @@
 
 import Foundation
 
+//Builder for environment lines
 class LineBuilder: Builder {
+    //Supervisor
     unowned var level: LevelView
     
+    //Initializes from supervisor reference
     required init(level: LevelView) {
         self.level = level
     }
     
+    //Compress the polygons and return them as drawable lines
     func  build(from transform: Transform, state: Int) -> [DrawItem] {
         var ret: [DrawItem] = []
-        for line in level.compression!.compress(with: transform, reverse: false) {
+        for line in level.compression!.compress(with: transform) {
             ret.append(.LINE(line.origin, line.outpost, .init(srgbRed: 0.0, green: 0.0, blue: 0.0, alpha: 1.0), 0))
         }
         return ret

@@ -8,6 +8,7 @@
 
 import Foundation
 
+//Data type for storing and accessing level data
 class Level: Codable {
     var polygons: [Polygon]
     var goal: Goal

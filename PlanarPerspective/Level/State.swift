@@ -9,8 +9,10 @@
 import Foundation
 import CoreGraphics
 
+//Represents the current state of the game
 enum State {
     case REST
     case MOTION([CGPoint])
     case TRANSITION(Plane, Plane)
+    case ARRIVED
 }

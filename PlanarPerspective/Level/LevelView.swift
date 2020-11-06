@@ -13,7 +13,11 @@ import UIKit
  IDEAS:
  - Accelerate pace of movement as more queue items are added. Visual Fast forward effect?
  */
+
+//The view for an individual level
 class LevelView: UIView {
+    
+    //The delegates that deal with varius tasks
     var graphics: GraphicsHandler!
     var renderer: RenderHandler!
     var compression: CompressionHandler!
@@ -21,45 +25,62 @@ class LevelView: UIView {
     var input: InputHandler!
     var motion: MotionHandler!
     var contact: ContactHandler!
+    
+    //Level contents
     var polygons: [Polygon]!
     var goal: Goal!
-    var display: CADisplayLink?
-    var state: State = .REST
-    var plane: Plane = .FRONT
     var position: Position!
     
+    //State variables
+    var state: State = .REST
+    var plane: Plane = .FRONT
+    
+    //Display link to update view with each frame
+    var display: CADisplayLink?
+    
+    //Initialize from Level type
     init(frame: CGRect, level: Level) {
         super.init(frame: frame)
-        var new = Level(polygons: polygons, goal: goal, position: position)
-        let encoder = JSONEncoder()
-        let data = try? encoder.encode(new)
         
+        //Initialize from level data
         polygons = level.polygons
         goal = level.goal
         position = level.position
+        
+        //Initialize and assign delegates
         graphics = GraphicsHandler(level: self)
         renderer = RenderHandler()
-        compression = CompressionHandler(level: self)
+        compression = try! CompressionHandler(level: self)
         logic = LogicHandler(level: self)
         input = InputHandler(level: self)
         motion = MotionHandler(level: self)
         contact = ContactHandler(level: self, radius: 10)
+        
+        //Setup display link
         display = CADisplayLink(target: self, selector: #selector(loop))
         display?.add(to: .current, forMode: .common)
-        input.setup()
         backgroundColor = .white
     }
     
+    //Called before each frame to move the player (if applicable) and redraw the view
     @objc
     func loop() {
         motion.move()
         render()
     }
     
+    //Called once the player reaches the goal to trigger success sequence and exit to menu
+    //NOTE: In progress
+    func arrived() {
+        state = .ARRIVED
+    }
+    
+    //Marks the view as needing refresh before frame render, calling draw(_:)
     func render() {
         setNeedsDisplay()
     }
     
+    //Calls the render delegate
     override func draw(_ rect: CGRect) {
         if let context = UIGraphicsGetCurrentContext() {
             let items = graphics.build()

@@ -9,8 +9,11 @@
 import Foundation
 import UIKit
 
+//Delegate class for detecting and handling user input
 class InputHandler {
+    //The current test point
     private var test: CGPoint?
+    //Gesture recognizers
     private var left: UISwipeGestureRecognizer!
     private var right: UISwipeGestureRecognizer!
     private var up: UISwipeGestureRecognizer!
@@ -18,11 +21,13 @@ class InputHandler {
     private var tap: UITapGestureRecognizer!
     private var pan: UIPanGestureRecognizer!
     private var long: UILongPressGestureRecognizer!
+    //Supervisor
     private unowned let level: LevelView
     
-    
+    //Initialize delegate with supervisor reference
     init(level: LevelView) {
         self.level = level
+        //Setup recognizers
         left = UISwipeGestureRecognizer(target: self, action: #selector(swipeLeft))
         right = UISwipeGestureRecognizer(target: self, action: #selector(swipeRight))
         up = UISwipeGestureRecognizer(target: self, action: #selector(swipeUp))
@@ -46,11 +51,9 @@ class InputHandler {
         }
     }
     
-    func setup() {
-        
-    }
-    
+    //Called when a leftward swipe is detected
     @objc func swipeLeft() {
+        //Attempts transition depending on plane
         switch level.plane {
         case .FRONT:
             attemptTransition(from: .FRONT, to: .RIGHT)
@@ -67,7 +70,9 @@ class InputHandler {
         }
     }
     
+    //Called when a rightward swipe is detected
     @objc func swipeRight() {
+        //Attempts transition depending on plane
         switch level.plane {
         case .FRONT:
             attemptTransition(from: .FRONT, to: .LEFT)
@@ -84,7 +89,9 @@ class InputHandler {
         }
     }
     
+    //Called when a upward swipe is detected
     @objc func swipeUp() {
+        //Attempts transition depending on plane
         switch level.plane {
         case .FRONT:
             attemptTransition(from: .FRONT, to: .BOTTOM)
@@ -101,7 +108,9 @@ class InputHandler {
         }
     }
     
+    //Called when a downward swipe is detected
     @objc func swipeDown(_ recognizer: UISwipeGestureRecognizer) {
+        //Attempts transition depending on plane
         switch level.plane {
         case .FRONT:
             attemptTransition(from: .FRONT, to: .TOP)
@@ -118,14 +127,16 @@ class InputHandler {
         }
     }
     
+    //Called when a tap gesture is detected
     @objc func tap(_ recognizer: UITapGestureRecognizer) {
-        let loc = recognizer.location(in: level)//.applying(transform.inverted())
+        let loc = recognizer.location(in: level)
         touch(transform(loc))
     }
     
+    //Called when a pan gesture is detected. Tests if still active; attempts move if ended.
     @objc func pan(_ recognizer: UIPanGestureRecognizer) {
         if recognizer.numberOfTouches > 2 {
-            let loc = recognizer.location(in: level)//.applying(transform.inverted())
+            let loc = recognizer.location(in: level)
             test(touch: transform(loc))
             if recognizer.state == .ended {
                 touch(transform(loc))
@@ -133,26 +144,31 @@ class InputHandler {
         }
     }
     
+    //Called when a long press is detected. Tests if still active; attempts move if ended.
     @objc func long(_ recognizer: UILongPressGestureRecognizer) {
-        let loc = recognizer.location(in: level)//.applying(transform.inverted())
+        let loc = recognizer.location(in: level)
         test(touch: transform(loc))
         if recognizer.state == .ended {
             touch(transform(loc))
         }
     }
     
+    //Set the test point
     func test(touch: CGPoint) {
         test = touch
     }
     
+    //Reset the test point
     func nixTest() {
         test = nil
     }
     
+    //Retreive the test point
     func getTest() -> CGPoint? {
         return test
     }
     
+    //Decides whether a tap gesture will be processed
     func allowTap() -> Bool {
         for rec in [left, right, up, down] {
             if !(rec!.state == UIGestureRecognizer.State.ended || rec!.state == UIGestureRecognizer.State.failed || rec!.state == UIGestureRecognizer.State.cancelled) {
@@ -162,15 +178,18 @@ class InputHandler {
         return false
     }
     
+    //Attempts a transition between planes
     func attemptTransition(from initial: Plane, to final: Plane) {
         level.logic.attemptTransition(from: initial, to: final)
     }
     
+    //Attempts a movement following a touch
     func touch(_ touch: CGPoint) {
         test = nil
         level.logic.attemptMove(to: touch)
     }
     
+    //Retreives the current position transformation based on player location and current plane
     func transform(_ point: CGPoint) -> CGPoint {
         let player = ProjectionHandler.compress(vertex: level.position, onto: level.plane)
         return CGPoint(x: point.x + player.x - level.frame.width / 2, y: point.y + player.y - level.frame.height / 2)

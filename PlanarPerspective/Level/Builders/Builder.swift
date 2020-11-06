@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 
+//Protocol for all builders
 protocol Builder {
     var level: LevelView {get set}
     

@@ -9,19 +9,28 @@
 import Foundation
 import UIKit
 
+//Graphics Compiler for the TRANSITION state
 class TransitionCompiler: Compiler {
+    //Supervisor
     unowned var level: LevelView
+    //The transition planes of the compiler
     internal var initial: Plane
     internal var final: Plane
+    //Factory for this transition
     internal var factory: TransformFactory
+    //Rotation value for this transition
     internal var rotation: CGFloat
+    //Length of the transition (in frames)
     internal var length: Int
+    //Current frame
     internal var frame: Int = 0
+    //Children builders for each level element
     internal var lines: LineBuilder
     internal var motion: MotionBuilder
     internal var player: PlayerBuilder
     internal var goal: GoalBuilder
     
+    //Initializes from supervisor reference and transition parameters
     init(level: LevelView, initial: Plane, final: Plane, length: Int) {
         self.level = level
         self.initial = initial
@@ -36,6 +45,7 @@ class TransitionCompiler: Compiler {
         goal = GoalBuilder(level: level)
     }
     
+    //Current status of the transition
     func status() -> Bool {
         if frame >= length {
             return true
@@ -43,9 +53,15 @@ class TransitionCompiler: Compiler {
         return false
     }
     
+    //Compiles results of children builders
     func compile(state: Int) -> [DrawItem] {
+        //Increments frame
         frame += 1
+        
+        //Current progress as float between 0 and 1
         let prog = CGFloat(frame) / CGFloat(length)
+        
+        //Compiles items from builders
         var items: [DrawItem] = []
         let transform: Transform = factory(prog)
         items.append(contentsOf: lines.build(from: transform, state: state))
@@ -53,13 +69,15 @@ class TransitionCompiler: Compiler {
         items.append(contentsOf: player.build(from: transform, state: state))
         items.append(contentsOf: goal.build(from: transform, state: state))
         
+        //Calculates translation
         var translated: [DrawItem] = []
         var rot: CGAffineTransform = CGAffineTransform(rotationAngle: prog * rotation)
         let location = player.location().applying(rot)
-        
         let dx = level.frame.width / 2 - location.x
         let dy = level.frame.height / 2 - location.y
         var slide = CGAffineTransform(translationX: dx, y: dy)
+        
+        //Applies translation to each item
         for item in items {
             switch item {
             case .CIRCLE(let center, let radius, let color, let layer):
@@ -82,6 +100,8 @@ class TransitionCompiler: Compiler {
                 break
             }
         }
+        
+        //Returns translated items
         return translated
     }
 }

@@ -1,60 +1,54 @@
 //
-//  StaticCompiler.swift
-//  Planar Perspective
+//  ArrivedCompiler.swift
+//  PlanarPerspective
 //
-//  Created by Anderson, Todd W. on 6/5/20.
+//  Created by Rylie Anderson on 10/31/20.
 //  Copyright © 2020 Anderson, Todd W. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
-//Graphics Compiler for the REST and MOTION states
-class StaticCompiler: Compiler {
-    //Supervisor
+//NOT YET IN USE
+class ArrivedCompiler: Compiler {
     unowned var level: LevelView
-    //The plane of this compiler
     internal var plane: Plane
-    //The transform for this plane
     internal var transform: Transform
-    //Children builders for each level element
     internal var lines: LineBuilder
     internal var motion: MotionBuilder
     internal var player: PlayerBuilder
-    internal var goal: GoalBuilder
+    internal var rstate: Int
+    internal var frame: Int = 0
     
-    //Initializes from supervisor reference
-    init(level: LevelView, plane: Plane) {
+    init(level: LevelView, plane: Plane, state: Int) {
         self.level = level
         self.plane = plane
         self.transform = ProjectionHandler.component(of: plane)
+        self.rstate = state
         lines = LineBuilder(level: level)
         player = PlayerBuilder(level: level)
         motion = MotionBuilder(level: level)
-        goal = GoalBuilder(level: level)
     }
     
-    //Registers an invalid movement attempt for visualization
     func registerInvalid(at point: CGPoint) {
         motion.registerInvalid(at: point)
     }
     
-    //Compile the results of each child builder
     func compile(state: Int) -> [DrawItem] {
-        //Compile results
         var items: [DrawItem] = []
-        items.append(contentsOf: lines.build(from: transform, state: state))
-        items.append(contentsOf: motion.build(from: transform, state: state))
-        items.append(contentsOf: player.build(from: transform, state: state))
-        items.append(contentsOf: goal.build(from: transform, state: state))
-        var translated: [DrawItem] = []
+        items.append(contentsOf: lines.build(from: transform, state: rstate))
+        items.append(contentsOf: motion.build(from: transform, state: rstate))
+        items.append(contentsOf: player.build(from: transform, state: rstate))
         
-        //Find offset
+        let flatB = ProjectionHandler.compress(vertex: level.goal.origin, onto: level.plane).flatten()
+        let flatE = ProjectionHandler.compress(vertex: level.goal.outpost, onto: level.plane).flatten()
+        
+        frame += 1
+        
+        var translated: [DrawItem] = []
         let location = player.location()
         let dx = level.frame.width / 2 - location.x
         let dy = level.frame.height / 2 - location.y
-        
-        //Apply offset to compiled results
         var translation = CGAffineTransform(translationX: dx, y: dy)
         for item in items {
             switch item {
@@ -68,8 +62,6 @@ class StaticCompiler: Compiler {
                 translated.append(.PATH(path.copy(using: &translation)!, color, layer))
             }
         }
-        
-        //Return offset results
         return translated
     }
 }
