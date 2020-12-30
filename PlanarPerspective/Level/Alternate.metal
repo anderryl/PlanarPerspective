@@ -1,9 +1,9 @@
 //
-//  Library.metal
+//  Alternate.metal
 //  PlanarPerspective
 //
-//  Created by Rylie Anderson on 10/25/20.
-//  Copyright © 2020 Anderson, Rylie J. All rights reserved.
+//  Created by Rylie Anderson on 11/15/20.
+//  Copyright © 2020 Anderson, Todd W. All rights reserved.
 //
 
 #include <metal_stdlib>
@@ -28,7 +28,7 @@ using namespace metal;
  
  Notes:
  -The way the rest of the game is set up, lower z values are closer to the camera and thus higher priority
-
+    
  Arguments:
  - Clips: the MetalPolygon areas to clip out of the lines.
  - Lines: the Lines to be clipped and returned.
@@ -37,7 +37,8 @@ using namespace metal;
  - Bounds: the total number of lines and clips to be iterated over.
     - This is nessecary to prevent the function from going over index bounds if grid size doesn't exactly match the number of elements of both types.
  */
-kernel void clip(device const MetalPolygon *clips [[ buffer(0) ]], device MetalEdge *lines [[ buffer(1) ]], device DebuggeringMetal *debug [[ buffer(2) ]], device const uint2 *bounds [[ buffer(3) ]], uint index [[thread_position_in_grid]]) {
+
+kernel void longclip(device const MetalPolygon *clips [[ buffer(0) ]], device MetalEdge *lines [[ buffer(1) ]], device DebuggeringMetal *debug [[ buffer(2) ]], device const uint2 *bounds [[ buffer(3) ]], uint index [[thread_position_in_grid]]) {
     //If the index is out of bounds, stop before continuing and causing an error
     if (index >= bounds[0].y) {
         return;
@@ -176,7 +177,7 @@ kernel void clip(device const MetalPolygon *clips [[ buffer(0) ]], device MetalE
                 if (ab >= 0 && ab <= 1) {
                     //The percentage of the length along the clipping edge the intersection occurs
                     float cd = ((segment.origin.y - clipline.origin.y) * dx - (segment.origin.x - clipline.origin.x) * dy) / determinant;
-                    if (cd > 0 && cd < 1) {
+                    if (cd >= 0 && cd <= 1) {
                         //Increment the debug object's intersection count
                         debug[index].intersections++;
                         //Add the intersection's alpha value and increment the intersection count
@@ -195,53 +196,12 @@ kernel void clip(device const MetalPolygon *clips [[ buffer(0) ]], device MetalE
                         //If there is an intersection, increment the winding number
                         winding++;
                     }
-                    if (cd == 0) {
-                        MetalSegment other;
-                        if (i == 0) {
-                            other = list[clip.count - 1];
-                        }
-                        else {
-                            other = list[i - 1];
-                        }
-                        float odx = other.outpost.x - other.origin.x;
-                        float ody = other.outpost.y - other.origin.y;
-                        float sx = dx;
-                        float sy = dy;
-                        //Standardize for inequalities sake dont know if nessecary
-                        if (odx < 0) {
-                            odx = abs(odx);
-                            ody = -ody;
-                        }
-                        if (sx < 0) {
-                            sx = abs(sx);
-                            sy = -sy;
-                        }
-                        if (delta2x < 0) {
-                            delta2x = abs(delta2x);
-                            delta2y = -delta2y;
-                        }
-                        bool oover = (odx * sy > ody * sx);
-                        bool cover = (delta2x * sy > delta2y * sx);
-                        if (cover != oover) {
-                            intersections[intercount++] = ab;
-                            float sz = ab * dz + segment.origin.z;
-                            //The alpha value of the clipping edge at the intersection point
-                            float cz = cd * (clipline.outpost.z - clipline.origin.z) + clipline.origin.z;
-                            //If the segment's z value is lower than the clipping edge's, the clipping isn't relevant
-                            if (sz < cz) {
-                                //Exit Status 2 means it is above a clipping in the z priority
-                                debug[index].status = max(debug[index].status, 2);
-                                breakout = true;
-                                break;
-                            }
-                        }
-                    }
                 }
                 //If the intersection occurs forward of the origin, check the clipping
-                else if (ab > 0) {
+                else if (ab >= 0) {
                     float cd = ((segment.origin.y - clipline.origin.y) * dx - (segment.origin.x - clipline.origin.x) * dy) / determinant;
                     //If the intersection occurs between the origin and the outpost of the clipping, increment the winding number
-                    if (cd > 0 && cd < 1) {
+                    if (cd >= 0 && cd <= 1) {
                       winding++;
                     }
                 }
@@ -273,7 +233,7 @@ kernel void clip(device const MetalPolygon *clips [[ buffer(0) ]], device MetalE
             
             winding = 0;
             
-            MetalVertex one = MetalVertex{(intersections[0] * 0.723 + intersections[1]) / 1.723 * dx + segment.origin.x, (intersections[0] * 0.723 + intersections[1]) / 1.723 * dy + segment.origin.y, 0};
+            MetalVertex one = MetalVertex{(intersections[0] + intersections[1]) / 2 * dx + segment.origin.x, (intersections[0] + intersections[1]) / 2 * dy + segment.origin.y, 0};
             
             MetalSegment test = MetalSegment{one, MetalVertex{123487.2, 586346.18, 0}};
             
@@ -340,10 +300,50 @@ kernel void clip(device const MetalPolygon *clips [[ buffer(0) ]], device MetalE
             //Loop through intersections and build a segment from each consecutive pair
             for (int i = 0; i < intercount - 1; i++) {
                 //If current segment is outside the polygon, add it
+                //Build the origin and outpost using the alpha value, the origin, and the vector components
+                MetalVertex origin = MetalVertex{intersections[i] * dx + segment.origin.x, intersections[i] * dy + segment.origin.y, intersections[i] * dz + segment.origin.z};
+                MetalVertex outpost = MetalVertex{intersections[i + 1] * dx + segment.origin.x, intersections[i + 1] * dy + segment.origin.y, intersections[i + 1] * dz + segment.origin.z};
+                
+                winding = 0;
+                
+                MetalVertex one = MetalVertex{(intersections[i] + intersections[i + 1]) / 2 * dx + segment.origin.x, (intersections[i] + intersections[i + 1]) / 2 * dy + segment.origin.y, 0};
+                
+                MetalSegment test = MetalSegment{one, MetalVertex{123487.2, 586346.18, 0}};
+                
+                //Iterate through the entire list and check the segment against each of the clipping's edges
+                for (int i = 0; i < clip.count; i++) {
+                    //Reference to the current edge
+                    MetalSegment clipline = list[i];
+                    //The vector components of the current clipping edge
+                    float delta1x = test.outpost.x - test.origin.x;
+                    float delta1y = test.outpost.y - test.origin.y;
+                    float delta2x = clipline.outpost.x - clipline.origin.x;
+                    float delta2y = clipline.outpost.y - clipline.origin.y;
+                    
+                    if (delta2x == 0 && delta2y == 0) {
+                        continue;
+                    }
+         
+                    //Create a 2D matrix from the vectors and calculate the determinant
+                    float determinant = delta1x * delta2y - delta2x * delta1y;
+                    
+                    //If it is zero or very close, the lines are parallel
+                    if (abs(determinant) < 0.0001) {
+                        continue;
+                    }
+                    //If both coefficients are between 1 and 0, there is an intersection
+                    //The percentage of the length along the segment the intersection occurs
+                    float ab = ((test.origin.y - clipline.origin.y) * delta2x - (test.origin.x - clipline.origin.x) * delta2y) / determinant;
+                    float cd = ((test.origin.y - clipline.origin.y) * delta1x - (test.origin.x - clipline.origin.x) * delta1y) / determinant;
+                    if (cd >= 0 && cd <= 1 && ab >= 0) {
+                        winding++;
+                    }
+                }
+                
+                outside = (winding % 2) == 0;
+                
                 if (outside) {
-                    //Build the origin and outpost using the alpha value, the origin, and the vector components
-                    MetalVertex origin = MetalVertex{intersections[i] * dx + segment.origin.x, intersections[i] * dy + segment.origin.y, intersections[i] * dz + segment.origin.z};
-                    MetalVertex outpost = MetalVertex{intersections[i + 1] * dx + segment.origin.x, intersections[i + 1] * dy + segment.origin.y, intersections[i + 1] * dz + segment.origin.z};
+                    
                     //Add the new segment to the current iteration and increment the count
                     current.segments[current.count++] = MetalSegment{origin, outpost};
                     //Misc currently points to the number of segments in each edge

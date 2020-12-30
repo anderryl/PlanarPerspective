@@ -29,7 +29,7 @@ class CompressionHandler {
         //Builds a function library from all available metal files
         library = device.makeDefaultLibrary()!
         //Finds function named clip
-        let function = library.makeFunction(name: "clip")!
+        let function = library.makeFunction(name: "chloroform")!
         //Creates pipeline state
         state = try! device.makeComputePipelineState(function: function)
         queue = device.makeCommandQueue()!
