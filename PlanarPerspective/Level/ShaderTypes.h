@@ -41,6 +41,7 @@ typedef struct {
 typedef struct {
     MetalSegment segments[20];
     int count;
+    unsigned int polygon;
 } MetalEdge;
 
 //Debug information container type

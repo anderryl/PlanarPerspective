@@ -92,7 +92,7 @@ static MetalEdge trim(MetalSegment segment, MetalPolygon polygon, device Debugge
             line = MetalSegment{polygon.vertices[polygon.count - 1], polygon.vertices[0]};
         }
         else {
-            line = MetalSegment{polygon.vertices[i], polygon.vertices[i - 1]};
+            line = MetalSegment{polygon.vertices[i - 1], polygon.vertices[i]};
         }
         float2 intersect = intersection(segment, line);
         if (intersect.x < 1 && intersect.x > 0) {
@@ -135,11 +135,12 @@ static MetalEdge trim(MetalSegment segment, MetalPolygon polygon, device Debugge
         }
     }
     
-    //
+    
     MetalEdge ret = MetalEdge{{}, 0};
     float dx = segment.outpost.x - segment.origin.x;
     float dy = segment.outpost.y - segment.origin.y;
     float dz = segment.outpost.z - segment.origin.z;
+    debug[index].cuts = max(debug[index].cuts, intercount);
     for (int i = 1; i < intercount; i++) {
         MetalVertex mid = MetalVertex{segment.origin.x + dx * (inters[i] + inters[i - 1]) / 2, segment.origin.y + dy * (inters[i] + inters[i - 1]) / 2, segment.origin.z + dz * (inters[i] + inters[i - 1]) / 2};
         if (!internal(mid, polygon)) {
@@ -169,23 +170,28 @@ static MetalEdge clip(MetalEdge edge, MetalPolygon polygon, device DebuggeringMe
     MetalEdge interim = MetalEdge{{}, 0};
     for (int i = 0; i < edge.count; i++) {
         MetalEdge sub = trim(edge.segments[i], polygon, debug, index);
-        for (int s = 0; i < sub.count; i++) {
+        for (int s = 0; s < sub.count; s++) {
+            debug[index].code = max(sub.count, debug[index].code);
             interim.segments[interim.count++] = sub.segments[s];
         }
     }
     return interim;
 }
 
-//It's called chlorophorm cause thats what I'm gonna do to myself if this doesn't work
 kernel void chloroform(device const MetalPolygon *clips [[ buffer(0) ]], device MetalEdge *lines [[ buffer(1) ]], device DebuggeringMetal *debug [[ buffer(2) ]], device const uint2 *bounds [[ buffer(3) ]], uint index [[thread_position_in_grid]]) {
+    
     //If the index is out of bounds, stop before continuing and causing an error
     if (index >= bounds[0].y) {
         return;
     }
+    
     //The previous iteration for reference
     MetalEdge edge = lines[index];
     
     for (uint i = 0; i < bounds[0].x; i++) {
+        if (i == edge.polygon) {
+            continue;
+        }
         edge = clip(edge, clips[i], debug, index);
         if (edge.count == 0) {
             lines[index] = edge;

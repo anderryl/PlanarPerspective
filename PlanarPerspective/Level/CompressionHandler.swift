@@ -58,8 +58,10 @@ class CompressionHandler {
         
         //Compiles list of MetalEdges for clipping
         var edgeslist: [MetalEdge] = []
+        var i = 0
         polys.forEach { (poly) in
-            edgeslist.append(contentsOf: transform(poly).hardedges())
+            edgeslist.append(contentsOf: transform(poly).hardedges(id: i))
+            i += 1
         }
         
         //Calculates threadgrid parameters
@@ -114,6 +116,7 @@ class CompressionHandler {
         
         //Manually retreives function results from edge buffer
         let pointer = edges.contents()
+        
         for i in 0 ..< edgeslist.count {
             let new = pointer.load(fromByteOffset: i * MemoryLayout<MetalEdge>.stride, as: MetalEdge.self)
             unrefined.append(new)
@@ -127,43 +130,43 @@ class CompressionHandler {
                 case 0:
                     roughs.append(edge.segments.0)
                 case 1:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.1)
                 case 2:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.2)
                 case 3:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.3)
                 case 4:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.4)
                 case 5:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.5)
                 case 6:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.6)
                 case 7:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.7)
                 case 8:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.8)
                 case 9:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.9)
                 case 10:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.10)
                 case 11:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.11)
                 case 12:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.12)
                 case 13:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.13)
                 case 14:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.14)
                 case 15:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.15)
                 case 16:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.16)
                 case 17:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.17)
                 case 18:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.18)
                 case 19:
-                    roughs.append(edge.segments.0)
+                    roughs.append(edge.segments.19)
                 default:
                     break;
                 }
@@ -174,6 +177,9 @@ class CompressionHandler {
         let lines = roughs.map { (segment) -> Line in
             return Line(segment)
         }
+        
+        print(MemoryLayout<MetalEdge>.stride)
+        print(MemoryLayout<MetalSegment>.stride)
         
         //Cache results
         cache[test] = lines

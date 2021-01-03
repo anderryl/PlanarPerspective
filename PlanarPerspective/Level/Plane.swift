@@ -162,8 +162,8 @@ struct Polygon: Codable, Hashable {
     }
     
     //Retreives the edges as MetalEdge wrapper types
-    func hardedges() -> [MetalEdge] {
-        return edges().map { $0.harden() }
+    func hardedges(id: Int) -> [MetalEdge] {
+        return edges().map { $0.harden(id: id) }
     }
     
     //Initialize from a MetalPolygon wrapper type
@@ -230,8 +230,8 @@ struct Edge: Codable {
     }
     
     //Converts to a MetalEdge wrapper type
-    func harden() -> MetalEdge {
-        return MetalEdge(segments: (MetalSegment(origin: origin.harden(), outpost: outpost.harden()), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment()), count: Int32(1))
+    func harden(id: Int) -> MetalEdge {
+        return MetalEdge(segments: (MetalSegment(origin: origin.harden(), outpost: outpost.harden()), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment()), count: Int32(1), polygon: UInt32(id))
     }
 }
 
