@@ -18,6 +18,8 @@ class CompressionHandler {
     var queue: MTLCommandQueue
     var state: MTLComputePipelineState
     var polys: [Polygon]
+    var scope: MTLCaptureScope
+    var manager: MTLCaptureManager
     
     //Cache to prevent redundant GPU calls
     var cache: [Polygon : [Line]] = [:]
@@ -29,11 +31,18 @@ class CompressionHandler {
         //Builds a function library from all available metal files
         library = device.makeDefaultLibrary()!
         //Finds function named clip
-        let function = library.makeFunction(name: "chloroform")!
+        let function = library.makeFunction(name: "polygons")!
         //Creates pipeline state
         state = try! device.makeComputePipelineState(function: function)
         queue = device.makeCommandQueue()!
         polys = level.polygons
+        manager = MTLCaptureManager.shared()
+         
+        scope = manager.makeCaptureScope(device: device)
+        // Add a label if you want to capture it from XCode's debug bar
+        scope.label = "Pls debug me"
+        // If you want to set this scope as the default debug scope, assign it to MTLCaptureManager's defaultCaptureScope
+        manager.defaultCaptureScope = scope
     }
     
     //Compress the polygons using a given transform
@@ -48,13 +57,28 @@ class CompressionHandler {
         //Transformed polygons as MetalPolygon wrapper types
         let standards: [MetalPolygon] = polys.map { transform($0).harden() }
         
+        scope.begin()
+        
+        let buffer: MTLCommandBuffer
+        
+        if #available(iOS 14.0, *) {
+            let desc = MTLCommandBufferDescriptor()
+            desc.errorOptions = .encoderExecutionStatus
+            buffer = queue.makeCommandBuffer(descriptor: desc)!
+        } else {
+            buffer = queue.makeCommandBuffer()!
+        }
+        
         //Creates transient buffer and encoder for the compute run
-        let buffer: MTLCommandBuffer = queue.makeCommandBuffer()!
+        
         let encoder: MTLComputeCommandEncoder = buffer.makeComputeCommandEncoder()!
         encoder.setComputePipelineState(state)
         
         //Builds an input buffer to hold the polygons
+        
         let polygons = device.makeBuffer(bytes: standards, length: MemoryLayout<MetalPolygon>.stride * standards.count, options: .storageModeShared)!
+        
+        
         
         //Compiles list of MetalEdges for clipping
         var edgeslist: [MetalEdge] = []
@@ -70,7 +94,8 @@ class CompressionHandler {
         let amount = width * gheight
         
         //Builds a buffer to store the edges for clipping
-        let edges = device.makeBuffer(bytes: &edgeslist, length: amount * MemoryLayout<MetalEdge>.stride, options: .storageModeShared)!
+        let edges = try device.makeBuffer(bytes: &edgeslist, length: edgeslist.count * MemoryLayout<MetalEdge>.stride, options: .storageModeShared)!
+        
         
         //The parameter bounds (no way to get array length in a metal shader)
         var bounds: SIMD2<UInt32> = SIMD2<UInt32>(UInt32(standards.count), UInt32(edgeslist.count))
@@ -98,21 +123,38 @@ class CompressionHandler {
         //Send off for compute pass
         buffer.commit()
         
+        
+        scope.end()
+        
         //Wait until computation is completed
         buffer.waitUntilCompleted()
+        if #available(iOS 14.0, *) {
+            if let error = buffer.error as NSError? {
+                print(error)
+            }
+        }
         
         //Unrefined wrappers to be processed
         var unrefined: [MetalEdge] = []
         var debug: [DebuggeringMetal] = []
-        
+        /*
         //Manually retreives debugs from debug buffer from buffer pointer
         let pointerb = debugBuffer!.contents()
         for i in 0 ..< amount {
             let new = pointerb.load(fromByteOffset: i * MemoryLayout<DebuggeringMetal>.stride, as: DebuggeringMetal.self)
             debug.append(new)
         }
+        
         //Prints results
-        print(debug)
+        if debug.contains(where: { (debug) -> Bool in
+            return debug.point < 100 && debug.point > 0
+        }) {
+            print("yep")
+            /*print(debug.max(by: { (first, second) -> Bool in
+                return first.code < second.code
+            }))*/
+        }*/
+        
         
         //Manually retreives function results from edge buffer
         let pointer = edges.contents()
@@ -178,13 +220,14 @@ class CompressionHandler {
             return Line(segment)
         }
         
-        print(MemoryLayout<MetalEdge>.stride)
-        print(MemoryLayout<MetalSegment>.stride)
-        
+        //print(MemoryLayout<MetalEdge>.stride)
+        //print(MemoryLayout<MetalSegment>.stride)
+        //print(lines.count)
         //Cache results
         cache[test] = lines
         
         //Return 'em while your at it
+        //print("frame")
         return lines
     }
 }

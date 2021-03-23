@@ -52,6 +52,7 @@ typedef struct {
     int cuts;
     int status;
     float misc;
+    float point;
 } DebuggeringMetal;
 
 #endif /* ShaderTypes_h */

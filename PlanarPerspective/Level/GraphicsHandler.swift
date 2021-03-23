@@ -27,7 +27,7 @@ class GraphicsHandler {
     
     //Switch to a transition compiler
     func transition(from initial: Plane, to final: Plane) {
-        compiler = TransitionCompiler(level: level, initial: initial, final: final, length: 60)
+        compiler = TransitionCompiler(level: level, initial: initial, final: final, length: 40)
     }
     
     //Begin visual win sequence

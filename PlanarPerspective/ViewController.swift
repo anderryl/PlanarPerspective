@@ -23,7 +23,7 @@ class ViewController: UIViewController {
     func loadLevel(called name: String) -> Level {
         //Retreives Data
         let data = getFileData(filename: name)!
-        print(NSString(data: data, encoding: 1)!)
+        //print(NSString(data: data, encoding: 1)!)
         let decoder = JSONDecoder()
         //Loads the data as a Level type
         return try! decoder.decode(Level.self, from: data)
