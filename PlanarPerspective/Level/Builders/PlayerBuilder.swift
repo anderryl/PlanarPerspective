@@ -23,7 +23,7 @@ class PlayerBuilder: Builder {
     //Builds the player element given the transition and current state
     func build(from transform: Transform, state: Int) -> [DrawItem] {
         //Retreive the current position and flatten
-        let pos: CGPoint = transform(Polygon(vertices: [level.position])).vertices[0].flatten()
+        let pos: CGPoint = transform.method(Polygon(vertices: [level.position])).vertices[0].flatten()
         loc = pos
         
         //Player visuals configuration
@@ -31,7 +31,7 @@ class PlayerBuilder: Builder {
         let variation = 0.5
         let rounds = 3
         let points = 8
-        let speed = 8.0
+        let speed = 4.0
         let path: CGMutablePath = CGMutablePath()
         
         //Equation for player shape with given state

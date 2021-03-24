@@ -13,7 +13,7 @@ import UIKit
 class MotionHandler {
     //Supervisor view
     private unowned let level: LevelView
-    private var rate: CGFloat = 2
+    private var rate: CGFloat = 4
     
     //The current destination
     private var current: CGPoint?

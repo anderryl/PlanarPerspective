@@ -225,3 +225,5 @@ kernel void polygons(device const MetalPolygon *clips [[ buffer(0) ]], device Me
     debug[index].misc = 1.0;
     lines[index] = edge;
 }
+
+

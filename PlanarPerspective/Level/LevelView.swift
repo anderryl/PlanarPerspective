@@ -57,8 +57,11 @@ class LevelView: UIView {
         contact = ContactHandler(level: self, radius: 10)
         
         //Setup display link
-        display = CADisplayLink(target: self, selector: #selector(loop))
-        display?.add(to: .current, forMode: .common)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.025) {
+            self.loop()
+        }
+        //display = CADisplayLink(target: self, selector: #selector(loop))
+        //display?.add(to: .current, forMode: .common)
         backgroundColor = .white
     }
     
@@ -67,6 +70,9 @@ class LevelView: UIView {
     func loop() {
         motion.move()
         render()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.025) {
+            self.loop()
+        }
     }
     
     //Called once the player reaches the goal to trigger success sequence and exit to menu

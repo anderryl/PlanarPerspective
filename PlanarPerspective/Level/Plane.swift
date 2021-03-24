@@ -35,10 +35,28 @@ enum Plane {
  */
 
 //Creates Factory based on phase
-typealias TransformFactory = (_ phase: CGFloat) -> (_ vertice: Polygon) -> Polygon
+typealias TransformFactory = (_ phase: CGFloat) -> Transform
 
 //Trasforms and flattens polygons according to plane and transition state
-typealias Transform = (_ polygon: Polygon) -> Polygon
+struct Transform: Hashable, Equatable {
+    static func == (lhs: Transform, rhs: Transform) -> Bool {
+        if (lhs.from == rhs.from && lhs.to == rhs.to && lhs.prog == rhs.prog) {
+            return true
+        }
+        return false
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(to)
+        hasher.combine(from)
+        hasher.combine(abs(0.5 - prog))
+    }
+    
+    var method: (_ polygon: Polygon) -> Polygon
+    var from: Plane
+    var to: Plane
+    var prog: CGFloat
+}
       
 //Represents a three dimensional point
 struct Vertex: Codable, Hashable {

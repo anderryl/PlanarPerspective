@@ -31,6 +31,8 @@ typedef struct {
     int count;
 } MetalPolygon;
 
+
+
 //Wrapper for Edge
 typedef struct {
     MetalVertex origin;

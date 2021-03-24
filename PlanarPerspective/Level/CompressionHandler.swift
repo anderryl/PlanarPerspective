@@ -22,7 +22,7 @@ class CompressionHandler {
     var manager: MTLCaptureManager
     
     //Cache to prevent redundant GPU calls
-    var cache: [Polygon : [Line]] = [:]
+    var cache: [Transform : [Line]] = [:]
     
     //Initializes delegate with reference to supervisor
     init(level: LevelView) throws {
@@ -47,15 +47,13 @@ class CompressionHandler {
     
     //Compress the polygons using a given transform
     func compress(with transform: Transform) -> [Line] {
-        //Use test polygon to locat cached results (Transforms aren't hashable as they are actually closures)
-        let test = transform(Polygon(vertices: [Vertex(x: 31, y: 14, z: 159), Vertex(x: 27, y: 18, z: 28)]))
         //If there is a cached result, use it
-        if let cached = cache[test] {
+        if let cached = cache[transform] {
             return cached
         }
         
         //Transformed polygons as MetalPolygon wrapper types
-        let standards: [MetalPolygon] = polys.map { transform($0).harden() }
+        let standards: [MetalPolygon] = polys.map { transform.method($0).harden() }
         
         scope.begin()
         
@@ -84,7 +82,7 @@ class CompressionHandler {
         var edgeslist: [MetalEdge] = []
         var i = 0
         polys.forEach { (poly) in
-            edgeslist.append(contentsOf: transform(poly).hardedges(id: i))
+            edgeslist.append(contentsOf: transform.method(poly).hardedges(id: i))
             i += 1
         }
         
@@ -224,7 +222,7 @@ class CompressionHandler {
         //print(MemoryLayout<MetalSegment>.stride)
         //print(lines.count)
         //Cache results
-        cache[test] = lines
+        cache[transform] = lines
         
         //Return 'em while your at it
         //print("frame")

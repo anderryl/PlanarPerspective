@@ -26,7 +26,6 @@
 		F2578891249300EB00ACCD26 /* LogicHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2578890249300EB00ACCD26 /* LogicHandler.swift */; };
 		F28179C02495D4D800EC9243 /* MotionBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28179BF2495D4D800EC9243 /* MotionBuilder.swift */; };
 		F28179C22496B64400EC9243 /* MotionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28179C12496B64400EC9243 /* MotionHandler.swift */; };
-		F285C54E248730630030D75A /* CompressionHandlerArchaic.swift in Sources */ = {isa = PBXBuildFile; fileRef = F285C54D248730630030D75A /* CompressionHandlerArchaic.swift */; };
 		F2A057AD2491C64C005342D1 /* TransitionCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A057AC2491C64C005342D1 /* TransitionCompiler.swift */; };
 		F2A057B12491CF68005342D1 /* InputHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A057B02491CF68005342D1 /* InputHandler.swift */; };
 		F2CF9AE524705C8E008397E6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CF9AE424705C8E008397E6 /* AppDelegate.swift */; };
@@ -82,7 +81,6 @@
 		F2578890249300EB00ACCD26 /* LogicHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicHandler.swift; sourceTree = "<group>"; };
 		F28179BF2495D4D800EC9243 /* MotionBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionBuilder.swift; sourceTree = "<group>"; };
 		F28179C12496B64400EC9243 /* MotionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionHandler.swift; sourceTree = "<group>"; };
-		F285C54D248730630030D75A /* CompressionHandlerArchaic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionHandlerArchaic.swift; sourceTree = "<group>"; };
 		F2A057AC2491C64C005342D1 /* TransitionCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionCompiler.swift; sourceTree = "<group>"; };
 		F2A057B02491CF68005342D1 /* InputHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHandler.swift; sourceTree = "<group>"; };
 		F2CF9AE124705C8E008397E6 /* Perspective.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perspective.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -148,7 +146,6 @@
 				7A2DC85125068D55006CB549 /* State.swift */,
 				F2553B3A24733AEA0089F132 /* Plane.swift */,
 				F2D92155248894F4007809F7 /* RenderHandler.swift */,
-				F285C54D248730630030D75A /* CompressionHandlerArchaic.swift */,
 				7A9B75C825453EFE00683F03 /* CompressionHandler.swift */,
 				7A3E8BAB2549C43000B4B680 /* ShaderTypes.h */,
 				7A587F8E259553960071F21D /* Library.metal */,
@@ -382,7 +379,6 @@
 				F2A057AD2491C64C005342D1 /* TransitionCompiler.swift in Sources */,
 				F2D9215A248B13F4007809F7 /* Compiler.swift in Sources */,
 				F2129883249D492800C98F32 /* ContactHandler.swift in Sources */,
-				F285C54E248730630030D75A /* CompressionHandlerArchaic.swift in Sources */,
 				F2553B36247339DE0089F132 /* Builder.swift in Sources */,
 				7A587F8F259553960071F21D /* Library.metal in Sources */,
 				F2D92158248B13DF007809F7 /* StaticCompiler.swift in Sources */,
