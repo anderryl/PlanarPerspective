@@ -36,6 +36,13 @@ class CompressionHandler {
         state = try! device.makeComputePipelineState(function: function)
         queue = device.makeCommandQueue()!
         polys = level.polygons
+        //Disturb the data by telling scary stories right before bed.
+        polys = polys.map { (polygon) -> Polygon in
+            return Polygon(vertices: polygon.vertices.map { (vertex) -> Vertex in
+                //...and the stack trace was coming from INSIDE the program.
+                return Vertex(x: vertex.x + CGFloat.random(in: -0.1...0.1), y: vertex.y + CGFloat.random(in: -0.1...0.1), z: vertex.z + CGFloat.random(in: -0.1...0.1))
+            })
+        }
         manager = MTLCaptureManager.shared()
          
         scope = manager.makeCaptureScope(device: device)
@@ -135,14 +142,14 @@ class CompressionHandler {
         //Unrefined wrappers to be processed
         var unrefined: [MetalEdge] = []
         var debug: [DebuggeringMetal] = []
-        /*
+        
         //Manually retreives debugs from debug buffer from buffer pointer
         let pointerb = debugBuffer!.contents()
         for i in 0 ..< amount {
             let new = pointerb.load(fromByteOffset: i * MemoryLayout<DebuggeringMetal>.stride, as: DebuggeringMetal.self)
             debug.append(new)
         }
-        
+        /*
         //Prints results
         if debug.contains(where: { (debug) -> Bool in
             return debug.point < 100 && debug.point > 0
@@ -152,6 +159,7 @@ class CompressionHandler {
                 return first.code < second.code
             }))*/
         }*/
+        print(debug)
         
         
         //Manually retreives function results from edge buffer

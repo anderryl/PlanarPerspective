@@ -57,4 +57,9 @@ typedef struct {
     float point;
 } DebuggeringMetal;
 
+typedef struct {
+    MetalPolygon children[10];
+    int count;
+} MetalPolyhedron;
+
 #endif /* ShaderTypes_h */
