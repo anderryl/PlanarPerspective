@@ -50,7 +50,7 @@ class RenderHandler {
                     context?.addLines(between: [origin, outpost])
                     context?.setStrokeColor(color)
                     context?.setLineCap(.round)
-                    context?.setLineWidth(2)
+                    context?.setLineWidth(1)
                     context?.strokePath()
                 case .CIRCLE(let position, let radius, let color, _):
                     context?.setFillColor(color)

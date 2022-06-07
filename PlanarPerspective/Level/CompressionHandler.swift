@@ -30,8 +30,11 @@ class CompressionHandler {
         device = MTLCreateSystemDefaultDevice()!
         //Builds a function library from all available metal files
         library = device.makeDefaultLibrary()!
+        
         //Finds function named clip
-        let function = library.makeFunction(name: "polygons")!
+        let function = library.makeFunction(name: "cliplines")!
+        //let function = library.makeFunction(name: "polygons")!
+        
         //Creates pipeline state
         state = try! device.makeComputePipelineState(function: function)
         queue = device.makeCommandQueue()!
@@ -92,42 +95,44 @@ class CompressionHandler {
             edgeslist.append(contentsOf: transform.method(poly).hardedges(id: i))
             i += 1
         }
-        
+
         //Calculates threadgrid parameters
         let width = min(state.maxTotalThreadsPerThreadgroup, edgeslist.count)
         let gheight = Int((Double(edgeslist.count) / Double(width)).rounded(.up))
         let amount = width * gheight
-        
+
         //Builds a buffer to store the edges for clipping
         let edges = try device.makeBuffer(bytes: &edgeslist, length: edgeslist.count * MemoryLayout<MetalEdge>.stride, options: .storageModeShared)!
-        
-        
+
+
         //The parameter bounds (no way to get array length in a metal shader)
         var bounds: SIMD2<UInt32> = SIMD2<UInt32>(UInt32(standards.count), UInt32(edgeslist.count))
-        
+
         //Creates a buffer to store the bounds
         let boundBuffer = device.makeBuffer(bytes: &bounds, length: MemoryLayout<SIMD2<UInt>>.stride, options: .storageModeShared)
-        
+
         //Creates array of blank debug types
         let debugs: [DebuggeringMetal] = [DebuggeringMetal].init(repeating: DebuggeringMetal(), count: amount)
-        
+
         //Creates buffer to store them
         let debugBuffer = device.makeBuffer(bytes: debugs, length: MemoryLayout<DebuggeringMetal>.stride * amount, options: .storageModeShared)
-        
+
         //Encodes the buffers
         encoder.setBuffer(polygons, offset: 0, index: 0)
         encoder.setBuffer(edges, offset: 0, index: 1)
         encoder.setBuffer(debugBuffer, offset: 0, index: 2)
         encoder.setBuffer(boundBuffer, offset: 0, index: 3)
+
+
+        //Dispath the threadgroups with the calculated configuration
+        encoder.dispatchThreadgroups(MTLSize(width: gheight, height: 1, depth: 1), threadsPerThreadgroup: MTLSize(width: width, height: 1, depth: 1))
         
         
         //Dispath the threadgroups with the calculated configuration
-        encoder.dispatchThreadgroups(MTLSize(width: gheight, height: 1, depth: 1), threadsPerThreadgroup: MTLSize(width: width, height: 1, depth: 1))
         encoder.endEncoding()
         
         //Send off for compute pass
         buffer.commit()
-        
         
         scope.end()
         
@@ -141,30 +146,72 @@ class CompressionHandler {
         
         //Unrefined wrappers to be processed
         var unrefined: [MetalEdge] = []
-        var debug: [DebuggeringMetal] = []
         
-        //Manually retreives debugs from debug buffer from buffer pointer
-        let pointerb = debugBuffer!.contents()
-        for i in 0 ..< amount {
-            let new = pointerb.load(fromByteOffset: i * MemoryLayout<DebuggeringMetal>.stride, as: DebuggeringMetal.self)
-            debug.append(new)
+        let debugging = false
+        
+        if debugging {
+            var debug: [DebuggeringMetal] = []
+
+            //Manually retreives debugs from debug buffer from buffer pointer
+            let pointerb = debugBuffer!.contents()
+            for i in 0 ..< edgeslist.count {
+                let new = pointerb.load(fromByteOffset: i * MemoryLayout<DebuggeringMetal>.stride, as: DebuggeringMetal.self)
+                debug.append(new)
+            }
+            
+            print("\n\nNew Log:")
+            for log in debug {
+                print(log)
+            }
+            
+            
+            print("\nAbnormalities:")
+            var j = 0
+            var abns = false
+            for log in debug {
+                if (log.point < 100.0 && log.point > 0) {
+                    print(log)
+                    print("\n")
+                    abns = true
+                    /*print("\n" + j.description + ":")
+                    print(log.point)
+                    print(log.mcount)
+                    let ml = log.marklines
+                    print("0. ")
+                    print(ml.0)
+                    print("1. ")
+                    print(ml.1)
+                    print("2. ")
+                    print(ml.2)
+                    print("3. ")
+                    print(ml.3)
+                    print("4. ")
+                    print(ml.4)
+                    print("5. ")
+                    print(ml.5)
+                    print("6. ")
+                    print(ml.6)
+                    print("7. ")
+                    print(ml.7)
+                    print("8. ")
+                    print(ml.8)
+                    print("9. ")
+                    print(ml.9)*/
+                    j += 1
+                }
+            }
+            if (!abns) {
+                print("None")
+            }
+            print("\nTotal Edges:")
+            print(debug.count)
         }
-        /*
-        //Prints results
-        if debug.contains(where: { (debug) -> Bool in
-            return debug.point < 100 && debug.point > 0
-        }) {
-            print("yep")
-            /*print(debug.max(by: { (first, second) -> Bool in
-                return first.code < second.code
-            }))*/
-        }*/
-        print(debug)
+        
         
         
         //Manually retreives function results from edge buffer
         let pointer = edges.contents()
-        
+
         for i in 0 ..< edgeslist.count {
             let new = pointer.load(fromByteOffset: i * MemoryLayout<MetalEdge>.stride, as: MetalEdge.self)
             unrefined.append(new)
@@ -220,20 +267,15 @@ class CompressionHandler {
                 }
             }
         }
-        
+
         //Final results are attained by converting wrapper types to normal swift types for return
         let lines = roughs.map { (segment) -> Line in
             return Line(segment)
         }
-        
-        //print(MemoryLayout<MetalEdge>.stride)
-        //print(MemoryLayout<MetalSegment>.stride)
-        //print(lines.count)
         //Cache results
         cache[transform] = lines
         
-        //Return 'em while your at it
-        //print("frame")
+        //sleep(1)
         return lines
     }
 }

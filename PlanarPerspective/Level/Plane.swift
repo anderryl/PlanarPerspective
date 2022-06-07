@@ -124,7 +124,7 @@ struct Polygon: Codable, Hashable {
         }
     }
     
-    //Converts to Objective-C wrapper type for use in Metal compression shader
+    //Converts to C++ wrapper type for use in Metal compression shader
     //VERY VERY MESSY
     func harden() -> MetalPolygon {
         var verts = (MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex())
@@ -249,7 +249,7 @@ struct Edge: Codable {
     
     //Converts to a MetalEdge wrapper type
     func harden(id: Int) -> MetalEdge {
-        return MetalEdge(segments: (MetalSegment(origin: origin.harden(), outpost: outpost.harden()), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment()), count: Int32(1), polygon: UInt32(id))
+        return MetalEdge(segments: (MetalSegment(origin: origin.harden(), outpost: outpost.harden(), markline: MarkLine()), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment(), MetalSegment()), count: Int32(1), polygon: UInt32(id))
     }
 }
 

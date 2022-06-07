@@ -94,25 +94,6 @@ class InputHandler {
         //Attempts transition depending on plane
         switch level.plane {
         case .FRONT:
-            attemptTransition(from: .FRONT, to: .BOTTOM)
-        case .BACK:
-            attemptTransition(from: .BACK, to: .BOTTOM)
-        case .LEFT:
-            attemptTransition(from: .LEFT, to: .BOTTOM)
-        case .RIGHT:
-            attemptTransition(from: .RIGHT, to: .BOTTOM)
-        case .TOP:
-            attemptTransition(from: .TOP, to: .FRONT)
-        case .BOTTOM:
-            attemptTransition(from: .BOTTOM, to: .BACK)
-        }
-    }
-    
-    //Called when a downward swipe is detected
-    @objc func swipeDown(_ recognizer: UISwipeGestureRecognizer) {
-        //Attempts transition depending on plane
-        switch level.plane {
-        case .FRONT:
             attemptTransition(from: .FRONT, to: .TOP)
         case .BACK:
             attemptTransition(from: .BACK, to: .TOP)
@@ -124,6 +105,25 @@ class InputHandler {
             attemptTransition(from: .TOP, to: .BACK)
         case .BOTTOM:
             attemptTransition(from: .BOTTOM, to: .FRONT)
+        }
+    }
+    
+    //Called when a downward swipe is detected
+    @objc func swipeDown(_ recognizer: UISwipeGestureRecognizer) {
+        //Attempts transition depending on plane
+        switch level.plane {
+        case .FRONT:
+            attemptTransition(from: .FRONT, to: .BOTTOM)
+        case .BACK:
+            attemptTransition(from: .BACK, to: .BOTTOM)
+        case .LEFT:
+            attemptTransition(from: .LEFT, to: .BOTTOM)
+        case .RIGHT:
+            attemptTransition(from: .RIGHT, to: .BOTTOM)
+        case .TOP:
+            attemptTransition(from: .TOP, to: .FRONT)
+        case .BOTTOM:
+            attemptTransition(from: .BOTTOM, to: .BACK)
         }
     }
     

@@ -1,11 +1,3 @@
-//
-//  ISwearItBetterWorkThisTime.metal
-//  PlanarPerspective
-//
-//  Created by Rylie Anderson on 12/24/20.
-//  Copyright © 2020 Anderson, Todd W. All rights reserved.
-//
-
 #include <metal_stdlib>
 #import "ShaderTypes.h"
 using namespace metal;
@@ -28,7 +20,10 @@ static float2 intersection(MetalSegment first, MetalSegment second) {
     if (abs(determinant) < 0.01) {
         if (delta1x == 0) {
             if (first.origin.x == second.origin.x) {
-                //colinear
+                float fmay = max(first.origin.y, first.outpost.y);
+                float fmiy = min(first.origin.y, first.outpost.y);
+                float smay = max(second.origin.y, second.outpost.y);
+                float smiy = min(second.origin.y, second.outpost.y);
             }
         }
         else {
@@ -166,6 +161,46 @@ static MetalEdge trim(MetalSegment segment, MetalPolygon polygon, device Debugge
     }
     array<float, 40> inters = {0, 1};
     int intercount = 2;
+    for (int cvi = 0; cvi < polygon.count; cvi++) {
+        MetalSegment cseg;
+        if (cvi == polygon.count - 1) {
+            cseg = MetalSegment{polygon.vertices[cvi], polygon.vertices[0]};
+        }
+        else {
+            cseg = MetalSegment{polygon.vertices[cvi], polygon.vertices[cvi + 1]};
+        }
+        float2 inters = intersection(segment, cseg);
+        if (inters.x > 0 && inters.x < 1 && inters.y > 0 && inters.y < 1) {
+            inters[intercount++] = inters.x;
+            float linez = inters.y * (cseg.outpost.z - cseg.origin.z) + cseg.origin.z;
+            float segz = inters.x * (segment.outpost.z - segment.origin.z) + segment.origin.z;
+            if (segz <= linez) {
+                debug[index].status = max(debug[index].status, 1);
+                return MetalEdge{{segment}, 1};
+            }
+        }
+        if (inters.y == 1) {
+            MetalSegment csegout;
+            if (cvi == polygon.count - 2) {
+                csegout = MetalSegment{polygon.vertices[cvi + 1], polygon.vertices[0]};
+            }
+            else {
+                csegout = MetalSegment{polygon.vertices[cvi + 1], polygon.vertices[cvi + 2]};
+            }
+            if (junction(segment, cseg, csegout)) {
+                inters[intercount++] = inters.x;
+            }
+            float linez = inters.y * (cseg.outpost.z - cseg.origin.z) + cseg.origin.z;
+            float segz = inters.x * (segment.outpost.z - segment.origin.z) + segment.origin.z;
+            if (segz <= linez) {
+                debug[index].status = max(debug[index].status, 1);
+                return MetalEdge{{segment}, 1};
+            }
+        }
+    }
+    /*
+    array<float, 40> inters = {0, 1};
+    int intercount = 2;
     for (int i = 0; i < polygon.count; i++) {
         MetalSegment line;
         if (i == 0) {
@@ -210,7 +245,7 @@ static MetalEdge trim(MetalSegment segment, MetalPolygon polygon, device Debugge
                 }
             }
         }
-    }
+    }*/
     //Confirmed
     if (intercount == 2) {
         MetalVertex mid = MetalVertex{(segment.origin.x + segment.outpost.x) / 2, (segment.origin.y + segment.outpost.y) / 2, (segment.origin.z + segment.outpost.z) / 2};

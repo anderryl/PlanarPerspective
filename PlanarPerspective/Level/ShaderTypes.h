@@ -1,11 +1,3 @@
-//
-//  ShaderTypes.h
-//  PlanarPerspective
-//
-//  Created by Rylie Anderson on 10/28/20.
-//  Copyright © 2020 Anderson, Todd W. All rights reserved.
-//
-
 #ifndef ShaderTypes_h
 #define ShaderTypes_h
 
@@ -31,12 +23,26 @@ typedef struct {
     int count;
 } MetalPolygon;
 
+/*
+Codes:
+-1: Exit Polygon
+1: Enter Polygon
+*/
+typedef struct {
+    float alpha;
+    int code;
+} Mark;
 
+typedef struct {
+    Mark marks[30];
+    int count;
+} MarkLine;
 
 //Wrapper for Edge
 typedef struct {
     MetalVertex origin;
     MetalVertex outpost;
+    MarkLine markline;
 } MetalSegment;
 
 //[Edge] wrapper despite the name
@@ -54,12 +60,33 @@ typedef struct {
     int cuts;
     int status;
     float misc;
+    float comp;
     float point;
+    MarkLine markline;
+    //MarkLine temp;
 } DebuggeringMetal;
 
 typedef struct {
     MetalPolygon children[10];
     int count;
 } MetalPolyhedron;
+
+typedef struct {
+    int segment;
+    float alpha;
+    bool type;
+} Cut;
+
+struct CutMap {
+    Cut cuts[20];
+    int count;
+    bool obscured;
+};
+
+typedef struct {
+    int code;
+    simd_float2 intersection;
+    simd_float2 colinear;
+} Intersection;
 
 #endif /* ShaderTypes_h */
