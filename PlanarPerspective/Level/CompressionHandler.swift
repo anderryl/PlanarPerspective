@@ -147,7 +147,7 @@ class CompressionHandler {
         //Unrefined wrappers to be processed
         var unrefined: [MetalEdge] = []
         
-        let debugging = false
+        let debugging = true
         
         if debugging {
             var debug: [DebuggeringMetal] = []

@@ -2,6 +2,10 @@
 #import "ShaderTypes.h"
 using namespace metal;
 
+constant float thresholdLow = 0.005;
+constant float thresholdHigh = 1 - thresholdLow;
+
+
 /*
  Finds and classifies the intersection between two line segments
  
@@ -93,7 +97,6 @@ static Intersection intersect(MetalSegment first, MetalSegment second) {
         }
     }
     
-    //If both coefficients are between 1 and 0, there is an intersection
     //The percentage of the length along the segment the intersection occurs
     float ab = ((first.origin.y - second.origin.y) * deltasx - (first.origin.x - second.origin.x) * deltasy) / det;
     float cd = ((first.origin.y - second.origin.y) * deltafx - (first.origin.x - second.origin.x) * deltafy) / det;
@@ -180,11 +183,11 @@ static bool above(MetalVertex vert, MetalPolygon polygon, device DebuggeringMeta
     
     //Calculate the z value of the polygon plane at the x and y coordinates of the given vertex
     float z = (normalx * vert.x + normaly * vert.y + offset) / -normalz;
-    debug[index].misc = vert.z;
-    debug[index].comp = z;
+    //debug[index].misc = vert.z;
+    //debug[index].comp = z;
     
     //If the vertex is above or approximately equal to the level of the plane
-    return vert.z < z || abs(vert.z - z) < 0.5;
+    return vert.z < z || abs(vert.z - z) < 1;
 }
 
 /*
@@ -202,7 +205,7 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device Debugge
     MetalSegment edges[20];
     
     //If the line is a point, return a blank
-    if (abs(line.outpost.x - line.origin.x) < 0.5 && abs(line.outpost.y - line.origin.y) < 0.5) {
+    if (abs(line.outpost.x - line.origin.x) < 1 && abs(line.outpost.y - line.origin.y) < 1) {
         debug[index].status = 4;
         return {line.origin, line.outpost, {{{0, 1}}, 1}};
     }
@@ -211,6 +214,10 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device Debugge
     if (exclusive(line, polygon)) {
         return line;
     }
+    
+    //Flags for line adjoining the polygon
+    int adjoiners[20] = {};
+    int adcount = 0;
     
     //Loop through each of the polygons edges
     float dzline = line.outpost.z - line.origin.z;
@@ -223,27 +230,30 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device Debugge
         if (edge.origin.x == edge.outpost.x && edge.origin.y == edge.outpost.y) {
             return line;
         }
-         
+        
         //Calculate the intersection
         Intersection inter = intersect(line, edge);
         
         //If there is an intersection
         if (inter.code > 0) {
             
-            //If the intersection occurs along the lengths of both segments
+            //If the intersection occurs along the lengths of the clipped segment (endpoint exclusive) and clip edge (endpoint inclusive)
             if (inter.intersection.x >= 0 && inter.intersection.x <= 1 && inter.intersection.y >= 0 && inter.intersection.y <= 1) {
                 
                 //Calculate the z values of the line and edge
                 float dzedge = edge.outpost.z - edge.origin.z;
                 float lz = dzline * inter.intersection.x + line.origin.z;
                 float ez = dzedge * inter.intersection.y + edge.origin.z;
-                debug[index].misc = lz;
-                debug[index].comp = ez;
                 
-                //If the line is above or level with the edge, no clipping required
-                if (abs(lz - ez) < 0.5 || lz < ez) {
-                    debug[index].status = 1;
+                //If the line is above with the edge, no clipping required
+                if (lz + 1 < ez) {
+                    debug[index].status = 69;
+                    debug[index].misc = inter.intersection.x;
                     return line;
+                }
+                //If the line is on the edge
+                if (abs(lz - ez) < 1 && inter.code == 1) {
+                    adjoiners[adcount++] = i;
                 }
             }
         }
@@ -270,7 +280,7 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device Debugge
             float2 hit = cross.intersection;
             
             //If the intersection occurs on the positive end of the line and along the length of the edge including the outpost but excluding the origin
-            if (hit.x > 0 && hit.y > 0 && hit.y <= 1) {
+            if (hit.x > thresholdLow && hit.y > thresholdLow && hit.y <= thresholdHigh) {
                 
                 //If the hit is within the bounds of the edge not at the endpoints
                 if (hit.y != 1) {
@@ -330,10 +340,10 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device Debugge
                 
                 //If the intersection occurs after the origin
                 //Barrier breaking intersection is always stored in the colinear parameter
-                if (cross.colinear.x > 0) {
+                if (cross.colinear.x > thresholdLow) {
                     
                     //If the intersection occurs along the length of the line, mark it
-                    if (cross.colinear.x < 1) {
+                    if (cross.colinear.x < thresholdHigh) {
                         marks[mcount++] = {cross.colinear.x, 1};
                         debug[index].intersections++;
                     }

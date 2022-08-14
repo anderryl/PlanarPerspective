@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7A1DC84A252EAFA200903B40 /* WeBool.json in Resources */ = {isa = PBXBuildFile; fileRef = 7A1DC849252EAFA200903B40 /* WeBool.json */; };
+		7A1DC84A252EAFA200903B40 /* Orthogonal.json in Resources */ = {isa = PBXBuildFile; fileRef = 7A1DC849252EAFA200903B40 /* Orthogonal.json */; };
 		7A2DC85225068D55006CB549 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A2DC85125068D55006CB549 /* State.swift */; };
 		7A3E8BB3254E29D700B4B680 /* ArrivedCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A3E8BB2254E29D700B4B680 /* ArrivedCompiler.swift */; };
 		7A4DD4EC26D088D30046AB63 /* Clipper.metal in Sources */ = {isa = PBXBuildFile; fileRef = 7A4DD4EB26D088D30046AB63 /* Clipper.metal */; };
@@ -64,7 +64,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		7A1DC849252EAFA200903B40 /* WeBool.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = WeBool.json; sourceTree = "<group>"; };
+		7A1DC849252EAFA200903B40 /* Orthogonal.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Orthogonal.json; sourceTree = "<group>"; };
 		7A2DC85125068D55006CB549 /* State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
 		7A3E8BAB2549C43000B4B680 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
 		7A3E8BB2254E29D700B4B680 /* ArrivedCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrivedCompiler.swift; sourceTree = "<group>"; };
@@ -142,7 +142,7 @@
 				7A5E5903284457D700A4DFD0 /* Recursion.json */,
 				7AA9361E251B089D00D88952 /* TestLevel.json */,
 				7A9B75C32544B20D00683F03 /* Living.json */,
-				7A1DC849252EAFA200903B40 /* WeBool.json */,
+				7A1DC849252EAFA200903B40 /* Orthogonal.json */,
 			);
 			path = LevelData;
 			sourceTree = "<group>";
@@ -348,7 +348,7 @@
 				7A5E5904284457D700A4DFD0 /* Recursion.json in Resources */,
 				F2CF9AF124705C8F008397E6 /* LaunchScreen.storyboard in Resources */,
 				F2CF9AEE24705C8F008397E6 /* Assets.xcassets in Resources */,
-				7A1DC84A252EAFA200903B40 /* WeBool.json in Resources */,
+				7A1DC84A252EAFA200903B40 /* Orthogonal.json in Resources */,
 				7AA9361F251B089D00D88952 /* TestLevel.json in Resources */,
 				7A87A0EE283EF7070086171B /* ClusterFuck.json in Resources */,
 				7A9B75C42544B20D00683F03 /* Living.json in Resources */,
