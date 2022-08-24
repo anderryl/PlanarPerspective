@@ -2,7 +2,7 @@
 #import "ShaderTypes.h"
 using namespace metal;
 
-constant float thresholdLow = 0.005;
+constant float thresholdLow = 0.01;
 constant float thresholdHigh = 1 - thresholdLow;
 
 
@@ -216,8 +216,7 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device Debugge
     }
     
     //Flags for line adjoining the polygon
-    int adjoiners[20] = {};
-    int adcount = 0;
+    int adjoiner = -1;
     
     //Loop through each of the polygons edges
     float dzline = line.outpost.z - line.origin.z;
@@ -238,7 +237,7 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device Debugge
         if (inter.code > 0) {
             
             //If the intersection occurs along the lengths of the clipped segment (endpoint exclusive) and clip edge (endpoint inclusive)
-            if (inter.intersection.x >= 0 && inter.intersection.x <= 1 && inter.intersection.y >= 0 && inter.intersection.y <= 1) {
+            if (inter.intersection.x > thresholdLow && inter.intersection.x < thresholdHigh && inter.intersection.y >= 0 && inter.intersection.y <= 1) {
                 
                 //Calculate the z values of the line and edge
                 float dzedge = edge.outpost.z - edge.origin.z;
@@ -251,9 +250,15 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device Debugge
                     debug[index].misc = inter.intersection.x;
                     return line;
                 }
-                //If the line is on the edge
+                
+                //If the line is on the edge, set the adjoiner counter
                 if (abs(lz - ez) < 1 && inter.code == 1) {
-                    adjoiners[adcount++] = i;
+                    
+                    //If an adjoiner has already been found, line must lie within plane of polygon and no clipping is required
+                    if (adjoiner != -1) {
+                        return line;
+                    }
+                    adjoiner = i;
                 }
             }
         }
@@ -280,13 +285,13 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device Debugge
             float2 hit = cross.intersection;
             
             //If the intersection occurs on the positive end of the line and along the length of the edge including the outpost but excluding the origin
-            if (hit.x > thresholdLow && hit.y > thresholdLow && hit.y <= thresholdHigh) {
+            if (hit.x > thresholdLow && hit.y > thresholdLow && hit.y <= 1) {
                 
                 //If the hit is within the bounds of the edge not at the endpoints
-                if (hit.y != 1) {
+                if (hit.y < thresholdHigh) {
                     
                     //If the intersection occurs within the bounds of the line, add the intersection to the markline
-                    if (hit.x < 1) {
+                    if (hit.x < thresholdHigh) {
                         marks[mcount++] = {hit.x, 1};
                         debug[index].intersections++;
                     }
