@@ -548,3 +548,4 @@ kernel void cliplines(device const MetalPolygon *clips [[ buffer(0) ]], device M
     //Return the final result
     lines[index] = final;
 }
+
