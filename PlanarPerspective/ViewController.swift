@@ -13,7 +13,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         //Loads a level from a JSON file
-        let test = true
+        let test = false
         let level = loadLevel(called: test ? "Orthogonal" : "Living")
         //let level = loadLevel(called: "TestLevel")
         //Creates and adds a LevelView subview to the view

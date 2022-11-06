@@ -2,9 +2,8 @@
 #import "ShaderTypes.h"
 using namespace metal;
 
-constant float thresholdLow = 0.01;
+constant float thresholdLow = 0.00;
 constant float thresholdHigh = 1 - thresholdLow;
-
 
 /*
  Finds and classifies the intersection between two line segments
@@ -26,7 +25,7 @@ static Intersection intersect(MetalSegment first, MetalSegment second) {
     
     //If the line is a point, return exit code zero
     if (deltasx == 0 && deltasy == 0) {
-     return {0};
+        return {0};
     }
     
     //Create a 2D matrix from the vectors and calculate the determinant
@@ -183,8 +182,6 @@ static bool above(MetalVertex vert, MetalPolygon polygon, device DebuggeringMeta
     
     //Calculate the z value of the polygon plane at the x and y coordinates of the given vertex
     float z = (normalx * vert.x + normaly * vert.y + offset) / -normalz;
-    //debug[index].misc = vert.z;
-    //debug[index].comp = z;
     
     //If the vertex is above or approximately equal to the level of the plane
     return vert.z < z || abs(vert.z - z) < 1;
@@ -212,6 +209,11 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device Debugge
 
     //If the bounding boxes don't intersect, no clipping is nessecary
     if (exclusive(line, polygon)) {
+        return line;
+    }
+    
+    //If both endpoints lie above the plane of the polygon, no clipping is nessecary
+    if (above(line.origin, polygon, debug, index) && above(line.outpost, polygon, debug, index)) {
         return line;
     }
     
@@ -548,4 +550,3 @@ kernel void cliplines(device const MetalPolygon *clips [[ buffer(0) ]], device M
     //Return the final result
     lines[index] = final;
 }
-
