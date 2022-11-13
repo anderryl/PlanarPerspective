@@ -30,6 +30,10 @@ class GraphicsHandler {
         compiler = TransitionCompiler(level: level, initial: initial, final: final, length: 40)
     }
     
+    func center() -> CGPoint {
+        return compiler.getCenter()
+    }
+    
     //Begin visual win sequence
     func arrived() {
         

@@ -32,9 +32,7 @@ class CompressionHandler {
         library = device.makeDefaultLibrary()!
         
         //Finds function named clip
-        //let function = library.makeFunction(name: "hitlerschimney")!
         let function = library.makeFunction(name: "cliplines")!
-        //let function = library.makeFunction(name: "polygons")!
         
         //Creates pipeline state
         state = try! device.makeComputePipelineState(function: function)

@@ -11,7 +11,6 @@
 		7A2DC85225068D55006CB549 /* State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A2DC85125068D55006CB549 /* State.swift */; };
 		7A3E8BB3254E29D700B4B680 /* ArrivedCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A3E8BB2254E29D700B4B680 /* ArrivedCompiler.swift */; };
 		7A4DD4EC26D088D30046AB63 /* Clipper.metal in Sources */ = {isa = PBXBuildFile; fileRef = 7A4DD4EB26D088D30046AB63 /* Clipper.metal */; };
-		7A587F8F259553960071F21D /* ArchaicClipper.metal in Sources */ = {isa = PBXBuildFile; fileRef = 7A587F8E259553960071F21D /* ArchaicClipper.metal */; };
 		7A5E5904284457D700A4DFD0 /* Recursion.json in Resources */ = {isa = PBXBuildFile; fileRef = 7A5E5903284457D700A4DFD0 /* Recursion.json */; };
 		7A87A0EE283EF7070086171B /* ClusterFuck.json in Resources */ = {isa = PBXBuildFile; fileRef = 7A87A0ED283EF7070086171B /* ClusterFuck.json */; };
 		7A9B75C42544B20D00683F03 /* Living.json in Resources */ = {isa = PBXBuildFile; fileRef = 7A9B75C32544B20D00683F03 /* Living.json */; };
@@ -69,7 +68,6 @@
 		7A3E8BAB2549C43000B4B680 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
 		7A3E8BB2254E29D700B4B680 /* ArrivedCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrivedCompiler.swift; sourceTree = "<group>"; };
 		7A4DD4EB26D088D30046AB63 /* Clipper.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Clipper.metal; sourceTree = "<group>"; };
-		7A587F8E259553960071F21D /* ArchaicClipper.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ArchaicClipper.metal; sourceTree = "<group>"; };
 		7A5E5903284457D700A4DFD0 /* Recursion.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Recursion.json; sourceTree = "<group>"; };
 		7A87A0ED283EF7070086171B /* ClusterFuck.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ClusterFuck.json; sourceTree = "<group>"; };
 		7A9B75C32544B20D00683F03 /* Living.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Living.json; sourceTree = "<group>"; };
@@ -157,7 +155,6 @@
 				7A9B75C825453EFE00683F03 /* CompressionHandler.swift */,
 				7A3E8BAB2549C43000B4B680 /* ShaderTypes.h */,
 				7A4DD4EB26D088D30046AB63 /* Clipper.metal */,
-				7A587F8E259553960071F21D /* ArchaicClipper.metal */,
 				F2D9215B2490444F007809F7 /* ProjectionHandler.swift */,
 				F28179C12496B64400EC9243 /* MotionHandler.swift */,
 				F2A057B02491CF68005342D1 /* InputHandler.swift */,
@@ -391,7 +388,6 @@
 				F2D9215A248B13F4007809F7 /* Compiler.swift in Sources */,
 				F2129883249D492800C98F32 /* ContactHandler.swift in Sources */,
 				F2553B36247339DE0089F132 /* Builder.swift in Sources */,
-				7A587F8F259553960071F21D /* ArchaicClipper.metal in Sources */,
 				F2D92158248B13DF007809F7 /* StaticCompiler.swift in Sources */,
 				F2553B3924733A430089F132 /* LineBuilder.swift in Sources */,
 				F2CF9AE924705C8E008397E6 /* ViewController.swift in Sources */,

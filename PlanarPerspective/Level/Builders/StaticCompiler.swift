@@ -22,6 +22,7 @@ class StaticCompiler: Compiler {
     internal var motion: MotionBuilder
     internal var player: PlayerBuilder
     internal var goal: GoalBuilder
+    internal var center: CGPoint?
     
     //Initializes from supervisor reference
     init(level: LevelView, plane: Plane) {
@@ -39,6 +40,13 @@ class StaticCompiler: Compiler {
         motion.registerInvalid(at: point)
     }
     
+    func getCenter() -> CGPoint {
+        if center == nil {
+            return level.region.restrain(position: player.location(), transform: transform, frame: level.frame)
+        }
+        return center!
+    }
+    
     //Compile the results of each child builder
     func compile(state: Int) -> [DrawItem] {
         //Compile results
@@ -50,9 +58,10 @@ class StaticCompiler: Compiler {
         var translated: [DrawItem] = []
         
         //Find offset
-        let location = player.location()
-        let dx = level.frame.width / 2 - location.x
-        let dy = level.frame.height / 2 - location.y
+        let restrained = level.region.restrain(position: transform.method(Polygon(vertices: [level.position])).vertices[0].flatten(), transform: transform, frame: level.frame)
+        center = restrained
+        let dx = level.frame.width / 2 - restrained.x
+        let dy = level.frame.height / 2 - restrained.y
         
         //Apply offset to compiled results
         var translation = CGAffineTransform(translationX: dx, y: dy)

@@ -19,6 +19,7 @@ class ArrivedCompiler: Compiler {
     internal var player: PlayerBuilder
     internal var rstate: Int
     internal var frame: Int = 0
+    internal var center: CGPoint?
     
     init(level: LevelView, plane: Plane, state: Int) {
         self.level = level
@@ -34,6 +35,13 @@ class ArrivedCompiler: Compiler {
         motion.registerInvalid(at: point)
     }
     
+    func getCenter() -> CGPoint {
+        if center == nil {
+            return level.region.restrain(position: player.location(), transform: transform, frame: level.frame)
+        }
+        return center!
+    }
+    
     func compile(state: Int) -> [DrawItem] {
         var items: [DrawItem] = []
         items.append(contentsOf: lines.build(from: transform, state: rstate))
@@ -46,9 +54,10 @@ class ArrivedCompiler: Compiler {
         frame += 1
         
         var translated: [DrawItem] = []
-        let location = player.location()
-        let dx = level.frame.width / 2 - location.x
-        let dy = level.frame.height / 2 - location.y
+        let restrained = level.region.restrain(position: transform.method(Polygon(vertices: [level.position])).vertices[0].flatten(), transform: transform, frame: level.frame)
+        center = restrained
+        let dx = level.frame.width / 2 - restrained.x
+        let dy = level.frame.height / 2 - restrained.y
         var translation = CGAffineTransform(translationX: dx, y: dy)
         for item in items {
             switch item {

@@ -74,9 +74,17 @@ struct Vertex: Codable, Hashable {
         self.init(x: CGFloat(metal.x), y: CGFloat(metal.y), z: CGFloat(metal.z))
     }
     
+    init(_ point: CGPoint) {
+        self.init(x: point.x, y: point.y, z: 0)
+    }
+    
     //Convert to a two dimensional point
     func flatten() -> CGPoint {
         return CGPoint(x: x, y: y)
+    }
+    
+    func distance(_ other: Vertex) -> CGFloat {
+        return sqrt(pow(other.x - x, 2) + pow(other.y - y, 2) + pow(other.z - z, 2))
     }
     
     //Convert to MetalVertex Objective-C wrapper type for use with the Metal compression shader
@@ -267,10 +275,177 @@ struct Line {
         self.origin = Vertex(metal.origin).flatten()
         self.outpost = Vertex(metal.outpost).flatten()
     }
+    
+    //Finds the intersection between two lines
+    static func &(first: Line, second: Line) -> CGPoint? {
+        //Calculate line vector components
+        let delta1x = first.outpost.x - first.origin.x
+        let delta1y = first.outpost.y - first.origin.y
+        let delta2x = second.outpost.x - second.origin.x
+        let delta2y = second.outpost.y - second.origin.y
+
+        //Create a 2D matrix from the vectors and calculate the determinant
+        let determinant = delta1x * delta2y - delta2x * delta1y
+        
+        //If determinant is zero (or very close as approximation), the lines are parallel or colinear
+        if abs(determinant) < 0.0001 {
+            return nil
+        }
+
+        //If the coefficients are between 0 and 1 (meaning they occur between their beginnings and ends not off in the distance), there is an intersection
+        let ab = ((first.origin.y - second.origin.y) * delta2x - (first.origin.x - second.origin.x) * delta2y) / determinant
+        if ab > 0 && ab < 1 {
+            let cd = ((first.origin.y - second.origin.y) * delta1x - (first.origin.x - second.origin.x) * delta1y) / determinant
+            if cd > 0 && cd < 1 {
+                //Calculate exact intersection point
+                let intersectX = first.origin.x + ab * delta1x
+                let intersectY = first.origin.y + ab * delta1y
+                return CGPoint(x: intersectX, y: intersectY)
+            }
+        }
+        
+        //Lines don't cross
+        return nil
+    }
 }
 
 //A goal is an edge
 typealias Goal = Edge
+
+//Represents a 3D Box
+struct Region: Codable {
+    var origin: Vertex
+    var outpost: Vertex
+    private var points: [Vertex] {
+        var temp: [Vertex] = []
+        for x in [origin.x, outpost.x] {
+            for y in [origin.y, outpost.y] {
+                for z in [origin.z, outpost.z] {
+                    temp.append(Vertex(x: x, y: y, z: z))
+                }
+            }
+        }
+        return temp
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case origin, outpost
+    }
+    
+    //Calculates the outline of the falttened region
+    func flatten(transform: Transform) -> Polygon {
+        
+        let vertices = transform.method(Polygon(vertices: points)).vertices
+        
+        func sweep(center: Vertex, point: Vertex) -> CGFloat {
+            let dot: CGFloat = (point.y - center.y)
+            let dist = sqrt(pow(center.x - point.x, 2) + pow(center.y - point.y, 2))
+            if dist == 0 {
+                return 0
+            }
+            let theta = acos(dot / dist)
+            if point.x < center.x {
+                return 3.14159 * 2 - theta
+            }
+            return theta
+        }
+        
+        var center = Vertex(x: 0, y: 0, z: 0)
+        for vert in vertices {
+            center.x += vert.x
+            center.y += vert.y
+            center.z += vert.z
+        }
+        center.x /= CGFloat(vertices.count)
+        center.y /= CGFloat(vertices.count)
+        center.z /= CGFloat(vertices.count)
+        
+        //Lol, get fucked future me
+        var raw = vertices.map { (angle: sweep(center: center, point: $0), vert: $0) }.sorted { $0.angle > $1.angle }
+        print(raw)
+        var sorted = raw.map { $0.vert }
+        var removes: [Int] = []
+        
+        func hits(_ first: Line, _ second: Line) -> Bool {
+            //Calculate line vector components
+            let delta1x = first.outpost.x - first.origin.x
+            let delta1y = first.outpost.y - first.origin.y
+            let delta2x = second.outpost.x - second.origin.x
+            let delta2y = second.outpost.y - second.origin.y
+
+            //Create a 2D matrix from the vectors and calculate the determinant
+            let determinant = delta1x * delta2y - delta2x * delta1y
+            
+            //If determinant is zero (or very close as approximation), the lines are parallel or colinear
+            if abs(determinant) < 0.0001 {
+                return false
+            }
+
+            //If the coefficients are between 0 and 1 (meaning they occur between their beginnings and ends not off in the distance), there is an intersection
+            let cd = ((first.origin.y - second.origin.y) * delta1x - (first.origin.x - second.origin.x) * delta1y) / determinant
+            let ab = ((first.origin.y - second.origin.y) * delta2x - (first.origin.x - second.origin.x) * delta2y) / determinant
+            if cd > 0 && cd < 1 && ab > 1 {
+                return true
+            }
+            return false
+        }
+        
+        for i in 0 ..< sorted.count {
+            let before = sorted[i - 1 < 0 ? sorted.count - 1 : i - 1]
+            let after = sorted[(i + 1) % sorted.count]
+            let current = sorted[i]
+            if current == before {
+                removes.append(i)
+                continue
+            }
+            if hits(Line(origin: center.flatten(), outpost: current.flatten()), Line(origin: before.flatten(), outpost: after.flatten())) {
+                print(i.description + " hit")
+                removes.append(i)
+            }
+        }
+        
+        print(removes)
+        
+        for i in removes.sorted().reversed() {
+            sorted.remove(at: i)
+        }
+        
+        return Polygon(vertices: sorted)
+    }
+    
+    func restrain(position: CGPoint, transform: Transform, frame: CGRect, rotation: CGAffineTransform = CGAffineTransform()) -> CGPoint {
+        let flattened: [CGPoint] = flatten(transform: transform).vertices.map { $0.flatten().applying(rotation) }
+        
+        let ymax = flattened.max(by: { $0.y < $1.y })!.y -  frame.height / 2
+        let ymin = flattened.max(by: { $0.y > $1.y })!.y +  frame.height / 2
+        let xmax = flattened.max(by: { $0.x < $1.x })!.x - frame.width / 2
+        let xmin = flattened.max(by: { $0.x > $1.x })!.x + frame.width / 2
+        
+        var y = min(max(ymin, position.y), ymax)
+        var x = min(max(xmin, position.x), xmax)
+        
+        if ymin > ymax {
+            y = frame.height / 2
+        }
+        if xmin > xmax {
+            x = frame.width / 2
+        }
+        
+        return CGPoint(x: x, y: y)
+    }
+    
+    init(origin: Vertex, outpost: Vertex) {
+        self.origin = origin
+        self.outpost = outpost
+//        for x in [origin.x, outpost.x] {
+//            for y in [origin.y, outpost.y] {
+//                for z in [origin.z, outpost.z] {
+//                    points.append(Vertex(x: x, y: y, z: z))
+//                }
+//            }
+//        }
+    }
+}
 
 //Extension for distance function and hashability
 extension CGPoint: Hashable {

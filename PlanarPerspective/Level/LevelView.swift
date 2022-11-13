@@ -30,6 +30,7 @@ class LevelView: UIView {
     var polygons: [Polygon]!
     var goal: Goal!
     var position: Position!
+    var region: Region!
     
     //State variables
     var state: State = .REST
@@ -46,6 +47,7 @@ class LevelView: UIView {
         polygons = level.polygons
         goal = level.goal
         position = level.position
+        region = level.bounds
         
         //Initialize and assign delegates
         graphics = GraphicsHandler(level: self)

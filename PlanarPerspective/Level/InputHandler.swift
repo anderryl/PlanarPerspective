@@ -191,7 +191,10 @@ class InputHandler {
     
     //Retreives the current position transformation based on player location and current plane
     func transform(_ point: CGPoint) -> CGPoint {
-        let player = ProjectionHandler.compress(vertex: level.position, onto: level.plane)
-        return CGPoint(x: point.x + player.x - level.frame.width / 2, y: point.y + player.y - level.frame.height / 2)
+        let center = level.graphics.center()
+        print(center)
+        let x = point.x + center.x - level.frame.width / 2
+        let y = point.y + center.y - level.frame.height / 2
+        return CGPoint(x: x, y: y)
     }
 }

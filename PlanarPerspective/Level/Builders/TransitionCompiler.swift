@@ -29,6 +29,7 @@ class TransitionCompiler: Compiler {
     internal var motion: MotionBuilder
     internal var player: PlayerBuilder
     internal var goal: GoalBuilder
+    internal var center: CGPoint
     
     //Initializes from supervisor reference and transition parameters
     init(level: LevelView, initial: Plane, final: Plane, length: Int) {
@@ -43,6 +44,7 @@ class TransitionCompiler: Compiler {
         player = PlayerBuilder(level: level)
         motion = MotionBuilder(level: level)
         goal = GoalBuilder(level: level)
+        center = CGPoint(x: 0, y: 0)
     }
     
     //Current status of the transition
@@ -51,6 +53,10 @@ class TransitionCompiler: Compiler {
             return true
         }
         return false
+    }
+    
+    func getCenter() -> CGPoint {
+        return center
     }
     
     //Compiles results of children builders
@@ -72,9 +78,10 @@ class TransitionCompiler: Compiler {
         //Calculates translation
         var translated: [DrawItem] = []
         var rot: CGAffineTransform = CGAffineTransform(rotationAngle: prog * rotation)
-        let location = player.location().applying(rot)
-        let dx = level.frame.width / 2 - location.x
-        let dy = level.frame.height / 2 - location.y
+        let restrained = level.region.restrain(position: transform.method(Polygon(vertices: [level.position])).vertices[0].flatten().applying(rot), transform: transform, frame: level.frame, rotation: rot)
+        center = restrained
+        let dx = level.frame.width / 2 - restrained.x
+        let dy = level.frame.height / 2 - restrained.y
         var slide = CGAffineTransform(translationX: dx, y: dy)
         
         //Applies translation to each item

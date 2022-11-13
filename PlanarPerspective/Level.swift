@@ -13,10 +13,12 @@ class Level: Codable {
     var polygons: [Polygon]
     var goal: Goal
     var position: Position
+    var bounds: Region
     
-    init(polygons: [Polygon], goal: Goal, position: Position) {
+    init(polygons: [Polygon], goal: Goal, position: Position, bounds: Region) {
         self.polygons = polygons
         self.goal = goal
         self.position = position
+        self.bounds = bounds
     }
 }

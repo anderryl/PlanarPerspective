@@ -106,6 +106,7 @@ static Intersection intersect(MetalSegment first, MetalSegment second) {
 Determines whether a line penetrates the juncture created by two other segments
 */
 static bool penetrates(MetalSegment line, MetalVertex first, MetalVertex second) {
+    
     //The vector of the line
     float2 vec = {line.outpost.x - line.origin.x, line.outpost.y - line.origin.y};
     //The offset of the first point
@@ -164,6 +165,7 @@ static bool exclusive(MetalSegment line, MetalPolygon polygon) {
 Determine whether a segment is above a polygon
 */
 static bool above(MetalVertex vert, MetalPolygon polygon, device DebuggeringMetal *debug, int index) {
+    
     //Find the vectors of the polygon edges
     float dfx = polygon.vertices[1].x - polygon.vertices[0].x;
     float dfy = polygon.vertices[1].y - polygon.vertices[0].y;
@@ -191,6 +193,7 @@ static bool above(MetalVertex vert, MetalPolygon polygon, device DebuggeringMeta
  Calculates the intersections with a given polygon and updates the markline with the new intersections
  */
 static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device DebuggeringMetal *debug, int index) {
+    
     //If there are only two vertices no clipping is nessecary
     int count = polygon.count;
     if (count == 2) {

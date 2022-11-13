@@ -13,6 +13,11 @@ import UIKit
 class ProjectionHandler {
     
     //Creates a Transform factory from a transition
+//    static func __transformation(from one: Plane, to two: Plane) -> (rotation: CGFloat, factory: TransformFactory) {
+//        return
+//    }
+    
+    //Creates a Transform factory from a transition
     static func transformation(from one: Plane, to two: Plane) -> (rotation: CGFloat, factory: TransformFactory) {
         let first: (_ polygon: Polygon) -> Polygon = component(of: one).method
         //let second: Transform = component(of: two)
@@ -147,6 +152,7 @@ class ProjectionHandler {
                 return Polygon(vertices: vertices)
             }
             return Transform(method: transform(_:), from: plane, to: plane, prog: 0)
+            
         case .BOTTOM:
             func transform(_ polygon: Polygon) -> Polygon {
                 var vertices: [Vertex] = []
@@ -157,6 +163,7 @@ class ProjectionHandler {
                 return Polygon(vertices: vertices)
             }
             return Transform(method: transform(_:), from: plane, to: plane, prog: 0)
+            
         case .LEFT:
             func transform(_ polygon: Polygon) -> Polygon {
                 var vertices: [Vertex] = []
