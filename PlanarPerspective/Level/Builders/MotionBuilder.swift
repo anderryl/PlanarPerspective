@@ -24,18 +24,19 @@ class MotionBuilder: Builder {
     }
     
     //Builds motion elements using given transform and state
-    func build(from transform: Transform, state: Int) -> [DrawItem] {
+    func build(from transform: MatrixTransform, state: Int) -> [DrawItem] {
         //If in rest, only render invalids and test
         //If in motion, complete a full render
+        let position = (transform * level.position).flatten()
         switch level.state {
         case .MOTION(let queue):
-            return generate(from: queue, test: level.input.getTest(), state: state)
+            return generate(from: queue.map {(transform * $0).flatten()}, position: position, test: level.input.getTest(), state: state)
         case .REST:
             if let path = level.input.getTest() {
-                return generate(from: [], test: path, state: state)
+                return generate(from: [], position: position, test: path, state: state)
             }
             else {
-                return generateInvalids(from: ProjectionHandler.compress(vertex: level.position, onto: level.plane).flatten(), state: state)
+                return generateInvalids(from: position, state: state)
             }
         default:
             return []
@@ -43,17 +44,7 @@ class MotionBuilder: Builder {
     }
     
     //Register an invalid movement attempt
-    func registerInvalid(at point: CGPoint) {
-        //Determine proper origin
-        var origin: CGPoint
-        switch level.state {
-        case .MOTION(let queue):
-            origin = queue.last!
-        case .REST:
-            origin = ProjectionHandler.compress(vertex: level.position, onto: level.plane).flatten()
-        default:
-            return
-        }
+    func registerInvalid(from origin: CGPoint, to point: CGPoint) {
         //Register in dictionary with initial intensity of 1.0
         invalids[point] = (intensity: 1.0, origin: origin)
     }
@@ -119,7 +110,7 @@ class MotionBuilder: Builder {
     }
     
     //Generate the full motion effect given the queue and test point
-    private func generate(from queue: [CGPoint], test: CGPoint?, state: Int) -> [DrawItem] {
+    private func generate(from queue: [CGPoint], position: CGPoint, test: CGPoint?, state: Int) -> [DrawItem] {
         //The current visual phase based on state
         let phase = CGFloat(state % frames) / CGFloat(frames)
         
@@ -133,7 +124,6 @@ class MotionBuilder: Builder {
         let offset: CGFloat = phase * length
         
         //Build path
-        let position = ProjectionHandler.compress(vertex: level.position, onto: level.plane).flatten()
         var path: [CGPoint] = [position]
         path.append(contentsOf: queue)
         

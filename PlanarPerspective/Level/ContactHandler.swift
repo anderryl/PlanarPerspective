@@ -27,10 +27,14 @@ class ContactHandler {
         var contacts: [CGPoint] = []
         let player = Line(origin: position, outpost: point)
         //Compress the polygons onto the current plane
-        let transform = ProjectionHandler.component(of: level.plane)
+        let transform = level.matrix
         let lines: [Line] = level.compression.compress(with: transform)
         //Iterate through lines and find collisions
         for line in lines {
+            contacts.append(contentsOf: contact(between: line, and: player))
+        }
+        
+        for line in level.region.flatten(transform: transform).lines() {
             contacts.append(contentsOf: contact(between: line, and: player))
         }
         

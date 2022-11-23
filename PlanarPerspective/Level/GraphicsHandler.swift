@@ -9,6 +9,21 @@
 import Foundation
 import CoreGraphics
 
+struct Invalid {
+    let origin: CGPoint
+    let outpost: CGPoint
+    var intensity: Double
+}
+
+struct BuildSnapshot {
+    var position: CGPoint
+    var goal: [CGPoint]
+    var queue: [CGPoint]
+    var invalids: [Invalid]
+    var test: CGPoint?
+    var state: Int
+}
+
 //Delegate class for building the graphics elements
 class GraphicsHandler {
     //Supervisor
@@ -17,17 +32,13 @@ class GraphicsHandler {
     var compiler: Compiler
     //State value used for smooth transitions
     var state: Int = 0
+    var invalids: [Invalid] = []
     
     //Initializes delegate with supervisor reference
     init(level: LevelView) {
         self.level = level
         //Begin with a static compiler using the current plane
-        compiler = StaticCompiler(level: level, plane: level.plane)
-    }
-    
-    //Switch to a transition compiler
-    func transition(from initial: Plane, to final: Plane) {
-        compiler = TransitionCompiler(level: level, initial: initial, final: final, length: 40)
+        compiler = StaticCompiler(level: level)
     }
     
     func center() -> CGPoint {
@@ -36,7 +47,7 @@ class GraphicsHandler {
     
     //Begin visual win sequence
     func arrived() {
-        
+        compiler = ArrivedCompiler(supervisor: level, state: state)
     }
     
     //Registers an invalid with the static compiler
@@ -46,22 +57,40 @@ class GraphicsHandler {
         }
     }
     
+    func snapshot() -> BuildSnapshot {
+        let queue: [CGPoint]
+        switch level.state {
+        case .MOTION(let q):
+            queue = q.map { (level.matrix * $0).flatten() }
+        default:
+            queue = []
+        }
+        return BuildSnapshot(
+            position: (level.matrix * level.position).flatten(),
+            goal: level.goal.flatten(transform: level.matrix).vertices.map { $0.flatten() },
+            queue: queue,
+            invalids: invalids,
+            test: level.input.getTest(),
+            state: state
+        )
+    }
+    
+    func ageInvalids() {
+        var next: [Invalid] = []
+        for invalid in invalids {
+            next.append(Invalid(origin: invalid.origin, outpost: invalid.outpost, intensity: invalid.intensity - 0.02))
+        }
+        invalids = next
+    }
+    
     //Retreives the visual elements from the current compiler
     func build() -> [DrawItem] {
-        //If transitioning, check TransitionCompiler status
-        if compiler is TransitionCompiler {
-            if (compiler as! TransitionCompiler).status() {
-                //If done, switch to StaticCompiler, switch to rest state, and check win condition
-                compiler = StaticCompiler(level: level, plane: level.plane)
-                level.state = .REST
-                level.logic.check()
-            }
-        }
-        
         //Increment the state value
         state += 1
         
+        ageInvalids()
+        
         //Return the compiler results
-        return compiler.compile(state: state)
+        return compiler.compile(snapshot())
     }
 }

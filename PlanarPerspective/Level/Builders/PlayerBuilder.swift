@@ -21,9 +21,9 @@ class PlayerBuilder: Builder {
     }
     
     //Builds the player element given the transition and current state
-    func build(from transform: Transform, state: Int) -> [DrawItem] {
+    func build(from transform: MatrixTransform, state: Int) -> [DrawItem] {
         //Retreive the current position and flatten
-        let pos: CGPoint = transform.method(Polygon(vertices: [level.position])).vertices[0].flatten()
+        let pos: CGPoint = (transform * level.position).flatten()
         loc = pos
         
         //Player visuals configuration

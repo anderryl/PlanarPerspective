@@ -22,9 +22,9 @@ class LogicHandler {
     //Checks if player is inside the goal area two-dimensionally
     func check() {
         //Flatten the goal endpoints and the player position
-        let flatB = ProjectionHandler.compress(vertex: level.goal.origin, onto: level.plane).flatten()
-        let flatE = ProjectionHandler.compress(vertex: level.goal.outpost, onto: level.plane).flatten()
-        let flatP = ProjectionHandler.compress(vertex: level.position, onto: level.plane).flatten()
+        let flatB = (level.matrix * level.goal.origin).flatten()
+        let flatE = (level.matrix * level.goal.outpost).flatten()
+        let flatP = (level.matrix * level.position).flatten()
         
         //If the player position is within the goal area, begin win sequence
         if min(flatE.x, flatB.x) < flatP.x && flatP.x < max(flatE.x, flatB.x) {
@@ -35,14 +35,47 @@ class LogicHandler {
         return
     }
     
+    func propogate() {
+        switch level.state {
+        case .TRANSITION(let factory, let progress, let length):
+            level.matrix = factory(CGFloat(progress) / CGFloat(length))
+            if progress == length {
+                print("\n\n\nArrived:")
+                
+                level.state = .REST
+                level.matrix = level.matrix.normalized()
+            }
+            else {
+                level.state = .TRANSITION(factory, progress + 1, length)
+                print("\n")
+            }
+            print(level.matrix)
+            print(level.matrix * level.region)
+            print(level.graphics.center())
+            print(level.position!)
+        default:
+            break
+        }
+    }
+    
     //Attempts a transition if feasible
-    func attemptTransition(from first: Plane, to second: Plane) {
+    func attemptTransition(direction: Direction) {
         //If at rest, perform the transition
         switch level.state {
         case .REST:
-            level.graphics.transition(from: first, to: second)
-            level.state = .TRANSITION(first, second)
-            level.plane = second
+            level.state = .TRANSITION(level.matrix.slide(in: direction), 0, 30)
+        default:
+            //Negative Feedback
+            return
+        }
+    }
+    
+    //Attempts a transition if feasible
+    func attemptTwist(rotation: Rotation) {
+        //If at rest, perform the transition
+        switch level.state {
+        case .REST:
+            level.state = .TRANSITION(level.matrix.twist(in: rotation), 0, 30)
         default:
             //Negative Feedback
             return
@@ -50,13 +83,13 @@ class LogicHandler {
     }
     
     //Attempts a movement if feasible
-    func attemptMove(to point: CGPoint) {
+    func attemptMove(to point: Position) {
         //If at rest or in motion, perform the movement
         switch level.state {
         case .REST:
-            let pos = ProjectionHandler.compress(vertex: level.position, onto: level.plane)
+            let pos = (level.matrix * level.position)
             //If there is a collision notify the graphics handler
-            if let contact = level.contact.findContact(from: pos.flatten(), to: point) {
+            if let contact = level.contact.findContact(from: pos.flatten(), to: (level.matrix * point).flatten()) {
                 level.graphics.registerInvalid(at: contact)
                 return
             }
@@ -64,7 +97,7 @@ class LogicHandler {
             level.motion.input()
         case .MOTION(var queue):
             //If there is a collision notify the graphics handler
-            if let contact = level.contact.findContact(from: queue.last!, to: point) {
+            if let contact = level.contact.findContact(from: (level.matrix * queue.last!).flatten(), to: (level.matrix * point).flatten()) {
                 level.graphics.registerInvalid(at: contact)
                 return
             }

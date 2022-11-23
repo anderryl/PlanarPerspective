@@ -11,11 +11,11 @@ import Foundation
 //Data type for storing and accessing level data
 class Level: Codable {
     var polygons: [Polygon]
-    var goal: Goal
+    var goal: Region
     var position: Position
     var bounds: Region
     
-    init(polygons: [Polygon], goal: Goal, position: Position, bounds: Region) {
+    init(polygons: [Polygon], goal: Region, position: Position, bounds: Region) {
         self.polygons = polygons
         self.goal = goal
         self.position = position

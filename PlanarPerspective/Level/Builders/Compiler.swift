@@ -11,7 +11,7 @@ import CoreGraphics
 
 //A compiler capable of compiling nessecary visual elements
 protocol Compiler {
-    func compile(state: Int) -> [DrawItem]
+    func compile(_ snapshot: BuildSnapshot) -> [DrawItem]
     
     func getCenter() -> CGPoint
 }

@@ -16,7 +16,7 @@ class MotionHandler {
     private var rate: CGFloat = 4
     
     //The current destination
-    private var current: CGPoint?
+    private var current: Position?
     //The movement vectors
     private var dx: CGFloat?
     private var dy: CGFloat?
@@ -49,7 +49,7 @@ class MotionHandler {
         //Otherwise reset to inactivity and set state to rest
         switch level.state {
         case .MOTION(var queue):
-            level.position = ProjectionHandler.unfold(point: queue.first!, onto: level.position, from: level.plane)
+            level.position = queue.first!
             queue.remove(at: 0)
             if queue.count == 0 {
                 current = nil
@@ -74,27 +74,30 @@ class MotionHandler {
     }
     
     //Sets the new destination point
-    func setCurrent(_ point: CGPoint) {
+    func setCurrent(_ point: Position) {
         current = point
-        let pos = ProjectionHandler.compress(vertex: level.position, onto: level.plane).flatten()
-        let x = point.x - pos.x
-        let y = point.y - pos.y
-        let time = Int((pos | point) / rate)
+        let pos = (level.matrix * level.position).flatten()
+        let tp = (level.matrix * point).flatten()
+        let x = tp.x - pos.x
+        let y = tp.y - pos.y
+        let time = Int((pos | tp) / rate)
         duration = time
         frame = 0
         dx = x / CGFloat(time)
         dy = y / CGFloat(time)
-        
     }
     
     //Called each frame to move the player
     func move() {
         if dx != nil && dy != nil {
             //Update game position
-            var pos = ProjectionHandler.compress(vertex: level.position, onto: level.plane).flatten()
-            pos.x += dx!
-            pos.y += dy!
-            level.position = ProjectionHandler.unfold(point: pos, onto: level.position, from: level.plane)
+//            var pos = (level.matrix * level.position).flatten()
+//            pos.x += dx!
+//            pos.y += dy!
+//            level.position = ProjectionHandler.unfold(point: pos, onto: level.position, against: level.matrix)
+            let offset = level.matrix.inverted() * Position(x: dx!, y: dy!, z: 0)
+            level.position = level.position + offset
+            
             frame! += 1
             //Check win condition
             level.logic.check()

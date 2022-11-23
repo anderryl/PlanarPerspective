@@ -15,5 +15,5 @@ protocol Builder {
     
     init(level: LevelView)
     
-    func build(from: Transform, state: Int) -> [DrawItem]
+    func build(from: MatrixTransform, state: Int) -> [DrawItem]
 }

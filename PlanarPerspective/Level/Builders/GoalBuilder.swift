@@ -20,19 +20,15 @@ class GoalBuilder: Builder {
     }
     
     //Build the goal element given the transition
-    func build(from transform: Transform, state: Int) -> [DrawItem] {
+    func build(from transform: MatrixTransform, state: Int) -> [DrawItem] {
         //Flatten the goal
-        let flat = transform.method(Polygon(vertices: [level.goal.origin, level.goal.outpost]))
-        let lines = flat.lines()
+        let flat = level.goal.flatten(transform: transform)
         
-        //Find the goal endpoints
-        let one = lines.first!.origin
-        let two = lines.first!.outpost
+        let path: CGMutablePath = CGMutablePath()
         
-        //Calculate the current opacity
-        let alpha: CGFloat = 0.3 - 0.2 * sin(CGFloat(state) / 20)
+        path.addLines(between: flat.vertices.map { $0.flatten() })
+        path.closeSubpath()
         
-        //Build and return a rectabgle from the endpoints in the current opacity of green
-        return [.RECTANGLE(one, CGSize(width: two.x - one.x, height: two.y - one.y), .init(srgbRed: 0, green: 1, blue: 0, alpha: alpha), 1)]
+        return [DrawItem.PATH(path, .init(srgbRed: 0, green: 0, blue: 0, alpha: 0.3 + (0.1 * cos(Double(state) / 15))), 1)]
     }
 }

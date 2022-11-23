@@ -22,7 +22,7 @@ class CompressionHandler {
     var manager: MTLCaptureManager
     
     //Cache to prevent redundant GPU calls
-    var cache: [Transform : [Line]] = [:]
+    var cache: [Int : [(transform: MatrixTransform, lines: [Line])]] = [:]
     
     //Initializes delegate with reference to supervisor
     init(level: LevelView) throws {
@@ -55,14 +55,18 @@ class CompressionHandler {
     }
     
     //Compress the polygons using a given transform
-    func compress(with transform: Transform) -> [Line] {
+    func compress(with transform: MatrixTransform) -> [Line] {
         //If there is a cached result, use it
-        if let cached = cache[transform] {
-            return cached
+        if let cached = cache[transform.hash()] {
+            for item in cached {
+                if item.transform == transform {
+                    return item.lines
+                }
+            }
         }
         
         //Transformed polygons as MetalPolygon wrapper types
-        let standards: [MetalPolygon] = polys.map { transform.method($0).harden() }
+        let standards: [MetalPolygon] = polys.map { (transform * $0).harden() }
         
         scope.begin()
         
@@ -91,7 +95,7 @@ class CompressionHandler {
         var edgeslist: [MetalEdge] = []
         var i = 0
         polys.forEach { (poly) in
-            edgeslist.append(contentsOf: transform.method(poly).hardedges(id: i))
+            edgeslist.append(contentsOf: (transform * poly).hardedges(id: i))
             i += 1
         }
 
@@ -168,7 +172,7 @@ class CompressionHandler {
             var j = 0
             var abns = false
             for log in debug {
-                if (log.point < 100.0 && log.point > 0) {
+                if log.point < 100.0 && log.point > 0 {
                     print(log)
                     print("\n")
                     abns = true
@@ -199,7 +203,7 @@ class CompressionHandler {
                     j += 1
                 }
             }
-            if (!abns) {
+            if !abns {
                 print("None")
             }
             print("\nTotal Edges:")
@@ -271,8 +275,14 @@ class CompressionHandler {
         let lines = roughs.map { (segment) -> Line in
             return Line(segment)
         }
+        
         //Cache results
-        cache[transform] = lines
+        if let others = cache[transform.hash()] {
+            cache[transform.hash()] = others + [(transform: transform, lines: lines)]
+        }
+        else {
+            cache[transform.hash()] = [(transform: transform, lines: lines)]
+        }
         
         //sleep(1)
         return lines

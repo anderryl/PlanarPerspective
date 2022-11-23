@@ -12,7 +12,7 @@ import CoreGraphics
 //Represents the current state of the game
 enum State {
     case REST
-    case MOTION([CGPoint])
-    case TRANSITION(Plane, Plane)
+    case MOTION([Position])
+    case TRANSITION(MatrixTransformFactory, Int, Int)
     case ARRIVED
 }

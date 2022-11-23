@@ -12,8 +12,6 @@ import UIKit
 //NOT YET IN USE
 class ArrivedCompiler: Compiler {
     unowned var level: LevelView
-    internal var plane: Plane
-    internal var transform: Transform
     internal var lines: LineBuilder
     internal var motion: MotionBuilder
     internal var player: PlayerBuilder
@@ -21,40 +19,31 @@ class ArrivedCompiler: Compiler {
     internal var frame: Int = 0
     internal var center: CGPoint?
     
-    init(level: LevelView, plane: Plane, state: Int) {
-        self.level = level
-        self.plane = plane
-        self.transform = ProjectionHandler.component(of: plane)
+    init(supervisor: LevelView, state: Int) {
+        self.level = supervisor
         self.rstate = state
         lines = LineBuilder(level: level)
         player = PlayerBuilder(level: level)
         motion = MotionBuilder(level: level)
     }
     
-    func registerInvalid(at point: CGPoint) {
-        motion.registerInvalid(at: point)
-    }
-    
     func getCenter() -> CGPoint {
         if center == nil {
-            return level.region.restrain(position: player.location(), transform: transform, frame: level.frame)
+            return level.region.restrain(position: player.location(), transform: level.matrix, frame: level.frame)
         }
         return center!
     }
     
-    func compile(state: Int) -> [DrawItem] {
+    func compile(_ snapshot: BuildSnapshot) -> [DrawItem] {
         var items: [DrawItem] = []
-        items.append(contentsOf: lines.build(from: transform, state: rstate))
-        items.append(contentsOf: motion.build(from: transform, state: rstate))
-        items.append(contentsOf: player.build(from: transform, state: rstate))
-        
-        let flatB = ProjectionHandler.compress(vertex: level.goal.origin, onto: level.plane).flatten()
-        let flatE = ProjectionHandler.compress(vertex: level.goal.outpost, onto: level.plane).flatten()
+        items.append(contentsOf: lines.build(from: level.matrix, state: rstate))
+        items.append(contentsOf: motion.build(from: level.matrix, state: rstate))
+        items.append(contentsOf: player.build(from: level.matrix, state: rstate))
         
         frame += 1
         
         var translated: [DrawItem] = []
-        let restrained = level.region.restrain(position: transform.method(Polygon(vertices: [level.position])).vertices[0].flatten(), transform: transform, frame: level.frame)
+        let restrained = level.region.restrain(position: (level.matrix * level.position).flatten(), transform: level.matrix, frame: level.frame)
         center = restrained
         let dx = level.frame.width / 2 - restrained.x
         let dy = level.frame.height / 2 - restrained.y

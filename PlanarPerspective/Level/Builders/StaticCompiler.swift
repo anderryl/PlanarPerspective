@@ -11,12 +11,10 @@ import UIKit
 
 //Graphics Compiler for the REST and MOTION states
 class StaticCompiler: Compiler {
+    
     //Supervisor
     unowned var level: LevelView
-    //The plane of this compiler
-    internal var plane: Plane
-    //The transform for this plane
-    internal var transform: Transform
+    
     //Children builders for each level element
     internal var lines: LineBuilder
     internal var motion: MotionBuilder
@@ -25,10 +23,8 @@ class StaticCompiler: Compiler {
     internal var center: CGPoint?
     
     //Initializes from supervisor reference
-    init(level: LevelView, plane: Plane) {
+    init(level: LevelView) {
         self.level = level
-        self.plane = plane
-        self.transform = ProjectionHandler.component(of: plane)
         lines = LineBuilder(level: level)
         player = PlayerBuilder(level: level)
         motion = MotionBuilder(level: level)
@@ -37,28 +33,35 @@ class StaticCompiler: Compiler {
     
     //Registers an invalid movement attempt for visualization
     func registerInvalid(at point: CGPoint) {
-        motion.registerInvalid(at: point)
+        switch level.state {
+        case .MOTION(let queue):
+            motion.registerInvalid(from: (level.matrix * queue.last!).flatten(), to: point)
+        case .REST:
+            motion.registerInvalid(from: (level.matrix * level.position).flatten(), to: point)
+        default:
+            break
+        }
     }
     
     func getCenter() -> CGPoint {
         if center == nil {
-            return level.region.restrain(position: player.location(), transform: transform, frame: level.frame)
+            return level.region.restrain(position: player.location(), transform: level.matrix, frame: level.frame)
         }
         return center!
     }
     
     //Compile the results of each child builder
-    func compile(state: Int) -> [DrawItem] {
+    func compile(_ snapshot: BuildSnapshot) -> [DrawItem] {
         //Compile results
         var items: [DrawItem] = []
-        items.append(contentsOf: lines.build(from: transform, state: state))
-        items.append(contentsOf: motion.build(from: transform, state: state))
-        items.append(contentsOf: player.build(from: transform, state: state))
-        items.append(contentsOf: goal.build(from: transform, state: state))
+        items.append(contentsOf: lines.build(from: level.matrix, state: snapshot.state))
+        items.append(contentsOf: motion.build(from: level.matrix, state: snapshot.state))
+        items.append(contentsOf: player.build(from: level.matrix, state: snapshot.state))
+        items.append(contentsOf: goal.build(from: level.matrix, state: snapshot.state))
         var translated: [DrawItem] = []
         
         //Find offset
-        let restrained = level.region.restrain(position: transform.method(Polygon(vertices: [level.position])).vertices[0].flatten(), transform: transform, frame: level.frame)
+        let restrained = level.region.restrain(position: (level.matrix * level.position).flatten(), transform: level.matrix, frame: level.frame)
         center = restrained
         let dx = level.frame.width / 2 - restrained.x
         let dy = level.frame.height / 2 - restrained.y

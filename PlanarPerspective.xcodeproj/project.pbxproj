@@ -28,7 +28,6 @@
 		F2578891249300EB00ACCD26 /* LogicHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2578890249300EB00ACCD26 /* LogicHandler.swift */; };
 		F28179C02495D4D800EC9243 /* MotionBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28179BF2495D4D800EC9243 /* MotionBuilder.swift */; };
 		F28179C22496B64400EC9243 /* MotionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28179C12496B64400EC9243 /* MotionHandler.swift */; };
-		F2A057AD2491C64C005342D1 /* TransitionCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A057AC2491C64C005342D1 /* TransitionCompiler.swift */; };
 		F2A057B12491CF68005342D1 /* InputHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A057B02491CF68005342D1 /* InputHandler.swift */; };
 		F2CF9AE524705C8E008397E6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CF9AE424705C8E008397E6 /* AppDelegate.swift */; };
 		F2CF9AE724705C8E008397E6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CF9AE624705C8E008397E6 /* SceneDelegate.swift */; };
@@ -41,7 +40,7 @@
 		F2D92156248894F4007809F7 /* RenderHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D92155248894F4007809F7 /* RenderHandler.swift */; };
 		F2D92158248B13DF007809F7 /* StaticCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D92157248B13DF007809F7 /* StaticCompiler.swift */; };
 		F2D9215A248B13F4007809F7 /* Compiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D92159248B13F4007809F7 /* Compiler.swift */; };
-		F2D9215C2490444F007809F7 /* ProjectionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D9215B2490444F007809F7 /* ProjectionHandler.swift */; };
+		F2D9215C2490444F007809F7 /* MatrixTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D9215B2490444F007809F7 /* MatrixTransform.swift */; };
 		F4ECA39D24A7846300CCB385 /* Level.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4ECA39C24A7846300CCB385 /* Level.swift */; };
 /* End PBXBuildFile section */
 
@@ -85,7 +84,6 @@
 		F2578890249300EB00ACCD26 /* LogicHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicHandler.swift; sourceTree = "<group>"; };
 		F28179BF2495D4D800EC9243 /* MotionBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionBuilder.swift; sourceTree = "<group>"; };
 		F28179C12496B64400EC9243 /* MotionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionHandler.swift; sourceTree = "<group>"; };
-		F2A057AC2491C64C005342D1 /* TransitionCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionCompiler.swift; sourceTree = "<group>"; };
 		F2A057B02491CF68005342D1 /* InputHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputHandler.swift; sourceTree = "<group>"; };
 		F2CF9AE124705C8E008397E6 /* Perspective.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Perspective.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2CF9AE424705C8E008397E6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -104,7 +102,7 @@
 		F2D92155248894F4007809F7 /* RenderHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderHandler.swift; sourceTree = "<group>"; };
 		F2D92157248B13DF007809F7 /* StaticCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StaticCompiler.swift; sourceTree = "<group>"; };
 		F2D92159248B13F4007809F7 /* Compiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compiler.swift; sourceTree = "<group>"; };
-		F2D9215B2490444F007809F7 /* ProjectionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectionHandler.swift; sourceTree = "<group>"; };
+		F2D9215B2490444F007809F7 /* MatrixTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixTransform.swift; sourceTree = "<group>"; };
 		F4ECA39C24A7846300CCB385 /* Level.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Level.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -155,7 +153,7 @@
 				7A9B75C825453EFE00683F03 /* CompressionHandler.swift */,
 				7A3E8BAB2549C43000B4B680 /* ShaderTypes.h */,
 				7A4DD4EB26D088D30046AB63 /* Clipper.metal */,
-				F2D9215B2490444F007809F7 /* ProjectionHandler.swift */,
+				F2D9215B2490444F007809F7 /* MatrixTransform.swift */,
 				F28179C12496B64400EC9243 /* MotionHandler.swift */,
 				F2A057B02491CF68005342D1 /* InputHandler.swift */,
 				F2129882249D492800C98F32 /* ContactHandler.swift */,
@@ -173,7 +171,6 @@
 				F2D92159248B13F4007809F7 /* Compiler.swift */,
 				7A3E8BB2254E29D700B4B680 /* ArrivedCompiler.swift */,
 				F2D92157248B13DF007809F7 /* StaticCompiler.swift */,
-				F2A057AC2491C64C005342D1 /* TransitionCompiler.swift */,
 				F2553B35247339DE0089F132 /* Builder.swift */,
 				F2553B3824733A430089F132 /* LineBuilder.swift */,
 				F28179BF2495D4D800EC9243 /* MotionBuilder.swift */,
@@ -378,13 +375,12 @@
 				F2D92156248894F4007809F7 /* RenderHandler.swift in Sources */,
 				F2473F7524A2EBEE00EF3142 /* GoalBuilder.swift in Sources */,
 				F2A057B12491CF68005342D1 /* InputHandler.swift in Sources */,
-				F2D9215C2490444F007809F7 /* ProjectionHandler.swift in Sources */,
+				F2D9215C2490444F007809F7 /* MatrixTransform.swift in Sources */,
 				F2553B34247339370089F132 /* DrawItem.swift in Sources */,
 				F4ECA39D24A7846300CCB385 /* Level.swift in Sources */,
 				F2553B3B24733AEA0089F132 /* Plane.swift in Sources */,
 				F2553B32247338560089F132 /* GraphicsHandler.swift in Sources */,
 				7A9B75C925453EFE00683F03 /* CompressionHandler.swift in Sources */,
-				F2A057AD2491C64C005342D1 /* TransitionCompiler.swift in Sources */,
 				F2D9215A248B13F4007809F7 /* Compiler.swift in Sources */,
 				F2129883249D492800C98F32 /* ContactHandler.swift in Sources */,
 				F2553B36247339DE0089F132 /* Builder.swift in Sources */,

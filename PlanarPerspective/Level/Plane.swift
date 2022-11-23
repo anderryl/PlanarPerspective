@@ -9,53 +9,16 @@
 import Foundation
 import UIKit
 
-//Represents one of the six possible perspectives
-enum Plane {
-    case TOP
-    case BOTTOM
-    case FRONT
-    case BACK
+enum Direction {
+    case UP
+    case DOWN
     case LEFT
     case RIGHT
 }
 
-/*
- Front represents the xy plane
-                    ___------___
-              ___---            ---___
-              ---___    Top     ___---
-              |     ---______---     |
-              |          |           |
-              |          |           |
-              |   Front  |    Right  |
-              |          |           |
-              |          |           |
-              ---___     |      ___---
-                    ---__|___---
- */
-
-//Creates Factory based on phase
-typealias TransformFactory = (_ phase: CGFloat) -> Transform
-
-//Trasforms and flattens polygons according to plane and transition state
-struct Transform: Hashable, Equatable {
-    static func == (lhs: Transform, rhs: Transform) -> Bool {
-        if (lhs.from == rhs.from && lhs.to == rhs.to && lhs.prog == rhs.prog) {
-            return true
-        }
-        return false
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(to)
-        hasher.combine(from)
-        hasher.combine(abs(0.5 - prog))
-    }
-    
-    var method: (_ polygon: Polygon) -> Polygon
-    var from: Plane
-    var to: Plane
-    var prog: CGFloat
+enum Rotation {
+    case CLOCKWISE
+    case COUNTER
 }
       
 //Represents a three dimensional point
@@ -90,6 +53,14 @@ struct Vertex: Codable, Hashable {
     //Convert to MetalVertex Objective-C wrapper type for use with the Metal compression shader
     func harden() -> MetalVertex {
         return MetalVertex(x: Float(x), y: Float(y), z: Float(z))
+    }
+    
+    static func +(_ lhs: Vertex, _ rhs: Vertex) -> Vertex {
+        return Vertex(x: lhs.x + rhs.x, y: lhs.y + rhs.y, z: lhs.z + rhs.z)
+    }
+    
+    static func -(_ lhs: Vertex, _ rhs: Vertex) -> Vertex {
+        return Vertex(x: lhs.x - rhs.x, y: lhs.y - rhs.y, z: lhs.z - rhs.z)
     }
 }
 
@@ -309,9 +280,6 @@ struct Line {
     }
 }
 
-//A goal is an edge
-typealias Goal = Edge
-
 //Represents a 3D Box
 struct Region: Codable {
     var origin: Vertex
@@ -333,10 +301,10 @@ struct Region: Codable {
     }
     
     //Calculates the outline of the falttened region
-    func flatten(transform: Transform) -> Polygon {
+    func flatten(transform: MatrixTransform) -> Polygon {
         
-        let vertices = transform.method(Polygon(vertices: points)).vertices
-        
+        let vertices = points.map {transform * $0}
+
         func sweep(center: Vertex, point: Vertex) -> CGFloat {
             let dot: CGFloat = (point.y - center.y)
             let dist = sqrt(pow(center.x - point.x, 2) + pow(center.y - point.y, 2))
@@ -349,7 +317,7 @@ struct Region: Codable {
             }
             return theta
         }
-        
+
         var center = Vertex(x: 0, y: 0, z: 0)
         for vert in vertices {
             center.x += vert.x
@@ -359,13 +327,12 @@ struct Region: Codable {
         center.x /= CGFloat(vertices.count)
         center.y /= CGFloat(vertices.count)
         center.z /= CGFloat(vertices.count)
-        
+
         //Lol, get fucked future me
         var raw = vertices.map { (angle: sweep(center: center, point: $0), vert: $0) }.sorted { $0.angle > $1.angle }
-        print(raw)
         var sorted = raw.map { $0.vert }
         var removes: [Int] = []
-        
+
         func hits(_ first: Line, _ second: Line) -> Bool {
             //Calculate line vector components
             let delta1x = first.outpost.x - first.origin.x
@@ -375,7 +342,7 @@ struct Region: Codable {
 
             //Create a 2D matrix from the vectors and calculate the determinant
             let determinant = delta1x * delta2y - delta2x * delta1y
-            
+
             //If determinant is zero (or very close as approximation), the lines are parallel or colinear
             if abs(determinant) < 0.0001 {
                 return false
@@ -389,7 +356,7 @@ struct Region: Codable {
             }
             return false
         }
-        
+
         for i in 0 ..< sorted.count {
             let before = sorted[i - 1 < 0 ? sorted.count - 1 : i - 1]
             let after = sorted[(i + 1) % sorted.count]
@@ -399,37 +366,35 @@ struct Region: Codable {
                 continue
             }
             if hits(Line(origin: center.flatten(), outpost: current.flatten()), Line(origin: before.flatten(), outpost: after.flatten())) {
-                print(i.description + " hit")
                 removes.append(i)
             }
         }
-        
-        print(removes)
-        
+
         for i in removes.sorted().reversed() {
             sorted.remove(at: i)
         }
-        
+
         return Polygon(vertices: sorted)
     }
     
-    func restrain(position: CGPoint, transform: Transform, frame: CGRect, rotation: CGAffineTransform = CGAffineTransform()) -> CGPoint {
-        let flattened: [CGPoint] = flatten(transform: transform).vertices.map { $0.flatten().applying(rotation) }
+    func restrain(position: CGPoint, transform: MatrixTransform, frame: CGRect, rotation: CGAffineTransform = CGAffineTransform()) -> CGPoint {
+        //let flattened: [CGPoint] = flatten(transform: transform).vertices.map { $0.flatten() }
+        let flattened: [CGPoint] = (transform * self).points.map { $0.flatten() }
         
         let ymax = flattened.max(by: { $0.y < $1.y })!.y -  frame.height / 2
-        let ymin = flattened.max(by: { $0.y > $1.y })!.y +  frame.height / 2
+        let ymin = flattened.min(by: { $0.y < $1.y })!.y +  frame.height / 2
         let xmax = flattened.max(by: { $0.x < $1.x })!.x - frame.width / 2
-        let xmin = flattened.max(by: { $0.x > $1.x })!.x + frame.width / 2
+        let xmin = flattened.min(by: { $0.x < $1.x })!.x + frame.width / 2
         
         var y = min(max(ymin, position.y), ymax)
         var x = min(max(xmin, position.x), xmax)
         
-        if ymin > ymax {
-            y = frame.height / 2
-        }
-        if xmin > xmax {
-            x = frame.width / 2
-        }
+//        if ymin > ymax {
+//            y = frame.height / 2
+//        }
+//        if xmin > xmax {
+//            x = frame.width / 2
+//        }
         
         return CGPoint(x: x, y: y)
     }
@@ -437,13 +402,6 @@ struct Region: Codable {
     init(origin: Vertex, outpost: Vertex) {
         self.origin = origin
         self.outpost = outpost
-//        for x in [origin.x, outpost.x] {
-//            for y in [origin.y, outpost.y] {
-//                for z in [origin.z, outpost.z] {
-//                    points.append(Vertex(x: x, y: y, z: z))
-//                }
-//            }
-//        }
     }
 }
 
