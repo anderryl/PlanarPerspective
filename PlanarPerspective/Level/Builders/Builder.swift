@@ -11,9 +11,5 @@ import UIKit
 
 //Protocol for all builders
 protocol Builder {
-    var level: LevelView {get set}
-    
-    init(level: LevelView)
-    
-    func build(from: MatrixTransform, state: Int) -> [DrawItem]
+    func build(from: BuildSnapshot) -> [DrawItem]
 }

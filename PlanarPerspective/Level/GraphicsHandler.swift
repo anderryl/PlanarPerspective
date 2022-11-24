@@ -15,12 +15,21 @@ struct Invalid {
     var intensity: Double
 }
 
+struct Test {
+    var point: CGPoint
+    var valid: Bool
+    var intersect: CGPoint?
+}
+
 struct BuildSnapshot {
     var position: CGPoint
+    var center: CGPoint
+    var lines: [Line]
     var goal: [CGPoint]
     var queue: [CGPoint]
     var invalids: [Invalid]
-    var test: CGPoint?
+    var test: Test?
+    var frame: CGRect
     var state: Int
 }
 
@@ -38,22 +47,25 @@ class GraphicsHandler {
     init(level: LevelView) {
         self.level = level
         //Begin with a static compiler using the current plane
-        compiler = StaticCompiler(level: level)
+        compiler = StaticCompiler()
     }
     
     func center() -> CGPoint {
-        return compiler.getCenter()
+        return level.region.flatten(transform: level.matrix).restrain(position: (level.matrix * level.position).flatten(), frame: level.frame)
     }
     
     //Begin visual win sequence
     func arrived() {
-        compiler = ArrivedCompiler(supervisor: level, state: state)
+        compiler = ArrivedCompiler()
     }
     
     //Registers an invalid with the static compiler
     func registerInvalid(at point: CGPoint) {
-        if let stat = compiler as? StaticCompiler {
-            stat.registerInvalid(at: point)
+        switch level.state {
+        case .MOTION(let queue):
+            invalids.append(Invalid(origin: (level.matrix * queue.last!).flatten(), outpost: point, intensity: 1.0))
+        default:
+            invalids.append(Invalid(origin: (level.matrix * level.position).flatten(), outpost: point, intensity: 1.0))
         }
     }
     
@@ -65,30 +77,43 @@ class GraphicsHandler {
         default:
             queue = []
         }
+        let position = (level.matrix * level.position).flatten()
+        var test: Test? = nil
+        if let testpt = level.input.getTest() {
+            let intersect = level.contact.findContact(from: queue.last ?? position, to: testpt)
+            test = Test(
+                point: testpt,
+                valid: intersect == nil,
+                intersect: intersect
+            )
+        }
+        
         return BuildSnapshot(
-            position: (level.matrix * level.position).flatten(),
+            position: position,
+            center: center(),
+            lines: level.compression.compress(with: level.matrix),
             goal: level.goal.flatten(transform: level.matrix).vertices.map { $0.flatten() },
             queue: queue,
             invalids: invalids,
-            test: level.input.getTest(),
+            test: test,
+            frame: level.frame,
             state: state
         )
     }
     
-    func ageInvalids() {
+    func update() {
         var next: [Invalid] = []
         for invalid in invalids {
             next.append(Invalid(origin: invalid.origin, outpost: invalid.outpost, intensity: invalid.intensity - 0.02))
         }
         invalids = next
+        state += 1
     }
     
     //Retreives the visual elements from the current compiler
     func build() -> [DrawItem] {
-        //Increment the state value
-        state += 1
         
-        ageInvalids()
+        update()
         
         //Return the compiler results
         return compiler.compile(snapshot())

@@ -103,6 +103,21 @@ struct Polygon: Codable, Hashable {
         }
     }
     
+    func restrain(position: CGPoint, frame: CGRect) -> CGPoint {
+        //let flattened: [CGPoint] = flatten(transform: transform).vertices.map { $0.flatten() }
+        let flattened: [CGPoint] = vertices.map { $0.flatten() }
+        
+        let ymax = flattened.max(by: { $0.y < $1.y })!.y -  frame.height / 2
+        let ymin = flattened.min(by: { $0.y < $1.y })!.y +  frame.height / 2
+        let xmax = flattened.max(by: { $0.x < $1.x })!.x - frame.width / 2
+        let xmin = flattened.min(by: { $0.x < $1.x })!.x + frame.width / 2
+        
+        let y = min(max(ymin, position.y), ymax)
+        let x = min(max(xmin, position.x), xmax)
+        
+        return CGPoint(x: x, y: y)
+    }
+    
     //Converts to C++ wrapper type for use in Metal compression shader
     //VERY VERY MESSY
     func harden() -> MetalPolygon {
@@ -375,28 +390,6 @@ struct Region: Codable {
         }
 
         return Polygon(vertices: sorted)
-    }
-    
-    func restrain(position: CGPoint, transform: MatrixTransform, frame: CGRect, rotation: CGAffineTransform = CGAffineTransform()) -> CGPoint {
-        //let flattened: [CGPoint] = flatten(transform: transform).vertices.map { $0.flatten() }
-        let flattened: [CGPoint] = (transform * self).points.map { $0.flatten() }
-        
-        let ymax = flattened.max(by: { $0.y < $1.y })!.y -  frame.height / 2
-        let ymin = flattened.min(by: { $0.y < $1.y })!.y +  frame.height / 2
-        let xmax = flattened.max(by: { $0.x < $1.x })!.x - frame.width / 2
-        let xmin = flattened.min(by: { $0.x < $1.x })!.x + frame.width / 2
-        
-        var y = min(max(ymin, position.y), ymax)
-        var x = min(max(xmin, position.x), xmax)
-        
-//        if ymin > ymax {
-//            y = frame.height / 2
-//        }
-//        if xmin > xmax {
-//            x = frame.width / 2
-//        }
-        
-        return CGPoint(x: x, y: y)
     }
     
     init(origin: Vertex, outpost: Vertex) {

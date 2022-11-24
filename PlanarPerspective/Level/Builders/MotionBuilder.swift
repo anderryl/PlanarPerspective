@@ -11,63 +11,25 @@ import UIKit
 
 //Builder for visual motion effects
 class MotionBuilder: Builder {
-    //Supervisor
-    unowned var level: LevelView
     //Length of motion
     private let frames: Int = 50
-    //Invalid movements for visual representation
-    private var invalids: [CGPoint : (intensity: Double, origin: CGPoint)] = [:]
-    
-    //Initializes from supervisor reference
-    required init(level: LevelView) {
-        self.level = level
-    }
     
     //Builds motion elements using given transform and state
-    func build(from transform: MatrixTransform, state: Int) -> [DrawItem] {
-        //If in rest, only render invalids and test
-        //If in motion, complete a full render
-        let position = (transform * level.position).flatten()
-        switch level.state {
-        case .MOTION(let queue):
-            return generate(from: queue.map {(transform * $0).flatten()}, position: position, test: level.input.getTest(), state: state)
-        case .REST:
-            if let path = level.input.getTest() {
-                return generate(from: [], position: position, test: path, state: state)
-            }
-            else {
-                return generateInvalids(from: position, state: state)
-            }
-        default:
-            return []
-        }
-    }
-    
-    //Register an invalid movement attempt
-    func registerInvalid(from origin: CGPoint, to point: CGPoint) {
-        //Register in dictionary with initial intensity of 1.0
-        invalids[point] = (intensity: 1.0, origin: origin)
+    func build(from snapshot: BuildSnapshot) -> [DrawItem] {
+        return generate(from: snapshot.queue, position: snapshot.position, test: snapshot.test, state: snapshot.state, invalids: snapshot.invalids)
     }
     
     //Render the invalid movement attempts
-    private func generateInvalids(from position: CGPoint, state: Int) -> [DrawItem] {
+    private func generateInvalids(from position: CGPoint, state: Int, invalids: [Invalid]) -> [DrawItem] {
         //Allocate empty list for items
         var items: [DrawItem] = []
         
         //Build each individual invalid and append to list
-        for fail in invalids.keys {
+        for invalid in invalids {
             //Add a faux player at the endpoint and a line between the origin and outpost
-            let color: CGColor = .init(srgbRed: 1, green: 0, blue: 0, alpha: CGFloat(invalids[fail]!.intensity))
-            items.append(.LINE(invalids[fail]!.origin, fail, color, 2))
-            items.append(fauxPlayer(at: fail, in: color, state: state))
-            
-            //Decrement intensity and remove if at zero
-            if let intensity = invalids[fail]?.intensity, intensity > 0 {
-                invalids[fail]?.intensity = intensity - 0.02
-            }
-            else {
-                invalids.removeValue(forKey: fail)
-            }
+            let color: CGColor = .init(srgbRed: 1, green: 0, blue: 0, alpha: CGFloat(invalid.intensity))
+            items.append(.LINE(invalid.origin, invalid.outpost, color, 2))
+            items.append(fauxPlayer(at: invalid.outpost, in: color, state: state))
         }
         
         //Return completed list
@@ -110,7 +72,7 @@ class MotionBuilder: Builder {
     }
     
     //Generate the full motion effect given the queue and test point
-    private func generate(from queue: [CGPoint], position: CGPoint, test: CGPoint?, state: Int) -> [DrawItem] {
+    private func generate(from queue: [CGPoint], position: CGPoint, test: Test?, state: Int, invalids: [Invalid]) -> [DrawItem] {
         //The current visual phase based on state
         let phase = CGFloat(state % frames) / CGFloat(frames)
         
@@ -132,8 +94,8 @@ class MotionBuilder: Builder {
         for i in 0 ..< path.count - 1 {
             dist += path[i] | path[i + 1]
         }
-        if test != nil {
-            dist += path.last! | test!
+        if let concrete = test {
+            dist += path.last! | concrete.point
         }
         
         //Place ticks forward of offset
@@ -211,26 +173,26 @@ class MotionBuilder: Builder {
         
         //Build test path
         //Compile DrawItems in both colors
-        var items: [DrawItem] = generateInvalids(from: path.last ?? position, state: state)
+        var items: [DrawItem] = generateInvalids(from: path.last ?? position, state: state, invalids: invalids)
         
         //Allocate list to store red lines
         var redlines: [Line] = []
         
         //If there is a test, process it
-        if test != nil {
+        if let concrete = test {
             //If there is a contact, build a legitimate line to the contact, a legitimate faux player at it, an invalid from the contact to the destination, and an invalid faux player at the destination
-            if let contact = level.contact.findContact(from: path.last!, to: test!) {
-                blacklines.append(contentsOf: dotline(from: path.last!, to: contact))
-                redlines.append(contentsOf: dotline(from: contact, to: test!))
+            if !concrete.valid {
+                blacklines.append(contentsOf: dotline(from: path.last!, to: concrete.intersect!))
+                redlines.append(contentsOf: dotline(from: concrete.intersect!, to: concrete.point))
                 let color: CGColor = .init(srgbRed: 1, green: 0, blue: 0, alpha: 0.5)
-                items.append(fauxPlayer(at: contact, in: color, state: state))
-                items.append(fauxPlayer(at: test!, in: color, state: state))
+                items.append(fauxPlayer(at: concrete.intersect!, in: color, state: state))
+                items.append(fauxPlayer(at: concrete.point, in: color, state: state))
             }
             //If there is no contact, build legitimate line to outpost and a legitimate faux player at it
             else {
-                blacklines.append(contentsOf: dotline(from: path.last!, to: test!))
+                blacklines.append(contentsOf: dotline(from: path.last!, to: concrete.point))
                 let color: CGColor = .init(srgbRed: 0, green: 0, blue: 0, alpha: 0.5)
-                items.append(fauxPlayer(at: test!, in: color, state: state))
+                items.append(fauxPlayer(at: concrete.point, in: color, state: state))
             }
         }
         //If there is no test, build a faux player at the final destination

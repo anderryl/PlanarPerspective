@@ -12,59 +12,33 @@ import UIKit
 //Graphics Compiler for the REST and MOTION states
 class StaticCompiler: Compiler {
     
-    //Supervisor
-    unowned var level: LevelView
-    
     //Children builders for each level element
     internal var lines: LineBuilder
     internal var motion: MotionBuilder
     internal var player: PlayerBuilder
     internal var goal: GoalBuilder
-    internal var center: CGPoint?
     
     //Initializes from supervisor reference
-    init(level: LevelView) {
-        self.level = level
-        lines = LineBuilder(level: level)
-        player = PlayerBuilder(level: level)
-        motion = MotionBuilder(level: level)
-        goal = GoalBuilder(level: level)
-    }
-    
-    //Registers an invalid movement attempt for visualization
-    func registerInvalid(at point: CGPoint) {
-        switch level.state {
-        case .MOTION(let queue):
-            motion.registerInvalid(from: (level.matrix * queue.last!).flatten(), to: point)
-        case .REST:
-            motion.registerInvalid(from: (level.matrix * level.position).flatten(), to: point)
-        default:
-            break
-        }
-    }
-    
-    func getCenter() -> CGPoint {
-        if center == nil {
-            return level.region.restrain(position: player.location(), transform: level.matrix, frame: level.frame)
-        }
-        return center!
+    required init() {
+        lines = LineBuilder()
+        player = PlayerBuilder()
+        motion = MotionBuilder()
+        goal = GoalBuilder()
     }
     
     //Compile the results of each child builder
     func compile(_ snapshot: BuildSnapshot) -> [DrawItem] {
         //Compile results
         var items: [DrawItem] = []
-        items.append(contentsOf: lines.build(from: level.matrix, state: snapshot.state))
-        items.append(contentsOf: motion.build(from: level.matrix, state: snapshot.state))
-        items.append(contentsOf: player.build(from: level.matrix, state: snapshot.state))
-        items.append(contentsOf: goal.build(from: level.matrix, state: snapshot.state))
+        items.append(contentsOf: lines.build(from: snapshot))
+        items.append(contentsOf: motion.build(from: snapshot))
+        items.append(contentsOf: player.build(from: snapshot))
+        items.append(contentsOf: goal.build(from: snapshot))
         var translated: [DrawItem] = []
         
         //Find offset
-        let restrained = level.region.restrain(position: (level.matrix * level.position).flatten(), transform: level.matrix, frame: level.frame)
-        center = restrained
-        let dx = level.frame.width / 2 - restrained.x
-        let dy = level.frame.height / 2 - restrained.y
+        let dx = snapshot.frame.width / 2 - snapshot.center.x
+        let dy = snapshot.frame.height / 2 - snapshot.center.y
         
         //Apply offset to compiled results
         var translation = CGAffineTransform(translationX: dx, y: dy)

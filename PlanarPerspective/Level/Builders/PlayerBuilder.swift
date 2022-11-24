@@ -11,20 +11,10 @@ import UIKit
 
 //Builder for the player element
 class PlayerBuilder: Builder {
-    //Supervisor
-    unowned var level: LevelView
-    private var loc: CGPoint = CGPoint(x: 0, y: 0)
-    
-    //Initializes from supervisor reference
-    required init(level: LevelView) {
-        self.level = level
-    }
-    
     //Builds the player element given the transition and current state
-    func build(from transform: MatrixTransform, state: Int) -> [DrawItem] {
+    func build(from snapshot: BuildSnapshot) -> [DrawItem] {
         //Retreive the current position and flatten
-        let pos: CGPoint = (transform * level.position).flatten()
-        loc = pos
+        let pos: CGPoint = snapshot.position
         
         //Player visuals configuration
         let base = 10.0
@@ -36,8 +26,8 @@ class PlayerBuilder: Builder {
         
         //Equation for player shape with given state
         func place(_ arc: Double) -> CGPoint {
-            let x = cos(arc) * (base + variation * sin(Double(rounds) * arc + Double(state) / speed))
-            let y = sin(arc) * (base + variation * sin(Double(rounds) * arc - Double(state) / speed))
+            let x = cos(arc) * (base + variation * sin(Double(rounds) * arc + Double(snapshot.state) / speed))
+            let y = sin(arc) * (base + variation * sin(Double(rounds) * arc - Double(snapshot.state) / speed))
             return CGPoint(x: CGFloat(x) + pos.x, y: CGFloat(y) + pos.y)
         }
         
@@ -57,10 +47,5 @@ class PlayerBuilder: Builder {
         
         //Return path as a DrawItem
         return [DrawItem.PATH(path, .init(srgbRed: 0, green: 0, blue: 0, alpha: 1), 3)]
-    }
-    
-    //Returns the last stored two dimensional player location
-    func location() -> CGPoint {
-        return loc
     }
 }
