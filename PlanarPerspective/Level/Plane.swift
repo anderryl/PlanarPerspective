@@ -50,6 +50,11 @@ struct Vertex: Codable, Hashable {
         return sqrt(pow(other.x - x, 2) + pow(other.y - y, 2) + pow(other.z - z, 2))
     }
     
+    func applying(_ transform: CGAffineTransform) -> Vertex {
+        let pt = flatten().applying(transform)
+        return Vertex(x: pt.x, y: pt.y, z: z)
+    }
+    
     //Convert to MetalVertex Objective-C wrapper type for use with the Metal compression shader
     func harden() -> MetalVertex {
         return MetalVertex(x: Float(x), y: Float(y), z: Float(z))
@@ -61,6 +66,10 @@ struct Vertex: Codable, Hashable {
     
     static func -(_ lhs: Vertex, _ rhs: Vertex) -> Vertex {
         return Vertex(x: lhs.x - rhs.x, y: lhs.y - rhs.y, z: lhs.z - rhs.z)
+    }
+    
+    static func *(_ lhs: CGFloat, _ rhs: Vertex) -> Vertex {
+        return Vertex(x: lhs * rhs.x, y: lhs * rhs.y, z: lhs * rhs.z)
     }
 }
 
@@ -116,6 +125,10 @@ struct Polygon: Codable, Hashable {
         let x = min(max(xmin, position.x), xmax)
         
         return CGPoint(x: x, y: y)
+    }
+    
+    func applying(_ transform: CGAffineTransform) -> Polygon {
+        return Polygon(vertices: self.vertices.map { $0.applying(transform) })
     }
     
     //Converts to C++ wrapper type for use in Metal compression shader
@@ -251,15 +264,28 @@ struct Edge: Codable {
 struct Line {
     var origin: CGPoint
     var outpost: CGPoint
+    var intensity: CGFloat = 1.0
+    var thickness: CGFloat = 1.0
     
     init(origin: CGPoint, outpost: CGPoint) {
         self.origin = origin
         self.outpost = outpost
     }
     
+    init(origin: CGPoint, outpost: CGPoint, intensity: CGFloat, thickness: CGFloat) {
+        self.origin = origin
+        self.outpost = outpost
+        self.intensity = intensity
+        self.thickness = thickness
+    }
+    
     init(_ metal: MetalSegment) {
         self.origin = Vertex(metal.origin).flatten()
         self.outpost = Vertex(metal.outpost).flatten()
+    }
+    
+    func softened() -> Line {
+        return Line(origin: origin, outpost: outpost, intensity: 0.3, thickness: 5.0)
     }
     
     //Finds the intersection between two lines

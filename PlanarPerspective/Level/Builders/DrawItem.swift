@@ -11,7 +11,7 @@ import UIKit
 
 //Represents a drawable item
 enum DrawItem {
-    case LINE(CGPoint, CGPoint, CGColor, Int)
+    case LINE(CGPoint, CGPoint, CGColor, CGFloat, Int)
     case CIRCLE(CGPoint, CGFloat, CGColor, Int)
     case RECTANGLE(CGPoint, CGSize, CGColor, Int)
     case PATH(CGPath, CGColor, Int)

@@ -17,7 +17,6 @@ import UIKit
 /*
  TODO:
  - Refactor and Centralize Line Compression, Graphics and Contact currently doing independently
- - Finish Refactoring Projection
  */
 
 //The view for an individual level
@@ -99,8 +98,9 @@ class LevelView: UIView {
     //Calls the render delegate
     override func draw(_ rect: CGRect) {
         if let context = UIGraphicsGetCurrentContext() {
-            let items = graphics.build()
-            renderer!.render(items: items, context: context)
+            let frame = graphics.build()
+            input.update(frame.planeform)
+            renderer!.render(items: frame.items, context: context)
         }
     }
     

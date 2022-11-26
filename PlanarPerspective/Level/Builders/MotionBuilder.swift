@@ -16,11 +16,11 @@ class MotionBuilder: Builder {
     
     //Builds motion elements using given transform and state
     func build(from snapshot: BuildSnapshot) -> [DrawItem] {
-        return generate(from: snapshot.queue, position: snapshot.position, test: snapshot.test, state: snapshot.state, invalids: snapshot.invalids)
+        return generate(from: snapshot.queue, position: snapshot.position, test: snapshot.test, scale: snapshot.scale, state: snapshot.state, invalids: snapshot.invalids)
     }
     
     //Render the invalid movement attempts
-    private func generateInvalids(from position: CGPoint, state: Int, invalids: [Invalid]) -> [DrawItem] {
+    private func generateInvalids(from position: CGPoint, scale: CGFloat, state: Int, invalids: [CompressedInvalid]) -> [DrawItem] {
         //Allocate empty list for items
         var items: [DrawItem] = []
         
@@ -28,8 +28,8 @@ class MotionBuilder: Builder {
         for invalid in invalids {
             //Add a faux player at the endpoint and a line between the origin and outpost
             let color: CGColor = .init(srgbRed: 1, green: 0, blue: 0, alpha: CGFloat(invalid.intensity))
-            items.append(.LINE(invalid.origin, invalid.outpost, color, 2))
-            items.append(fauxPlayer(at: invalid.outpost, in: color, state: state))
+            items.append(.LINE(invalid.origin, invalid.outpost, color, 1.0, 2))
+            items.append(fauxPlayer(at: invalid.outpost, in: color, scale: scale, state: state))
         }
         
         //Return completed list
@@ -37,9 +37,9 @@ class MotionBuilder: Builder {
     }
     
     //Builds a faux player based on state at the specified position
-    private func fauxPlayer(at position: CGPoint, in color: CGColor, state: Int) -> DrawItem {
+    private func fauxPlayer(at position: CGPoint, in color: CGColor, scale: CGFloat, state: Int) -> DrawItem {
         //Player visuals configuration
-        let base = 10.0
+        let base = 10.0 * scale
         let variation = 0.5
         let rounds = 3
         let points = 8
@@ -72,7 +72,7 @@ class MotionBuilder: Builder {
     }
     
     //Generate the full motion effect given the queue and test point
-    private func generate(from queue: [CGPoint], position: CGPoint, test: Test?, state: Int, invalids: [Invalid]) -> [DrawItem] {
+    private func generate(from queue: [CGPoint], position: CGPoint, test: Test?, scale: CGFloat, state: Int, invalids: [CompressedInvalid]) -> [DrawItem] {
         //The current visual phase based on state
         let phase = CGFloat(state % frames) / CGFloat(frames)
         
@@ -173,7 +173,7 @@ class MotionBuilder: Builder {
         
         //Build test path
         //Compile DrawItems in both colors
-        var items: [DrawItem] = generateInvalids(from: path.last ?? position, state: state, invalids: invalids)
+        var items: [DrawItem] = generateInvalids(from: path.last ?? position, scale: scale, state: state, invalids: invalids)
         
         //Allocate list to store red lines
         var redlines: [Line] = []
@@ -185,28 +185,28 @@ class MotionBuilder: Builder {
                 blacklines.append(contentsOf: dotline(from: path.last!, to: concrete.intersect!))
                 redlines.append(contentsOf: dotline(from: concrete.intersect!, to: concrete.point))
                 let color: CGColor = .init(srgbRed: 1, green: 0, blue: 0, alpha: 0.5)
-                items.append(fauxPlayer(at: concrete.intersect!, in: color, state: state))
-                items.append(fauxPlayer(at: concrete.point, in: color, state: state))
+                items.append(fauxPlayer(at: concrete.intersect!, in: color, scale: scale, state: state))
+                items.append(fauxPlayer(at: concrete.point, in: color, scale: scale, state: state))
             }
             //If there is no contact, build legitimate line to outpost and a legitimate faux player at it
             else {
                 blacklines.append(contentsOf: dotline(from: path.last!, to: concrete.point))
                 let color: CGColor = .init(srgbRed: 0, green: 0, blue: 0, alpha: 0.5)
-                items.append(fauxPlayer(at: concrete.point, in: color, state: state))
+                items.append(fauxPlayer(at: concrete.point, in: color, scale: scale, state: state))
             }
         }
         //If there is no test, build a faux player at the final destination
         else {
             let color: CGColor = .init(srgbRed: 0, green: 0, blue: 0, alpha: 0.5)
-            items.append(fauxPlayer(at: path.last!, in: color, state: state))
+            items.append(fauxPlayer(at: path.last!, in: color, scale: scale, state: state))
         }
         
         //Build the draw items depending on color
         for line in blacklines {
-            items.append(.LINE(line.origin, line.outpost, .init(srgbRed: 0, green: 0, blue: 0, alpha: 1), 2))
+            items.append(.LINE(line.origin, line.outpost, .init(srgbRed: 0, green: 0, blue: 0, alpha: 1), 1.0, 2))
         }
         for line in redlines {
-            items.append(.LINE(line.origin, line.outpost, .init(srgbRed: 1, green: 0, blue: 0, alpha: 1), 2))
+            items.append(.LINE(line.origin, line.outpost, .init(srgbRed: 1, green: 0, blue: 0, alpha: 1), 1.0, 2))
         }
         
         //Return the final results

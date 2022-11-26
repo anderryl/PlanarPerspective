@@ -17,7 +17,7 @@ class PlayerBuilder: Builder {
         let pos: CGPoint = snapshot.position
         
         //Player visuals configuration
-        let base = 10.0
+        let base = 10.0 * snapshot.scale
         let variation = 0.5
         let rounds = 3
         let points = 8

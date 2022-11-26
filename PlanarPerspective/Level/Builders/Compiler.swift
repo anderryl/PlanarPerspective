@@ -13,5 +13,5 @@ import CoreGraphics
 protocol Compiler {
     init()
     
-    func compile(_ snapshot: BuildSnapshot) -> [DrawItem]
+    func compile(_ snapshot: BuildSnapshot) -> Frame
 }

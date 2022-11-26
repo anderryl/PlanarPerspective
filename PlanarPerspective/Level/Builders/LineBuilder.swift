@@ -14,7 +14,7 @@ class LineBuilder: Builder {
     func  build(from snapshot: BuildSnapshot) -> [DrawItem] {
         var ret: [DrawItem] = []
         for line in snapshot.lines {
-            ret.append(.LINE(line.origin, line.outpost, .init(srgbRed: 0.0, green: 0.0, blue: 0.0, alpha: 1.0), 0))
+            ret.append(.LINE(line.origin, line.outpost, .init(srgbRed: 0.0, green: 0.0, blue: 0.0, alpha: line.intensity), line.thickness, 0))
         }
         return ret
     }

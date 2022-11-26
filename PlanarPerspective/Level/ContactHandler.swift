@@ -22,12 +22,12 @@ class ContactHandler {
     }
     
     //Find contacts along player path with environment lines
-    func findContact(from position: CGPoint, to point: CGPoint) -> CGPoint? {
+    func findContact(from position: Position, to point: Position) -> Position? {
+        let transform = level.matrix
         //Allocates empty array for collisions
         var contacts: [CGPoint] = []
-        let player = Line(origin: position, outpost: point)
+        let player = Line(origin: (transform * position).flatten(), outpost: (transform * point).flatten())
         //Compress the polygons onto the current plane
-        let transform = level.matrix
         let lines: [Line] = level.compression.compress(with: transform)
         //Iterate through lines and find collisions
         for line in lines {
@@ -42,8 +42,8 @@ class ContactHandler {
         let closest = contacts.max(by: { $0 | player.origin > $1 | player.origin })
         
         //Return the closest
-        if let best = closest, best | position < position | point {
-            return best
+        if let best = closest, best | player.origin < player.origin | player.outpost {
+            return (transform.inverted() * Position(x: best.x, y: best.y, z: (level.matrix * position).z))
         }
         
         //If no collisions, return nil

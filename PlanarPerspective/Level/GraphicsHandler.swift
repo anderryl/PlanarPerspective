@@ -10,9 +10,15 @@ import Foundation
 import CoreGraphics
 
 struct Invalid {
+    let origin: Position
+    let outpost: Position
+    var intensity: Double
+}
+
+struct CompressedInvalid {
     let origin: CGPoint
     let outpost: CGPoint
-    var intensity: Double
+    let intensity: Double
 }
 
 struct Test {
@@ -23,14 +29,36 @@ struct Test {
 
 struct BuildSnapshot {
     var position: CGPoint
-    var center: CGPoint
+    var bounds: Polygon
+    var scale: CGFloat
     var lines: [Line]
     var goal: [CGPoint]
     var queue: [CGPoint]
-    var invalids: [Invalid]
+    var invalids: [CompressedInvalid]
     var test: Test?
     var frame: CGRect
     var state: Int
+    
+    func applying(_ transform: CGAffineTransform) -> BuildSnapshot {
+        return BuildSnapshot(
+            position: position.applying(transform),
+            bounds: bounds.applying(transform),
+            //Some of the most heinous code ever written
+            scale: (CGPoint(x: 0, y: 0).applying(transform) | CGPoint(x: 1, y: 1).applying(transform)) / sqrt(2.0),
+            lines: lines.map { Line(origin: $0.origin.applying(transform), outpost: $0.outpost.applying(transform)) },
+            goal: goal.map { $0.applying(transform) },
+            queue: queue.map { $0.applying(transform) },
+            invalids: invalids.map { CompressedInvalid(origin: $0.origin.applying(transform), outpost: $0.outpost.applying(transform), intensity: $0.intensity ) },
+            test: test == nil ? nil : Test(point: test!.point.applying(transform), valid: test!.valid, intersect: test!.intersect?.applying(transform)),
+            frame: frame,
+            state: state
+        )
+    }
+}
+
+struct Frame {
+    var items: [DrawItem]
+    var planeform: CGAffineTransform
 }
 
 //Delegate class for building the graphics elements
@@ -50,51 +78,53 @@ class GraphicsHandler {
         compiler = StaticCompiler()
     }
     
-    func center() -> CGPoint {
-        return level.region.flatten(transform: level.matrix).restrain(position: (level.matrix * level.position).flatten(), frame: level.frame)
-    }
-    
     //Begin visual win sequence
     func arrived() {
         compiler = ArrivedCompiler()
     }
     
     //Registers an invalid with the static compiler
-    func registerInvalid(at point: CGPoint) {
+    func registerInvalid(at point: Position) {
         switch level.state {
         case .MOTION(let queue):
-            invalids.append(Invalid(origin: (level.matrix * queue.last!).flatten(), outpost: point, intensity: 1.0))
+            invalids.append(Invalid(origin: queue.last!, outpost: point, intensity: 1.0))
         default:
-            invalids.append(Invalid(origin: (level.matrix * level.position).flatten(), outpost: point, intensity: 1.0))
+            invalids.append(Invalid(origin: level.position, outpost: point, intensity: 1.0))
         }
     }
     
     func snapshot() -> BuildSnapshot {
         let queue: [CGPoint]
+        let queuethree: [Position]
         switch level.state {
         case .MOTION(let q):
             queue = q.map { (level.matrix * $0).flatten() }
+            queuethree = q
         default:
             queue = []
+            queuethree = []
         }
         let position = (level.matrix * level.position).flatten()
         var test: Test? = nil
         if let testpt = level.input.getTest() {
-            let intersect = level.contact.findContact(from: queue.last ?? position, to: testpt)
+            let intersect = level.contact.findContact(from: queuethree.last ?? level.position, to: level.matrix.unfold(point: testpt, onto: level.position))
             test = Test(
                 point: testpt,
                 valid: intersect == nil,
-                intersect: intersect
+                intersect: intersect == nil ? nil : (level.matrix * intersect!).flatten()
             )
         }
         
+        let bounds = level.region.flatten(transform: level.matrix)
+        
         return BuildSnapshot(
             position: position,
-            center: center(),
+            bounds: bounds,
+            scale: 1,
             lines: level.compression.compress(with: level.matrix),
             goal: level.goal.flatten(transform: level.matrix).vertices.map { $0.flatten() },
             queue: queue,
-            invalids: invalids,
+            invalids: invalids.map { CompressedInvalid(origin: (level.matrix * $0.origin).flatten(), outpost: (level.matrix * $0.outpost).flatten(), intensity: $0.intensity) },
             test: test,
             frame: level.frame,
             state: state
@@ -111,8 +141,7 @@ class GraphicsHandler {
     }
     
     //Retreives the visual elements from the current compiler
-    func build() -> [DrawItem] {
-        
+    func build() -> Frame {
         update()
         
         //Return the compiler results

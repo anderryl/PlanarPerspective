@@ -13,6 +13,7 @@ import UIKit
 class InputHandler {
     //The current test point
     private var test: CGPoint?
+    private var planeform: CGAffineTransform!
     //Gesture recognizers
     private var left: UISwipeGestureRecognizer!
     private var right: UISwipeGestureRecognizer!
@@ -55,6 +56,7 @@ class InputHandler {
         forward.direction = .left
         back.numberOfTouchesRequired = 2
         forward.numberOfTouchesRequired = 2
+        planeform = CGAffineTransform()
         
         for rec in [up, down, right, left, tap, long, pan, rotation, back, forward] {
             rec!.cancelsTouchesInView = false
@@ -93,16 +95,16 @@ class InputHandler {
     //Called when a tap gesture is detected
     @objc func tapped(_ recognizer: UITapGestureRecognizer) {
         let loc = recognizer.location(in: level)
-        touch(level.matrix.unfold(point: transform(loc), onto: level.position))
+        touch(level.matrix.unfold(point: loc.applying(planeform), onto: level.position))
     }
     
     //Called when a pan gesture is detected. Tests if still active; attempts move if ended.
     @objc func pan(_ recognizer: UIPanGestureRecognizer) {
         if recognizer.numberOfTouches > 2 {
             let loc = recognizer.location(in: level)
-            test(touch: transform(loc))
+            test(touch: loc.applying(planeform))
             if recognizer.state == .ended {
-                touch(level.matrix.unfold(point: transform(loc), onto: level.position))
+                touch(level.matrix.unfold(point: loc.applying(planeform), onto: level.position))
             }
         }
     }
@@ -110,19 +112,19 @@ class InputHandler {
     //Called when a long press is detected. Tests if still active; attempts move if ended.
     @objc func longed(_ recognizer: UILongPressGestureRecognizer) {
         let loc = recognizer.location(in: level)
-        test(touch: transform(loc))
+        test(touch: loc.applying(planeform))
         if recognizer.state == .ended {
-            touch(level.matrix.unfold(point: transform(loc), onto: level.position))
+            touch(level.matrix.unfold(point: loc.applying(planeform), onto: level.position))
         }
     }
     
     @objc func rotate(_ recognizer: UIRotationGestureRecognizer) {
         if abs(recognizer.rotation) > 3.14159 / 4 {
             if recognizer.rotation > 0 {
-                level.logic.attemptTwist(rotation: .CLOCKWISE)
+                level.logic.attemptTwist(rotation: .COUNTER)
             }
             else {
-                level.logic.attemptTwist(rotation: .COUNTER)
+                level.logic.attemptTwist(rotation: .CLOCKWISE)
             }
         }
     }
@@ -158,11 +160,7 @@ class InputHandler {
         level.logic.attemptMove(to: touch)
     }
     
-    //Retreives the current position transformation based on player location and current plane
-    func transform(_ point: CGPoint) -> CGPoint {
-        let center = level.graphics.center()
-        let x = point.x + center.x - level.frame.width / 2
-        let y = point.y + center.y - level.frame.height / 2
-        return CGPoint(x: x, y: y)
+    func update(_ planeform: CGAffineTransform) {
+        self.planeform = planeform
     }
 }

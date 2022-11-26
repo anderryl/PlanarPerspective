@@ -40,19 +40,12 @@ class LogicHandler {
         case .TRANSITION(let factory, let progress, let length):
             level.matrix = factory(CGFloat(progress) / CGFloat(length))
             if progress == length {
-                print("\n\n\nArrived:")
-                
                 level.state = .REST
                 level.matrix = level.matrix.normalized()
             }
             else {
                 level.state = .TRANSITION(factory, progress + 1, length)
-                print("\n")
             }
-            print(level.matrix)
-            print(level.matrix * level.region)
-            print(level.graphics.center())
-            print(level.position!)
         default:
             break
         }
@@ -87,9 +80,8 @@ class LogicHandler {
         //If at rest or in motion, perform the movement
         switch level.state {
         case .REST:
-            let pos = (level.matrix * level.position)
             //If there is a collision notify the graphics handler
-            if let contact = level.contact.findContact(from: pos.flatten(), to: (level.matrix * point).flatten()) {
+            if let contact = level.contact.findContact(from: level.position, to: point) {
                 level.graphics.registerInvalid(at: contact)
                 return
             }
@@ -97,7 +89,7 @@ class LogicHandler {
             level.motion.input()
         case .MOTION(var queue):
             //If there is a collision notify the graphics handler
-            if let contact = level.contact.findContact(from: (level.matrix * queue.last!).flatten(), to: (level.matrix * point).flatten()) {
+            if let contact = level.contact.findContact(from: queue.last!, to: point) {
                 level.graphics.registerInvalid(at: contact)
                 return
             }
