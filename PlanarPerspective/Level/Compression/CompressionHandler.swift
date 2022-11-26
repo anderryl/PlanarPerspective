@@ -56,14 +56,30 @@ class CompressionHandler {
     
     //Compress the polygons using a given transform
     func compress(with transform: MatrixTransform) -> [Line] {
+        
         //If there is a cached result, use it
-        if let cached = cache[transform.hash()] {
+        let hash = transform.hash()
+        if let cached = cache[hash] {
             for item in cached {
                 if item.transform == transform {
                     return item.lines
                 }
             }
+            for item in cached {
+                //God, I love writing unmaintainable code
+                if item.transform ~~ transform {
+                    let res = item.lines.map { transform * (item.transform.inverted() * $0) }
+                    if let cohashes = cache[hash] {
+                        cache[transform.hash()] = cohashes + [(transform: transform, lines: res)]
+                    }
+                    else {
+                        cache[hash] = [(transform: transform, lines: res)]
+                    }
+                    return res
+                }
+            }
         }
+        
         
         //Transformed polygons as MetalPolygon wrapper types
         let standards: [MetalPolygon] = polys.map { (transform * $0).harden() }

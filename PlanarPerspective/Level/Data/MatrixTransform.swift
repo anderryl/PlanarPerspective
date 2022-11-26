@@ -9,6 +9,8 @@
 import Foundation
 import UIKit
 
+infix operator ~~
+
 typealias MatrixTransform = [[CGFloat]]
 
 typealias MatrixTransformFactory = (_ theta: CGFloat) -> MatrixTransform
@@ -47,6 +49,17 @@ extension MatrixTransform {
         )
     }
     
+    static func *(_ rhs: MatrixTransform, _ lhs: CGPoint) -> CGPoint {
+        return CGPoint(
+            x: rhs[0][0] * lhs.x + rhs[0][1] * lhs.y,
+            y: rhs[1][0] * lhs.x + rhs[1][1] * lhs.y
+        )
+    }
+    
+    static func *(_ lhs: MatrixTransform, _ rhs: Line) -> Line {
+        return Line(origin: lhs * rhs.origin, outpost: lhs * rhs.outpost, intensity: rhs.intensity, thickness: rhs.thickness)
+    }
+    
     static func *(_ rhs: MatrixTransform, _ lhs: Polygon) -> Polygon {
         return Polygon(vertices: lhs.vertices.map({rhs * $0}))
     }
@@ -61,6 +74,21 @@ extension MatrixTransform {
                 if rhs[i][j] != lhs[i][j] {
                     return false
                 }
+            }
+        }
+        return true
+    }
+    
+    static func ~~(_ rhs: MatrixTransform, _ lhs: MatrixTransform) -> Bool {
+        for i in 0 ..< 3 {
+            if rhs[i][2] != lhs[i][2] {
+                return false
+            }
+        }
+        
+        for j in 0 ..< 3 {
+            if rhs[2][j] != lhs[2][j] {
+                return false
             }
         }
         return true
@@ -144,10 +172,11 @@ extension MatrixTransform {
     
     func hash() -> Int {
         var into = 0
-        for r in self {
-            for c in r {
-                into = (Int(bitPattern: c.bitPattern)^into)^(into<<1) + 1
-            }
+        for r in 0 ..< 3 {
+            into = (Int(bitPattern: self[r][2].bitPattern)^into)^(into<<1) + 1
+        }
+        for c in 0 ..< 2 {
+            into = (Int(bitPattern: self[2][c].bitPattern)^into)^(into<<1) + 1
         }
         return into
     }
