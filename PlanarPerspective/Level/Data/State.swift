@@ -15,4 +15,37 @@ enum State {
     case MOTION([Position])
     case TRANSITION(MatrixTransformFactory, Int, Int)
     case ARRIVED
+    
+    static func ~~(_ lhs: State, _ rhs: State) -> Bool {
+        switch lhs {
+        case .REST:
+            switch rhs {
+            case .REST:
+                return true
+            default:
+                return false
+            }
+        case .TRANSITION(_, _, _):
+            switch rhs {
+            case .TRANSITION(_, _, _):
+                return true
+            default:
+                return false
+            }
+        case .MOTION(_):
+            switch rhs {
+            case .MOTION(_):
+                return true
+            default:
+                return false
+            }
+        case .ARRIVED:
+            switch rhs {
+            case .ARRIVED:
+                return true
+            default:
+                return false
+            }
+        }
+    }
 }

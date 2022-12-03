@@ -14,12 +14,19 @@ class ArrivedCompiler: Compiler {
     internal var lines: LineBuilder
     internal var motion: MotionBuilder
     internal var player: PlayerBuilder
+    internal var scaler: Scaler
     
     required init() {
         lines = LineBuilder()
         player = PlayerBuilder()
         motion = MotionBuilder()
-    }    
+        scaler = ScalerFactory.BOUNDED.build()
+    }
+    
+    func setScaler(_ nscaler: @escaping Scaler) {
+        scaler = nscaler
+    }
+    
     func compile(_ snapshot: BuildSnapshot) -> Frame {
         
         var translated: [DrawItem] = []

@@ -119,7 +119,7 @@ class InputHandler {
     }
     
     @objc func rotate(_ recognizer: UIRotationGestureRecognizer) {
-        if abs(recognizer.rotation) > 3.14159 / 4 {
+        if abs(recognizer.rotation) > 3.14159 / 8 {
             if recognizer.rotation > 0 {
                 level.logic.attemptTwist(rotation: .COUNTER)
             }

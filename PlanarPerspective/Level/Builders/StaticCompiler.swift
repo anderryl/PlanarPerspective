@@ -17,6 +17,7 @@ class StaticCompiler: Compiler {
     internal var motion: MotionBuilder
     internal var player: PlayerBuilder
     internal var goal: GoalBuilder
+    internal var scaler: Scaler
     
     //Initializes from supervisor reference
     required init() {
@@ -24,27 +25,23 @@ class StaticCompiler: Compiler {
         player = PlayerBuilder()
         motion = MotionBuilder()
         goal = GoalBuilder()
+        scaler = ScalerFactory.BOUNDED.build()
+    }
+    
+    func setScaler(_ nscaler: @escaping Scaler) {
+        scaler = nscaler
     }
     
     //Compile the results of each child builder
     func compile(_ snapshot: BuildSnapshot) -> Frame {
         //Compile results
         
-        let vertices = snapshot.bounds.vertices.map { $0.flatten() }
-        let xmap = vertices.map { $0.x }
-        let ymap = vertices.map { $0.y }
-
-        let xspan = xmap.max()! - xmap.min()!
-        let yspan = ymap.max()! - ymap.min()!
-
-        let scale = max(snapshot.frame.width / xspan, snapshot.frame.height / yspan)
+        let scale = scaler(snapshot.bounds, snapshot.frame, snapshot.state)
         let scaleform = CGAffineTransform(scaleX: scale, y: scale)
 
         let scaledSnap = snapshot.applying(scaleform)
 
         let center = scaledSnap.bounds.restrain(position: scaledSnap.position, frame: snapshot.frame)
-        
-        //let center = snapshot.bounds.restrain(position: snapshot.position, frame: snapshot.frame)
         
         
         //Find offset

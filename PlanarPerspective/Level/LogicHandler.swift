@@ -40,11 +40,11 @@ class LogicHandler {
         case .TRANSITION(let factory, let progress, let length):
             level.matrix = factory(CGFloat(progress) / CGFloat(length))
             if progress == length {
-                level.state = .REST
+                updateState(.REST)
                 level.matrix = level.matrix.normalized()
             }
             else {
-                level.state = .TRANSITION(factory, progress + 1, length)
+                updateState(.TRANSITION(factory, progress + 1, length))
             }
         default:
             break
@@ -56,7 +56,7 @@ class LogicHandler {
         //If at rest, perform the transition
         switch level.state {
         case .REST:
-            level.state = .TRANSITION(level.matrix.slide(in: direction), 0, 30)
+            updateState(.TRANSITION(level.matrix.slide(in: direction), 0, 30))
         default:
             //Negative Feedback
             return
@@ -68,7 +68,7 @@ class LogicHandler {
         //If at rest, perform the transition
         switch level.state {
         case .REST:
-            level.state = .TRANSITION(level.matrix.twist(in: rotation), 0, 30)
+            updateState(.TRANSITION(level.matrix.twist(in: rotation), 0, 30))
         default:
             //Negative Feedback
             return
@@ -85,7 +85,7 @@ class LogicHandler {
                 level.graphics.registerInvalid(at: contact)
                 return
             }
-            level.state = .MOTION([point])
+            updateState(.MOTION([point]))
             level.motion.input()
         case .MOTION(var queue):
             //If there is a collision notify the graphics handler
@@ -94,10 +94,17 @@ class LogicHandler {
                 return
             }
             queue.append(point)
-            level.state = .MOTION(queue)
+            updateState(.MOTION(queue))
         default:
             //Negative Feedback
             return
         }
+    }
+    
+    func updateState(_ nstate: State) {
+        if !(nstate ~~ level.state) {
+            level.graphics.notifyStateChange(nstate)
+        }
+        level.state = nstate
     }
 }

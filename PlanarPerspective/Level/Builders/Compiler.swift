@@ -13,5 +13,7 @@ import CoreGraphics
 protocol Compiler {
     init()
     
+    func setScaler(_ nscaler: @escaping Scaler)
+    
     func compile(_ snapshot: BuildSnapshot) -> Frame
 }

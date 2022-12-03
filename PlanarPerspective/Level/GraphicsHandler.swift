@@ -140,6 +140,17 @@ class GraphicsHandler {
         state += 1
     }
     
+    func notifyStateChange(_ nstate: State) {
+        switch nstate {
+        case.TRANSITION(let factory, _, let length):
+            compiler.setScaler(ScalerFactory.TRANSITING(factory(0.0), factory(1.0), level.region, state, length).build())
+        case .REST:
+            compiler.setScaler(ScalerFactory.BOUNDED.build())
+        default:
+            break
+        }
+    }
+    
     //Retreives the visual elements from the current compiler
     func build() -> Frame {
         update()

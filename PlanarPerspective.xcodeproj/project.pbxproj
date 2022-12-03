@@ -13,6 +13,7 @@
 		7A4DD4EC26D088D30046AB63 /* Clipper.metal in Sources */ = {isa = PBXBuildFile; fileRef = 7A4DD4EB26D088D30046AB63 /* Clipper.metal */; };
 		7A5E5904284457D700A4DFD0 /* Recursion.json in Resources */ = {isa = PBXBuildFile; fileRef = 7A5E5903284457D700A4DFD0 /* Recursion.json */; };
 		7A87A0EE283EF7070086171B /* ClusterFuck.json in Resources */ = {isa = PBXBuildFile; fileRef = 7A87A0ED283EF7070086171B /* ClusterFuck.json */; };
+		7A9239BF29393EE00027BC6C /* Scaler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A9239BE29393EE00027BC6C /* Scaler.swift */; };
 		7A9571562931B0C800AA8431 /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A9571552931B0C800AA8431 /* Direction.swift */; };
 		7A9571582931B0FE00AA8431 /* Polygon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A9571572931B0FE00AA8431 /* Polygon.swift */; };
 		7A95715A2931B11300AA8431 /* Vertex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A9571592931B11300AA8431 /* Vertex.swift */; };
@@ -75,6 +76,7 @@
 		7A4DD4EB26D088D30046AB63 /* Clipper.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Clipper.metal; sourceTree = "<group>"; };
 		7A5E5903284457D700A4DFD0 /* Recursion.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Recursion.json; sourceTree = "<group>"; };
 		7A87A0ED283EF7070086171B /* ClusterFuck.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ClusterFuck.json; sourceTree = "<group>"; };
+		7A9239BE29393EE00027BC6C /* Scaler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scaler.swift; sourceTree = "<group>"; };
 		7A9571552931B0C800AA8431 /* Direction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Direction.swift; path = ../../../../../WebApp/Direction.swift; sourceTree = "<group>"; };
 		7A9571572931B0FE00AA8431 /* Polygon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Polygon.swift; sourceTree = "<group>"; };
 		7A9571592931B11300AA8431 /* Vertex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vertex.swift; sourceTree = "<group>"; };
@@ -202,6 +204,7 @@
 			isa = PBXGroup;
 			children = (
 				F2553B33247339370089F132 /* DrawItem.swift */,
+				7A9239BE29393EE00027BC6C /* Scaler.swift */,
 				F2D92159248B13F4007809F7 /* Compiler.swift */,
 				7A3E8BB2254E29D700B4B680 /* ArrivedCompiler.swift */,
 				F2D92157248B13DF007809F7 /* StaticCompiler.swift */,
@@ -406,6 +409,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F2578891249300EB00ACCD26 /* LogicHandler.swift in Sources */,
+				7A9239BF29393EE00027BC6C /* Scaler.swift in Sources */,
 				F2D92156248894F4007809F7 /* RenderHandler.swift in Sources */,
 				F2473F7524A2EBEE00EF3142 /* GoalBuilder.swift in Sources */,
 				7A9571602931B16E00AA8431 /* Region.swift in Sources */,
