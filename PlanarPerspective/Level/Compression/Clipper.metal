@@ -106,7 +106,6 @@ static Intersection intersect(MetalSegment first, MetalSegment second) {
 Determines whether a line penetrates the juncture created by two other segments
 */
 static bool penetrates(MetalSegment line, MetalVertex first, MetalVertex second) {
-    
     //The vector of the line
     float2 vec = {line.outpost.x - line.origin.x, line.outpost.y - line.origin.y};
     //The offset of the first point
@@ -164,8 +163,7 @@ static bool exclusive(MetalSegment line, MetalPolygon polygon) {
 /*
 Determine whether a segment is above a polygon
 */
-static bool above(MetalVertex vert, MetalPolygon polygon, int index) {
-    
+static bool above(MetalVertex vert, MetalPolygon polygon) {
     //Find the vectors of the polygon edges
     float dfx = polygon.vertices[1].x - polygon.vertices[0].x;
     float dfy = polygon.vertices[1].y - polygon.vertices[0].y;
@@ -189,10 +187,14 @@ static bool above(MetalVertex vert, MetalPolygon polygon, int index) {
     return vert.z < z || abs(vert.z - z) < 1;
 }
 
+static MetalSegment extract(MetalPolygon polygon, int i) {
+    return {polygon.vertices[i], polygon.vertices[(i + 1) % polygon.count], {}};
+}
+
 /*
  Calculates the intersections with a given polygon and updates the markline with the new intersections
  */
-static MetalSegment clip(MetalSegment line, MetalPolygon polygon, int index) {
+static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device ThreadResource &resource) {
     
     //If there are only two vertices no clipping is nessecary
     int count = polygon.count;
@@ -200,9 +202,9 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, int index) {
         return line;
     }
     
+    
     //Allocate arrays to store the intersections and edges
-    Intersection stack[20];
-    MetalSegment edges[20];
+    device Intersection (&stack)[20] = resource.intersections;
     
     //If the line is a point, return a blank
     if (abs(line.outpost.x - line.origin.x) < 1 && abs(line.outpost.y - line.origin.y) < 1) {
@@ -215,19 +217,20 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, int index) {
     }
     
     //If both endpoints lie above the plane of the polygon, no clipping is nessecary
-    if (above(line.origin, polygon, index) && above(line.outpost, polygon, index)) {
+    if (above(line.origin, polygon) && above(line.outpost, polygon)) {
         return line;
     }
     
     //Flags for line adjoining the polygon
     int adjoiner = -1;
     
+    
     //Loop through each of the polygons edges
     float dzline = line.outpost.z - line.origin.z;
     for (int i = 0; i < polygon.count; i++) {
         
         //Find the current edge
-        MetalSegment edge = {polygon.vertices[i], polygon.vertices[(i + 1) % count]};
+        MetalSegment edge = extract(polygon, i);
         
         //If the edge is a point, the polygon is one dimensional and no clipping is required
         if (edge.origin.x == edge.outpost.x && edge.origin.y == edge.outpost.y) {
@@ -236,26 +239,26 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, int index) {
         
         //Calculate the intersection
         Intersection inter = intersect(line, edge);
-        
+
         //If there is an intersection
         if (inter.code > 0) {
-            
+
             //If the intersection occurs along the lengths of the clipped segment (endpoint exclusive) and clip edge (endpoint inclusive)
             if (inter.intersection.x > thresholdLow && inter.intersection.x < thresholdHigh && inter.intersection.y >= 0 && inter.intersection.y <= 1) {
-                
+
                 //Calculate the z values of the line and edge
                 float dzedge = edge.outpost.z - edge.origin.z;
                 float lz = dzline * inter.intersection.x + line.origin.z;
                 float ez = dzedge * inter.intersection.y + edge.origin.z;
-                
+
                 //If the line is above with the edge, no clipping required
                 if (lz + 1 < ez) {
                     return line;
                 }
-                
+
                 //If the line is on the edge, set the adjoiner counter
                 if (abs(lz - ez) < 1 && inter.code == 1) {
-                    
+
                     //If an adjoiner has already been found, line must lie within plane of polygon and no clipping is required
                     if (adjoiner != -1) {
                         return line;
@@ -265,13 +268,15 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, int index) {
             }
         }
         
+        
+
         //Store the intersection and edge
         stack[i] = inter;
-        edges[i] = edge;
     }
     
+    
     //Allocate an array to store the marks
-    Mark marks[30] = {};
+    device Mark (&marks)[20] = resource.marks;
     int mcount = 0;
     
     //The winding number
@@ -279,7 +284,7 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, int index) {
     
     //Iterate through each of the intersections
     for (int i = 0; i < count; i++) {
-        Intersection cross = stack[i];
+        device Intersection &cross = stack[i];
         
         //If theres a cross intersection
         if (cross.code == 1) {
@@ -302,23 +307,23 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, int index) {
                 
                 //The intersection occurs at the outpost
                 else {
-                    
+
                     //If the next intersection is a cross, intersection falls under this jurisdiction
-                    Intersection next = stack[(i + 1) % count];
+                    device Intersection &next = stack[(i + 1) % count];
                     if (next.code == 1) {
-                        
+
                         /*
                          Because the intersection occurs at a vertex, the puncture test be applied to determine whether the line punctures the junction. If it does, the intersection must be marked and the winding number must be incremented. Otherwise, intersection shouldn't be marked and the winding number doesn't need incremented.
                          */
-                        MetalVertex departing = edges[(i + 1) % count].outpost;
-                        MetalVertex approaching = edges[i].origin;
+                        MetalVertex departing = extract(polygon, (i + 1) % count).outpost;
+                        MetalVertex approaching = extract(polygon, i).origin;
                         if (penetrates(line, approaching, departing)) {
-                            
+
                             //If the hit occurs within the bounds of the line, mark the intersection
                             if (hit.x < 1) {
                                 marks[mcount++] = {hit.x, 1};
                             }
-                            
+
                             //Increment the winding number
                             winding++;
                         }
@@ -336,12 +341,10 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, int index) {
         if (cross.code > 2) {
             
             //Find the approaching and departing edges
-            MetalVertex approaching = edges[i - 1 >= 0 ? i - 1 : count - 1].origin;
-            MetalVertex departing = edges[(i + 1) % count].outpost;
-            
+            MetalVertex approaching = extract(polygon, i - 1 >= 0 ? i - 1 : count - 1).origin;
+            MetalVertex departing = extract(polygon, (i + 1) % count).outpost;
             //If the line penetrates the juncture
             if (penetrates(line, approaching, departing)) {
-                
                 //If the intersection occurs after the origin
                 //Barrier breaking intersection is always stored in the colinear parameter
                 if (cross.colinear.x > thresholdLow) {
@@ -363,7 +366,7 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, int index) {
         
         //If the line is interior and the midpoint is above the polygon, return a blank
         MetalVertex midpoint = {(line.origin.x + line.outpost.x) / 2, (line.origin.y + line.outpost.y) / 2, (line.origin.z + line.outpost.z) / 2};
-        if (winding % 2 == 1 && !above(midpoint, polygon, index)) {
+        if (winding % 2 == 1 && !above(midpoint, polygon)) {
             return {line.origin, line.outpost, {{{0, 1}}, 1}};
         }
         
@@ -386,7 +389,8 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, int index) {
     bool interior = winding % 2 == 1;
     
     //Allocate the result markline
-    MarkLine result = {{}, 0};
+    device MarkLine &result = resource.initial;
+    result.count = 0;
     
     //If the line origin is interior, add a mark at the origin
     if (interior) {
@@ -410,6 +414,7 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, int index) {
         interior = !interior;
     }
     
+    
     //Add all of the existing marks to the result markline
     for (int i = 0; i < line.markline.count; i++) {
         result.marks[result.count++] = {line.markline.marks[i].alpha, line.markline.marks[i].code};
@@ -427,7 +432,8 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, int index) {
     }
     
     //Allocate the final markline to store the culled result
-    MarkLine final = {{}, 0};
+    device MarkLine &final = resource.result;
+    final.count = 0;
     
     //The total depth counter
     int total = 0;
@@ -458,22 +464,25 @@ constant uint bound [[ function_constant(0) ]];
 /*
  Returns a list of segments spliced from clipping against the levels polygons
  */
-kernel void cliplines(device const MetalPolygon *clips [[ buffer(0) ]], device MetalEdge *lines [[ buffer(1) ]], uint index [[thread_position_in_grid]]) {
+kernel void cliplines(device const MetalPolygon *clips [[ buffer(0) ]], device MetalEdge *lines [[ buffer(1) ]], device ThreadResource *resources [[ buffer(2) ]], uint index [[thread_position_in_grid]]) {
     
     //The previous iteration for reference
-    MetalEdge edge = lines[index];
-    MetalSegment segment = edge.segments[0];
+    device MetalEdge &edge = lines[index];
+    device MetalSegment &segment = edge.segments[0];
+    device ThreadResource &resource = resources[index];
 
     //Loop through the clipping polygons
     for (uint i = 0; i < bound; i++) {
-
+        
+        device const MetalPolygon &polygon = clips[i];
+        
         //If the line belongs to the clipping polygon, skip it
         if (i == edge.polygon) {
             continue;
         }
 
         //Calculate the updated markline against the currentclipping polygon
-        segment = clip(segment, clips[i], index);
+        segment = clip(segment, polygon, resource);
 
         //If there is only one mark on the line
         if (segment.markline.count == 1) {
@@ -485,16 +494,17 @@ kernel void cliplines(device const MetalPolygon *clips [[ buffer(0) ]], device M
             }
         }
     }
+    
 
     //If there are no marks on the line, return the line unaltered
-    MarkLine line = segment.markline;
+    device MarkLine &line = segment.markline;
     if (line.count == 0) {
-        lines[index] = edge;
         return;
     }
 
     //Allocate an empty edge
-    MetalEdge final = {{}, 0, edge.polygon};
+    device MetalEdge &final = resource.scaffold;
+    final = {{}, 0, edge.polygon};
 
     //Calculate the total segments vectors
     float dx = segment.outpost.x - segment.origin.x;
@@ -528,74 +538,4 @@ kernel void cliplines(device const MetalPolygon *clips [[ buffer(0) ]], device M
 
     //Return the final result
     lines[index] = final;
-}
-
-/*
- Returns a list of segments spliced from clipping against the levels polygons
- */
-kernel void test(device const MetalPolygon *clips [[ buffer(0) ]], device MetalEdge *lines [[ buffer(1) ]], uint index [[thread_position_in_grid]]) {
-    float fuckmedaddy0 = 0.0;
-    float fuckmedaddy1 = fuckmedaddy0 + 0.0;
-    float fuckmedaddy2 = fuckmedaddy1 + 1.0;
-    float fuckmedaddy3 = fuckmedaddy2 + 1.0;
-    float fuckmedaddy4 = fuckmedaddy3 + 1.0;
-    float fuckmedaddy5 = fuckmedaddy4 + 1.0;
-    float fuckmedaddy6 = fuckmedaddy5 + 1.0;
-    float fuckmedaddy7 = fuckmedaddy6 + 1.0;
-    float fuckmedaddy8 = fuckmedaddy7 + 1.0;
-    float fuckmedaddy9 = fuckmedaddy8 + 1.0;
-    float fuckmedaddy10 = fuckmedaddy9 + 1.0;
-    float fuckmedaddy11 = fuckmedaddy10 + 1.0;
-    float fuckmedaddy12 = fuckmedaddy11 + 1.0;
-    float fuckmedaddy13 = fuckmedaddy12 + 1.0;
-    float fuckmedaddy14 = fuckmedaddy13 + 1.0;
-    float fuckmedaddy15 = fuckmedaddy14 + 1.0;
-    float fuckmedaddy16 = fuckmedaddy15 + 1.0;
-    float fuckmedaddy17 = fuckmedaddy16 + 1.0;
-    float fuckmedaddy18 = fuckmedaddy17 + 1.0;
-    float fuckmedaddy19 = fuckmedaddy18 + 1.0;
-    float fuckmedaddy20 = fuckmedaddy19 + 1.0;
-    float fuckmedaddy21 = fuckmedaddy20 + 1.0;
-    float fuckmedaddy22 = fuckmedaddy21 + 1.0;
-    float fuckmedaddy23 = fuckmedaddy22 + 1.0;
-    float fuckmedaddy24 = fuckmedaddy23 + 1.0;
-    float fuckmedaddy25 = fuckmedaddy24 + 1.0;
-    float fuckmedaddy26 = fuckmedaddy25 + 1.0;
-    float fuckmedaddy27 = fuckmedaddy26 + 1.0;
-    float fuckmedaddy28 = fuckmedaddy27 + 1.0;
-    float fuckmedaddy29 = fuckmedaddy28 + 1.0;
-    float fuckmedaddy30 = fuckmedaddy29 + 1.0;
-    float fuckmedaddy31 = fuckmedaddy30 + 1.0;
-    float fuckmedaddy32 = fuckmedaddy31 + 1.0;
-    float fuckmedaddy33 = fuckmedaddy32 + 1.0;
-    float fuckmedaddy34 = fuckmedaddy33 + 1.0;
-    float fuckmedaddy35 = fuckmedaddy34 + 1.0;
-    float fuckmedaddy36 = fuckmedaddy35 + 1.0;
-    float fuckmedaddy37 = fuckmedaddy36 + 1.0;
-    float fuckmedaddy38 = fuckmedaddy37 + 1.0;
-    float fuckmedaddy39 = fuckmedaddy38 + 1.0;
-    float fuckmedaddy40 = fuckmedaddy39 + 1.0;
-    float fuckmedaddy41 = fuckmedaddy40 + 1.0;
-    float fuckmedaddy42 = fuckmedaddy41 + 1.0;
-    float fuckmedaddy43 = fuckmedaddy42 + 1.0;
-    float fuckmedaddy44 = fuckmedaddy43 + 1.0;
-    float fuckmedaddy45 = fuckmedaddy44 + 1.0;
-    float fuckmedaddy46 = fuckmedaddy45 + 1.0;
-    float fuckmedaddy47 = fuckmedaddy46 + 1.0;
-    float fuckmedaddy48 = fuckmedaddy47 + 1.0;
-    float fuckmedaddy49 = fuckmedaddy48 + 1.0;
-    float fuckmedaddy50 = fuckmedaddy49 + 1.0;
-    float fuckmedaddy51 = fuckmedaddy50 + 1.0;
-    float fuckmedaddy52 = fuckmedaddy51 + 1.0;
-    float fuckmedaddy53 = fuckmedaddy52 + 1.0;
-    float fuckmedaddy54 = fuckmedaddy53 + 1.0;
-    float fuckmedaddy55 = fuckmedaddy54 + 1.0;
-    float fuckmedaddy56 = fuckmedaddy55 + 1.0;
-    float fuckmedaddy57 = fuckmedaddy56 + 1.0;
-    float fuckmedaddy58 = fuckmedaddy57 + 1.0;
-    float fuckmedaddy59 = fuckmedaddy58 + 1.0;
-    if (fuckmedaddy59 > 0) {
-        return;
-    }
-    return;
 }

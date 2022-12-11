@@ -20,6 +20,7 @@ class CompressionHandler {
     var polys: [Polygon]
     var scope: MTLCaptureScope
     var manager: MTLCaptureManager
+    var first: Bool = true
     
     //Cache to prevent redundant GPU calls
     var cache: [Int : [(transform: MatrixTransform, lines: [Line])]] = [:]
@@ -39,9 +40,22 @@ class CompressionHandler {
         let rp = UnsafeRawPointer(up)
         constants.setConstantValue(rp, type: .uint, index: 0)
         let function = try! library.makeFunction(name: "cliplines", constantValues: constants)
-        
+
         //Creates pipeline state
         state = try! device.makeComputePipelineState(function: function)
+        
+//        let constants = MTLFunctionConstantValues()
+//        let up = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Int>.stride, alignment: MemoryLayout<Int>.alignment)
+//        up.storeBytes(of: UInt(level.polygons.reduce(0, { $0 + $1.vertices.count})), as: UInt.self)
+//        let rp = UnsafeRawPointer(up)
+//        constants.setConstantValue(rp, type: .uint, index: 0)
+//
+//        let function = try! library.makeFunction(name: "findIntersections", constantValues: constants)
+//
+//        //Creates pipeline state
+//        state = try! device.makeComputePipelineState(function: function)
+        
+        
         queue = device.makeCommandQueue()!
         polys = level.polygons
         //Disturb the data by telling scary stories right before bed.
@@ -52,6 +66,15 @@ class CompressionHandler {
             })
         }
         manager = MTLCaptureManager.shared()
+        
+        let captureDescriptor = MTLCaptureDescriptor()
+        captureDescriptor.captureObject = self.device
+        captureDescriptor.destination = .developerTools
+        if #available(iOS 16.0, *) {
+            captureDescriptor.outputURL = .currentDirectory()
+        } else {
+            // Fallback on earlier versions
+        }
          
         scope = manager.makeCaptureScope(device: device)
         // Add a label if you want to capture it from XCode's debug bar
@@ -62,6 +85,7 @@ class CompressionHandler {
     
     //Compress the polygons using a given transform
     func compress(with transform: MatrixTransform) -> [Line] {
+        //return alternate(with: transform)
         
         //If there is a cached result, use it
         let hash = transform.hash()
@@ -129,20 +153,12 @@ class CompressionHandler {
 
         //Builds a buffer to store the edges for clipping
         let edges = device.makeBuffer(bytes: &edgeslist, length: edgeslist.count * MemoryLayout<MetalEdge>.stride, options: .storageModeShared)!
-
-        //The parameter bounds (no way to get array length in a metal shader)
-        var bounds: SIMD2<UInt32> = SIMD2<UInt32>(UInt32(standards.count), UInt32(edgeslist.count))
-
-        //Creates a buffer to store the bounds
-        //let boundBuffer = device.makeBuffer(bytes: &bounds, length: MemoryLayout<SIMD2<UInt>>.stride, options: .storageModeShared)
-
-        //Encodes the buffers
-//        encoder.setBuffer(polygons, offset: 0, index: 0)
-//        encoder.setBuffer(edges, offset: 0, index: 1)
-//        encoder.setBuffer(boundBuffer, offset: 0, index: 2)
+        
+        let resources = device.makeBuffer(length: amount * MemoryLayout<ThreadResource>.stride, options: .storageModePrivate)
         
         encoder.setBuffer(polygons, offset: 0, index: 0)
         encoder.setBuffer(edges, offset: 0, index: 1)
+        encoder.setBuffer(resources, offset: 0, index: 2)
         
 
         //Dispath the threadgroups with the calculated configuration
@@ -156,6 +172,8 @@ class CompressionHandler {
         buffer.commit()
         
         scope.end()
+        
+        
         
         //Wait until computation is completed
         buffer.waitUntilCompleted()

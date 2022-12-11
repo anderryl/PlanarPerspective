@@ -89,4 +89,12 @@ typedef struct {
     simd_float2 colinear;
 } Intersection;
 
+typedef struct {
+    Intersection intersections[20];
+    Mark marks[20];
+    MarkLine initial;
+    MarkLine result;
+    MetalEdge scaffold;
+} ThreadResource;
+
 #endif /* ShaderTypes_h */
