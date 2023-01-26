@@ -98,20 +98,7 @@ class LevelView: UIView {
     }
     
     func compress() {
-        switch state {
-        case .TRANSITION(_):
-            arcs = compression.compress(transform: matrix)
-        default:
-            if let cached = compression.retrieve(transform: matrix) {
-                DispatchQueue.main.async {
-                    self.compression.preload(transform: self.matrix, length: self.transit)
-                }
-                arcs = cached
-            }
-            else {
-                arcs = compression.compress(transform: matrix)
-            }
-        }
+        arcs = compression.compress(transform: matrix)
     }
     
     //Calls the render delegate

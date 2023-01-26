@@ -24,8 +24,6 @@ class CompressionHandler {
     
     //Cache to prevent redundant GPU calls
     var cache: [Int : [(transform: MatrixTransform, lines: [Arc])]] = [:]
-    var mapping: [TransitionState : Int] = [:]
-    var cardinals: [MatrixTransform]
     
     //Initializes delegate with reference to supervisor
     init(level: LevelView) throws {
@@ -73,34 +71,6 @@ class CompressionHandler {
         scope.label = "Pls debug me"
         // If you want to set this scope as the default debug scope, assign it to MTLCaptureManager's defaultCaptureScope
         manager.defaultCaptureScope = scope
-        
-        cardinals = [MatrixTransform.identity]
-        cardinals.append(contentsOf: ([1.0, 2.0 ,3.0] as [CGFloat]).map({MatrixTransform.identity.slide(in: .RIGHT)($0)}))
-        cardinals.append(contentsOf: ([1.0, 3.0] as [CGFloat]).map({MatrixTransform.identity.slide(in: .UP)($0)}))
-    }
-    
-    func preload(transform: MatrixTransform, length: Int) {
-        let map: [TransitionState] = ([.DOWN, .UP, .LEFT, .RIGHT] as [Direction]).map({ direction in
-            let factory = transform.slide(in: direction)
-            let state = TransitionState(source: transform, destination: factory(1.0), factory: factory, progress: 0, length: length)
-            return state.progressed(to: mapping[state] ?? 0)
-        })
-        let thinnest = map.max(by: {($1.length - $1.progress) > ($0.length - $0.progress)})!
-        guard thinnest.progress < thinnest.length else {
-            cardinals.removeAll(where: {$0 ~~ transform})
-            guard cardinals.count > 0 else {
-                return
-            }
-            return preload(transform: cardinals.last!, length: length)
-        }
-        let next = thinnest.factory(CGFloat(thinnest.progress + 1) / CGFloat(thinnest.length))
-        guard retrieve(transform: next) == nil else {
-            mapping[thinnest] = thinnest.progress + 1
-            return preload(transform: transform, length: length)
-        }
-        let results = compute(with: next)
-        place(transform: next, arcs: results)
-        mapping[thinnest] = thinnest.progress + 1
     }
     
     func compress(transform: MatrixTransform) -> [Arc] {
