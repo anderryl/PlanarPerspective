@@ -65,8 +65,8 @@ class StaticCompiler: Compiler {
                 translated.append(.CIRCLE(position.applying(slideform), radius, color, layer))
             case .RECTANGLE(let position, let size, let color, let layer):
                 translated.append(.RECTANGLE(position.applying(slideform), size, color, layer))
-            case .LINE(let origin, let outpost, let color, let thickness, let layer):
-                translated.append(.LINE(origin.applying(slideform), outpost.applying(slideform), color, thickness, layer))
+            case .ARC(let origin, let outpost, let control, let color, let thickness, let layer):
+                translated.append(.ARC(origin.applying(slideform), outpost.applying(slideform), control.applying(slideform), color, thickness, layer))
             case .PATH(let path, let color, let layer):
                 translated.append(.PATH(path.copy(using: &slideform)!, color, layer))
             }

@@ -56,12 +56,16 @@ extension MatrixTransform {
         )
     }
     
-    static func *(_ lhs: MatrixTransform, _ rhs: Line) -> Line {
-        return Line(origin: lhs * rhs.origin, outpost: lhs * rhs.outpost, intensity: rhs.intensity, thickness: rhs.thickness)
+    static func *(_ lhs: MatrixTransform, _ rhs: Arc) -> Arc {
+        return Arc(origin: lhs * rhs.origin, outpost: lhs * rhs.outpost, control: lhs * rhs.control, intensity: rhs.intensity, thickness: rhs.thickness)
+    }
+    
+    static func *(_ lhs: MatrixTransform, _ rhs: Curve) -> Curve {
+        return Curve(origin: lhs * rhs.origin, outpost: lhs * rhs.outpost, control: lhs * rhs.control, thickness: rhs.thickness)
     }
     
     static func *(_ rhs: MatrixTransform, _ lhs: Polygon) -> Polygon {
-        return Polygon(vertices: lhs.vertices.map({rhs * $0}))
+        return Polygon(curves: lhs.curves.map {rhs * $0})
     }
     
     static func *(_ rhs: MatrixTransform, _ lhs: Region) -> Region {
@@ -79,6 +83,7 @@ extension MatrixTransform {
         return true
     }
     
+    //Operator for similarity in matrices, which evaluates as true if one matrix is a simple xy rotation of the other
     static func ~~(_ rhs: MatrixTransform, _ lhs: MatrixTransform) -> Bool {
         for i in 0 ..< 3 {
             if rhs[i][2] != lhs[i][2] {
@@ -170,6 +175,7 @@ extension MatrixTransform {
         return inverted() * Position(x: point.x, y: point.y, z: (self * position).z)
     }
     
+    //Hash function doesn't consider xy sub-matrix of transform to allow similar transforms to evaluate as equal
     func hash() -> Int {
         var into = 0
         for r in 0 ..< 3 {

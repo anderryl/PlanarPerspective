@@ -59,6 +59,10 @@ struct Vertex: Codable, Hashable {
     static func *(_ lhs: CGFloat, _ rhs: Vertex) -> Vertex {
         return Vertex(x: lhs * rhs.x, y: lhs * rhs.y, z: lhs * rhs.z)
     }
+    
+    static func random(in range: ClosedRange<CGFloat>) -> Vertex {
+        return Vertex(x: CGFloat.random(in: range), y: CGFloat.random(in: range), z: CGFloat.random(in: range))
+    }
 }
 
 //Position is vertex

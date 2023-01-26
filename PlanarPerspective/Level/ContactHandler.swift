@@ -26,15 +26,15 @@ class ContactHandler {
         let transform = level.matrix
         //Allocates empty array for collisions
         var contacts: [CGPoint] = []
-        let player = Line(origin: (transform * position).flatten(), outpost: (transform * point).flatten())
+        let player = Arc(origin: (transform * position).flatten(), outpost: (transform * point).flatten(), thickness: 0)
         //Compress the polygons onto the current plane
-        let lines: [Line] = level.compression.compress(with: transform)
+        let lines: [Arc] = level.arcs
         //Iterate through lines and find collisions
         for line in lines {
             contacts.append(contentsOf: contact(between: line, and: player))
         }
         
-        for line in level.region.flatten(transform: transform).lines() {
+        for line in level.region.flatten(transform: transform).arcs() {
             contacts.append(contentsOf: contact(between: line, and: player))
         }
         
@@ -51,13 +51,13 @@ class ContactHandler {
     }
     
     //Finds contacts between the player line and an individual environment line
-    private func contact(between line: Line, and player: Line) -> [CGPoint] {
+    private func contact(between line: Arc, and player: Arc) -> [CGPoint] {
         //Translate the line perpindicular to its own direction by one radius both ways
         let lmag = line.origin | line.outpost
         let lvecx = (line.outpost.x - line.origin.x) * radius / lmag
         let lvecy = (line.outpost.y - line.origin.y) * radius / lmag
-        let translatedOne = Line(origin: CGPoint(x: line.origin.x - lvecy, y: line.origin.y + lvecx), outpost: CGPoint(x: line.outpost.x - lvecy, y: line.outpost.y + lvecx))
-        let translatedTwo = Line(origin: CGPoint(x: line.origin.x + lvecy, y: line.origin.y - lvecx), outpost: CGPoint(x: line.outpost.x + lvecy, y: line.outpost.y - lvecx))
+        let translatedOne = Arc(origin: CGPoint(x: line.origin.x - lvecy, y: line.origin.y + lvecx), outpost: CGPoint(x: line.outpost.x - lvecy, y: line.outpost.y + lvecx), thickness: 0)
+        let translatedTwo = Arc(origin: CGPoint(x: line.origin.x + lvecy, y: line.origin.y - lvecx), outpost: CGPoint(x: line.outpost.x + lvecy, y: line.outpost.y - lvecx), thickness: 0)
         
         //Allocate empty array for collisions
         var ret: [CGPoint] = []
@@ -78,7 +78,7 @@ class ContactHandler {
     }
     
     //Finds the intersection between two lines
-    private func intersection(between first: Line, and second: Line) -> CGPoint? {
+    private func intersection(between first: Arc, and second: Arc) -> CGPoint? {
         //Calculate line vector components
         let delta1x = first.outpost.x - first.origin.x
         let delta1y = first.outpost.y - first.origin.y
@@ -110,9 +110,9 @@ class ContactHandler {
     }
     
     //Finds the collisions between an endcap and the player line
-    private func caps(of center: CGPoint, against player: Line) -> [CGPoint] {
+    private func caps(of center: CGPoint, against player: Arc) -> [CGPoint] {
         //Translate the player line so that the center of the endcap is the origin
-        let line = Line(origin: CGPoint(x: player.origin.x - center.x, y: player.origin.y - center.y), outpost: CGPoint(x: player.outpost.x - center.x, y: player.outpost.y - center.y))
+        let line = Arc(origin: CGPoint(x: player.origin.x - center.x, y: player.origin.y - center.y), outpost: CGPoint(x: player.outpost.x - center.x, y: player.outpost.y - center.y), thickness: 0)
         
         //Calculate player line vector components
         let dx = line.outpost.x - line.origin.x

@@ -191,6 +191,25 @@ static MetalSegment extract(MetalPolygon polygon, int i) {
     return {polygon.vertices[i], polygon.vertices[(i + 1) % polygon.count], {}};
 }
 
+//Sorts a markline by alpha value
+static void sort(device Mark *marks, int count) {
+    
+    //Selection sort
+    for (int i = 0; i < count; i++) {
+        int index = i;
+        float value = marks[i].alpha;
+        for (int j = i; j < count; j++) {
+            if (marks[j].alpha < value) {
+                index = j;
+                value = marks[j].alpha;
+            }
+        }
+        Mark temp = marks[i];
+        marks[i] = marks[index];
+        marks[index] = temp;
+    }
+}
+
 /*
  Calculates the intersections with a given polygon and updates the markline with the new intersections
  */
@@ -374,16 +393,7 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device ThreadR
         return line;
     }
     
-    //Bubble sort the marks list
-    for (int i = 0; i < mcount - 1; i++) {
-        for (int j = 0; j < mcount - 1; j++) {
-            if (marks[j].alpha > marks[j + 1].alpha) {
-                Mark temp = marks[j + 1];
-                marks[j + 1] = marks[j];
-                marks[j] = temp;
-            }
-        }
-    }
+    sort(marks, mcount);
     
     //Line origin is interior if winding number is odd
     bool interior = winding % 2 == 1;
@@ -420,16 +430,7 @@ static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device ThreadR
         result.marks[result.count++] = {line.markline.marks[i].alpha, line.markline.marks[i].code};
     }
     
-    //Bubble sort the marks again
-    for (int i = 0; i < result.count - 1; i++) {
-        for (int j = 0; j < result.count - 1; j++) {
-            if (result.marks[j].alpha > result.marks[j + 1].alpha) {
-                Mark temp = result.marks[j + 1];
-                result.marks[j + 1] = result.marks[j];
-                result.marks[j] = temp;
-            }
-        }
-    }
+    sort(result.marks, result.count);
     
     //Allocate the final markline to store the culled result
     device MarkLine &final = resource.result;
@@ -465,12 +466,11 @@ constant uint bound [[ function_constant(0) ]];
  Returns a list of segments spliced from clipping against the levels polygons
  */
 kernel void cliplines(device const MetalPolygon *clips [[ buffer(0) ]], device MetalEdge *lines [[ buffer(1) ]], device ThreadResource *resources [[ buffer(2) ]], uint index [[thread_position_in_grid]]) {
-    
     //The previous iteration for reference
     device MetalEdge &edge = lines[index];
     device MetalSegment &segment = edge.segments[0];
     device ThreadResource &resource = resources[index];
-
+    
     //Loop through the clipping polygons
     for (uint i = 0; i < bound; i++) {
         
@@ -480,13 +480,13 @@ kernel void cliplines(device const MetalPolygon *clips [[ buffer(0) ]], device M
         if (i == edge.polygon) {
             continue;
         }
-
+        
         //Calculate the updated markline against the currentclipping polygon
         segment = clip(segment, polygon, resource);
-
+        
         //If there is only one mark on the line
         if (segment.markline.count == 1) {
-
+            
             //If that mark is a blanking mark, return a blank
             if (segment.markline.marks[0].alpha == 0.0 && segment.markline.marks[0].code == 1.0) {
                 lines[index] = {{}, 0, edge.polygon};
@@ -495,13 +495,12 @@ kernel void cliplines(device const MetalPolygon *clips [[ buffer(0) ]], device M
         }
     }
     
-
     //If there are no marks on the line, return the line unaltered
     device MarkLine &line = segment.markline;
     if (line.count == 0) {
         return;
     }
-
+    
     //Allocate an empty edge
     device MetalEdge &final = resource.scaffold;
     final = {{}, 0, edge.polygon};

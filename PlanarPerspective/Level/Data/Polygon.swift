@@ -11,43 +11,21 @@ import CoreGraphics
 
 //Represents an in-game polygon
 struct Polygon: Codable, Hashable {
-    var vertices: [Vertex]
     
-    init(vertices: [Vertex]) {
-        self.vertices = vertices
+    var curves: [Curve]
+    
+    init(curves: [Curve]) {
+        self.curves = curves
     }
     
     //Retreives the two dimensional lines that make up the edge of the polygons
-    func lines() -> [Line] {
-        var lines: [Line] = []
-        for i in 0 ..< vertices.count - 1 {
-            lines.append(Line(origin: vertices[i].flatten(), outpost: vertices[i + 1].flatten()))
-        }
-        lines.append(Line(origin: vertices[0].flatten(), outpost: vertices.last!.flatten()))
-        return lines
-    }
-    
-    //Retreives the three dimensional edges that make up the polygon's borders
-    func edges() -> [Edge] {
-        var edges: [Edge] = []
-        for i in 0 ..< vertices.count - 1 {
-            edges.append(Edge(origin: vertices[i], outpost: vertices[i + 1]))
-        }
-        //Note: In order to increase compression efficiency, last vertice must come before first for the callback
-        edges.append(Edge(origin: vertices.last!, outpost: vertices[0]))
-        return edges
-    }
-    
-    //Retreives the vertices as two dimensional points
-    func points() -> [CGPoint] {
-        return vertices.map { (vertex) -> CGPoint in
-            return CGPoint(x: vertex.x, y: vertex.y)
-        }
+    func arcs() -> [Arc] {
+        return curves.map { $0.flatten() }
     }
     
     func restrain(position: CGPoint, frame: CGRect) -> CGPoint {
         //let flattened: [CGPoint] = flatten(transform: transform).vertices.map { $0.flatten() }
-        let flattened: [CGPoint] = vertices.map { $0.flatten() }
+        let flattened: [CGPoint] = curves.map { $0.origin.flatten() }
         
         let ymax = flattened.max(by: { $0.y < $1.y })!.y -  frame.height / 2
         let ymin = flattened.min(by: { $0.y < $1.y })!.y +  frame.height / 2
@@ -61,15 +39,15 @@ struct Polygon: Codable, Hashable {
     }
     
     func applying(_ transform: CGAffineTransform) -> Polygon {
-        return Polygon(vertices: self.vertices.map { $0.applying(transform) })
+        return Polygon(curves: self.curves.map { $0.applying(transform) })
     }
     
     //Converts to C++ wrapper type for use in Metal compression shader
     //VERY VERY MESSY
     func harden() -> MetalPolygon {
         var verts = (MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex(), MetalVertex())
-        for i in 0 ..< vertices.count {
-            let a = vertices[i].harden()
+        for i in 0 ..< curves.count {
+            let a = curves[i].origin.harden()
             switch i {
             case 0:
                 verts.0 = a
@@ -114,19 +92,18 @@ struct Polygon: Codable, Hashable {
             default:
                 break;
             }
-            
         }
-        return MetalPolygon(vertices: verts, count: Int32(vertices.count))
+        return MetalPolygon(vertices: verts, count: Int32(curves.count))
     }
     
     //Retreives the edges as MetalEdge wrapper types
     func hardedges(id: Int) -> [MetalEdge] {
-        return edges().map { $0.harden(id: id) }
+        return curves.map { $0.harden(id) }
     }
     
     //Initialize from a MetalPolygon wrapper type
     init(_ metal: MetalPolygon) {
-        self.vertices = []
+        var vertices: [Vertex] = []
         for i in 0 ..< metal.count {
             switch i {
             case 0:
@@ -173,6 +150,10 @@ struct Polygon: Codable, Hashable {
                 break;
             }
             
+        }
+        self.curves = []
+        for i in 0 ..< vertices.count {
+            curves.append(Curve(origin: vertices[i], outpost: vertices[i + 1 == vertices.count ? 0 : i + 1], thickness: 1))
         }
     }
 }

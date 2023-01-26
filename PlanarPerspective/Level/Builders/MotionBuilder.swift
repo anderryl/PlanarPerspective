@@ -13,6 +13,7 @@ import UIKit
 class MotionBuilder: Builder {
     //Length of motion
     private let frames: Int = 50
+    private let thickness: CGFloat = 1.0
     
     //Builds motion elements using given transform and state
     func build(from snapshot: BuildSnapshot) -> [DrawItem] {
@@ -28,7 +29,7 @@ class MotionBuilder: Builder {
         for invalid in invalids {
             //Add a faux player at the endpoint and a line between the origin and outpost
             let color: CGColor = .init(srgbRed: 1, green: 0, blue: 0, alpha: CGFloat(invalid.intensity))
-            items.append(.LINE(invalid.origin, invalid.outpost, color, 1.0, 2))
+            items.append(.ARC(invalid.origin, invalid.outpost, (invalid.origin + invalid.outpost) / 2, color, 1.0, 2))
             items.append(fauxPlayer(at: invalid.outpost, in: color, scale: scale, state: state))
         }
         
@@ -119,14 +120,14 @@ class MotionBuilder: Builder {
         }
         
         //Allocate list to store black lines
-        var blacklines: [Line] = []
+        var blacklines: [Arc] = []
         
         //The running total of distance processed
         var running: CGFloat = 0
         var visible: Bool = start
         
         //Builds a dotted line between two points
-        func dotline(from origin: CGPoint, to outpost: CGPoint) -> [Line] {
+        func dotline(from origin: CGPoint, to outpost: CGPoint) -> [Arc] {
             //Calculates vector components of line
             let dx = outpost.x - origin.x
             let dy = outpost.y - origin.y
@@ -138,7 +139,7 @@ class MotionBuilder: Builder {
             let applicable = ticks.filter { $0 > running && $0 < segment + running }
             
             //Builds lines between each applicable tickmark
-            var segments: [Line] = []
+            var segments: [Arc] = []
             var along = applicable.map { (tick: CGFloat) in
                 return CGPoint(x: dx * ((tick - running) / segment) + origin.x, y: dy * ((tick - running) / segment) + origin.y)
             }
@@ -149,14 +150,14 @@ class MotionBuilder: Builder {
             //Adds every other line to render list
             for i in 0 ..< along.count - 1 {
                 if visible {
-                    segments.append(Line(origin: along[i], outpost: along[i + 1]))
+                    segments.append(Arc(origin: along[i], outpost: along[i + 1], thickness: thickness))
                 }
                 visible = !visible
             }
             
             //If the last segment will be visible, add a line between the final tickmark and the line's outpost
             if visible {
-                segments.append(Line(origin: along.last!, outpost: outpost))
+                segments.append(Arc(origin: along.last!, outpost: outpost, thickness: thickness))
             }
             
             //Add the segments length to the running count
@@ -176,7 +177,7 @@ class MotionBuilder: Builder {
         var items: [DrawItem] = generateInvalids(from: path.last ?? position, scale: scale, state: state, invalids: invalids)
         
         //Allocate list to store red lines
-        var redlines: [Line] = []
+        var redlines: [Arc] = []
         
         //If there is a test, process it
         if let concrete = test {
@@ -203,10 +204,10 @@ class MotionBuilder: Builder {
         
         //Build the draw items depending on color
         for line in blacklines {
-            items.append(.LINE(line.origin, line.outpost, .init(srgbRed: 0, green: 0, blue: 0, alpha: 1), 1.0, 2))
+            items.append(.ARC(line.origin, line.outpost, line.control, .init(srgbRed: 0, green: 0, blue: 0, alpha: 1), 1.0, 2))
         }
         for line in redlines {
-            items.append(.LINE(line.origin, line.outpost, .init(srgbRed: 1, green: 0, blue: 0, alpha: 1), 1.0, 2))
+            items.append(.ARC(line.origin, line.outpost, line.control, .init(srgbRed: 1, green: 0, blue: 0, alpha: 1), 1.0, 2))
         }
         
         //Return the final results

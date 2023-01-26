@@ -37,14 +37,14 @@ class LogicHandler {
     
     func propogate() {
         switch level.state {
-        case .TRANSITION(let factory, let progress, let length):
-            level.matrix = factory(CGFloat(progress) / CGFloat(length))
-            if progress == length {
+        case .TRANSITION(let transition):
+            level.matrix = transition.factory(CGFloat(transition.progress) / CGFloat(transition.length))
+            if transition.progress == transition.length {
                 updateState(.REST)
                 level.matrix = level.matrix.normalized()
             }
             else {
-                updateState(.TRANSITION(factory, progress + 1, length))
+                updateState(.TRANSITION(transition.incremented()))
             }
         default:
             break
@@ -54,9 +54,11 @@ class LogicHandler {
     //Attempts a transition if feasible
     func attemptTransition(direction: Direction) {
         //If at rest, perform the transition
+        
         switch level.state {
         case .REST:
-            updateState(.TRANSITION(level.matrix.slide(in: direction), 0, 30))
+            let factory = level.matrix.slide(in: direction)
+            updateState(.TRANSITION(TransitionState(source: level.matrix, destination: factory(1.0), factory: factory, progress: 0, length: level.transit)))
         default:
             //Negative Feedback
             return
@@ -68,7 +70,8 @@ class LogicHandler {
         //If at rest, perform the transition
         switch level.state {
         case .REST:
-            updateState(.TRANSITION(level.matrix.twist(in: rotation), 0, 30))
+            let factory = level.matrix.twist(in: rotation)
+            updateState(.TRANSITION(TransitionState(source: level.matrix, destination: factory(1.0), factory: factory, progress: 0, length: level.transit)))
         default:
             //Negative Feedback
             return

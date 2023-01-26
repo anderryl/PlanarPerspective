@@ -23,7 +23,9 @@ class CompressionHandler {
     var first: Bool = true
     
     //Cache to prevent redundant GPU calls
-    var cache: [Int : [(transform: MatrixTransform, lines: [Line])]] = [:]
+    var cache: [Int : [(transform: MatrixTransform, lines: [Arc])]] = [:]
+    var mapping: [TransitionState : Int] = [:]
+    var cardinals: [MatrixTransform]
     
     //Initializes delegate with reference to supervisor
     init(level: LevelView) throws {
@@ -40,29 +42,19 @@ class CompressionHandler {
         let rp = UnsafeRawPointer(up)
         constants.setConstantValue(rp, type: .uint, index: 0)
         let function = try! library.makeFunction(name: "cliplines", constantValues: constants)
-
+        
         //Creates pipeline state
         state = try! device.makeComputePipelineState(function: function)
-        
-//        let constants = MTLFunctionConstantValues()
-//        let up = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Int>.stride, alignment: MemoryLayout<Int>.alignment)
-//        up.storeBytes(of: UInt(level.polygons.reduce(0, { $0 + $1.vertices.count})), as: UInt.self)
-//        let rp = UnsafeRawPointer(up)
-//        constants.setConstantValue(rp, type: .uint, index: 0)
-//
-//        let function = try! library.makeFunction(name: "findIntersections", constantValues: constants)
-//
-//        //Creates pipeline state
-//        state = try! device.makeComputePipelineState(function: function)
-        
         
         queue = device.makeCommandQueue()!
         polys = level.polygons
         //Disturb the data by telling scary stories right before bed.
+        let disturbance: CGFloat = 0.1
+        let range = -disturbance ... disturbance
         polys = polys.map { (polygon) -> Polygon in
-            return Polygon(vertices: polygon.vertices.map { (vertex) -> Vertex in
+            return Polygon(curves: polygon.curves.map { (curve) -> Curve in
                 //...and the stack trace was coming from INSIDE the program.
-                return Vertex(x: vertex.x + CGFloat.random(in: -0.1...0.1), y: vertex.y + CGFloat.random(in: -0.1...0.1), z: vertex.z + CGFloat.random(in: -0.1...0.1))
+                return Curve(origin: curve.origin + Vertex.random(in: range), outpost: curve.outpost + Vertex.random(in: range), control: curve.control + Vertex.random(in: range), thickness: curve.thickness)
             })
         }
         manager = MTLCaptureManager.shared()
@@ -81,12 +73,47 @@ class CompressionHandler {
         scope.label = "Pls debug me"
         // If you want to set this scope as the default debug scope, assign it to MTLCaptureManager's defaultCaptureScope
         manager.defaultCaptureScope = scope
+        
+        cardinals = [MatrixTransform.identity]
+        cardinals.append(contentsOf: ([1.0, 2.0 ,3.0] as [CGFloat]).map({MatrixTransform.identity.slide(in: .RIGHT)($0)}))
+        cardinals.append(contentsOf: ([1.0, 3.0] as [CGFloat]).map({MatrixTransform.identity.slide(in: .UP)($0)}))
     }
     
-    //Compress the polygons using a given transform
-    func compress(with transform: MatrixTransform) -> [Line] {
-        //return alternate(with: transform)
-        
+    func preload(transform: MatrixTransform, length: Int) {
+        let map: [TransitionState] = ([.DOWN, .UP, .LEFT, .RIGHT] as [Direction]).map({ direction in
+            let factory = transform.slide(in: direction)
+            let state = TransitionState(source: transform, destination: factory(1.0), factory: factory, progress: 0, length: length)
+            return state.progressed(to: mapping[state] ?? 0)
+        })
+        let thinnest = map.max(by: {($1.length - $1.progress) > ($0.length - $0.progress)})!
+        guard thinnest.progress < thinnest.length else {
+            cardinals.removeAll(where: {$0 ~~ transform})
+            guard cardinals.count > 0 else {
+                return
+            }
+            return preload(transform: cardinals.last!, length: length)
+        }
+        let next = thinnest.factory(CGFloat(thinnest.progress + 1) / CGFloat(thinnest.length))
+        guard retrieve(transform: next) == nil else {
+            mapping[thinnest] = thinnest.progress + 1
+            return preload(transform: transform, length: length)
+        }
+        let results = compute(with: next)
+        place(transform: next, arcs: results)
+        mapping[thinnest] = thinnest.progress + 1
+    }
+    
+    func compress(transform: MatrixTransform) -> [Arc] {
+        if let cached = retrieve(transform: transform) {
+            return cached
+        }
+        let results = compute(with: transform)
+        place(transform: transform, arcs: results)
+        return results
+    }
+    
+    //Retrieve computed arcs from cache
+    func retrieve(transform: MatrixTransform) -> [Arc]? {
         //If there is a cached result, use it
         let hash = transform.hash()
         if let cached = cache[hash] {
@@ -109,6 +136,23 @@ class CompressionHandler {
                 }
             }
         }
+        return nil
+    }
+    
+    func place(transform: MatrixTransform, arcs: [Arc]) {
+        //Cache results
+        if let others = cache[transform.hash()] {
+            cache[transform.hash()] = others + [(transform: transform, lines: arcs)]
+        }
+        else {
+            cache[transform.hash()] = [(transform: transform, lines: arcs)]
+        }
+    }
+    
+    //Compress the polygons using a given transform
+    func compute(with transform: MatrixTransform) -> [Arc] {
+        
+        //return polys.map { transform * $0 }.reduce([]) { $0 + $1.arcs() }
         
         
         //Transformed polygons as MetalPolygon wrapper types
@@ -246,17 +290,7 @@ class CompressionHandler {
         }
 
         //Final results are attained by converting wrapper types to normal swift types for return
-        let lines = roughs.map { (segment) -> Line in
-            return Line(segment)
-        }
-        
-        //Cache results
-        if let others = cache[transform.hash()] {
-            cache[transform.hash()] = others + [(transform: transform, lines: lines)]
-        }
-        else {
-            cache[transform.hash()] = [(transform: transform, lines: lines)]
-        }
+        let lines = roughs.map { Arc($0) }
         
         return lines
     }

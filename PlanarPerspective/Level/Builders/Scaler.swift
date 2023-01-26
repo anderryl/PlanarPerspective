@@ -17,7 +17,7 @@ enum ScalerFactory {
     
     func build() -> Scaler {
         func bind(_ bounds: Polygon, _ frame: CGRect, _ state: Int) -> CGFloat {
-            let vertices = bounds.vertices.map { $0.flatten() }
+            let vertices = bounds.curves.map { $0.origin.flatten() }
             let xmap = vertices.map { $0.x }
             let ymap = vertices.map { $0.y }
 

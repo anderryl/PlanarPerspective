@@ -40,9 +40,12 @@ class LevelView: UIView {
     //State variables
     var state: State = .REST
     var matrix: MatrixTransform = MatrixTransform.identity
+    var arcs: [Arc]!
     
     //Display link to update view with each frame
     var display: CADisplayLink?
+    var framerate: CGFloat = 30.0
+    var transit: Int = 20
     
     //Initialize from Level type
     init(frame: CGRect, level: Level) {
@@ -64,23 +67,20 @@ class LevelView: UIView {
         contact = ContactHandler(level: self, radius: 10)
         
         //Setup display link
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.025) { self.loop() }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0 / framerate) { self.loop() }
         //display = CADisplayLink(target: self, selector: #selector(loop))
         //display?.add(to: .current, forMode: .common)
         backgroundColor = .white
-        let vertices = level.polygons.flatMap { $0.vertices }
-        print(vertices.max(by: { $0.x < $1.x })!.x)
-        print(vertices.max(by: { $0.y < $1.y })!.y)
-        print(vertices.max(by: { $0.z < $1.z })!.z)
     }
     
     //Called before each frame to move the player (if applicable) and redraw the view
     @objc
     func loop() {
         logic.propogate()
+        compress()
         motion.move()
         render()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.025) { self.loop() }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1 / framerate) { self.loop() }
     }
     
     //Called once the player reaches the goal to trigger success sequence and exit to menu
@@ -95,8 +95,28 @@ class LevelView: UIView {
         setNeedsDisplay()
     }
     
+    func compress() {
+        switch state {
+        case .TRANSITION(_):
+            arcs = compression.compress(transform: matrix)
+        default:
+            if let cached = compression.retrieve(transform: matrix) {
+                DispatchQueue.main.async {
+                    self.compression.preload(transform: self.matrix, length: self.transit)
+                }
+                arcs = cached
+            }
+            else {
+                arcs = compression.compress(transform: matrix)
+            }
+        }
+    }
+    
     //Calls the render delegate
     override func draw(_ rect: CGRect) {
+        if arcs == nil {
+            arcs = compression.compress(transform: matrix)
+        }
         if let context = UIGraphicsGetCurrentContext() {
             let frame = graphics.build()
             input.update(frame.planeform)

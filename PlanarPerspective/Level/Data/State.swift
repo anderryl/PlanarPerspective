@@ -13,7 +13,7 @@ import CoreGraphics
 enum State {
     case REST
     case MOTION([Position])
-    case TRANSITION(MatrixTransformFactory, Int, Int)
+    case TRANSITION(TransitionState)
     case ARRIVED
     
     static func ~~(_ lhs: State, _ rhs: State) -> Bool {
@@ -25,9 +25,9 @@ enum State {
             default:
                 return false
             }
-        case .TRANSITION(_, _, _):
+        case .TRANSITION(_):
             switch rhs {
-            case .TRANSITION(_, _, _):
+            case .TRANSITION(_):
                 return true
             default:
                 return false

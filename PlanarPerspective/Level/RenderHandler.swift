@@ -29,7 +29,7 @@ class RenderHandler {
         //Build layers based on priority
         for item in items {
             switch item {
-            case .LINE(_, _, _, _, let layer):
+            case .ARC(_, _, _, _, _, let layer):
                 append(item: item, at: layer)
             case .CIRCLE(_, _, _, let layer):
                 append(item: item, at: layer)
@@ -46,11 +46,12 @@ class RenderHandler {
             for item in layers[layer]! {
                 //Each item type is drawn according to its parameters
                 switch item {
-                case .LINE(let origin, let outpost, let color, let thickness, _):
+                case .ARC(let origin, let outpost, let control, let color, let thickness, _):
                     context?.setStrokeColor(color)
                     context?.setLineCap(.round)
                     context?.setLineWidth(thickness)
-                    context?.addLines(between: [origin, outpost])
+                    context?.move(to: origin);
+                    context?.addQuadCurve(to: outpost, control: control);
                     context?.strokePath()
                 case .CIRCLE(let position, let radius, let color, _):
                     context?.setFillColor(color)

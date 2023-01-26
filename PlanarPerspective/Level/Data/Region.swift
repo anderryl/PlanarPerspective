@@ -62,7 +62,7 @@ struct Region: Codable {
         var sorted = raw.map { $0.vert }
         var removes: [Int] = []
 
-        func hits(_ first: Line, _ second: Line) -> Bool {
+        func hits(_ first: Arc, _ second: Arc) -> Bool {
             //Calculate line vector components
             let delta1x = first.outpost.x - first.origin.x
             let delta1y = first.outpost.y - first.origin.y
@@ -94,7 +94,7 @@ struct Region: Codable {
                 removes.append(i)
                 continue
             }
-            if hits(Line(origin: center.flatten(), outpost: current.flatten()), Line(origin: before.flatten(), outpost: after.flatten())) {
+            if hits(Arc(origin: center.flatten(), outpost: current.flatten(), control: (0.5 * (center + current)).flatten(), thickness: 0), Arc(origin: before.flatten(), outpost: after.flatten(), control: (0.5 * (before + after)).flatten(), thickness: 0)) {
                 removes.append(i)
             }
         }
@@ -102,8 +102,16 @@ struct Region: Codable {
         for i in removes.sorted().reversed() {
             sorted.remove(at: i)
         }
+        
+        var curves: [Curve] = []
+        
+        for i in 0 ..< sorted.count {
+            let origin = sorted[i]
+            let outpost = sorted[i + 1 == sorted.count ? 0 : i + 1]
+            curves.append(Curve(origin: origin, outpost: outpost, control: (0.5 * (origin + outpost)), thickness: 0))
+        }
 
-        return Polygon(vertices: sorted)
+        return Polygon(curves: curves)
     }
     
     init(origin: Vertex, outpost: Vertex) {

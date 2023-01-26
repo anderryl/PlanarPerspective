@@ -46,8 +46,8 @@ class ArrivedCompiler: Compiler {
                 translated.append(.CIRCLE(position.applying(translation), radius, color, layer))
             case .RECTANGLE(let position, let size, let color, let layer):
                 translated.append(.RECTANGLE(position.applying(translation), size, color, layer))
-            case .LINE(let origin, let outpost, let color, let thickness, let layer):
-                translated.append(.LINE(origin.applying(translation), outpost.applying(translation), color, thickness, layer))
+            case .ARC(let origin, let outpost, let control, let color, let thickness, let layer):
+                translated.append(.ARC(origin.applying(translation), outpost.applying(translation), control.applying(translation), color, thickness, layer))
             case .PATH(let path, let color, let layer):
                 translated.append(.PATH(path.copy(using: &translation)!, color, layer))
             }

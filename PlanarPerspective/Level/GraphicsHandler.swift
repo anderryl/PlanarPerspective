@@ -31,7 +31,7 @@ struct BuildSnapshot {
     var position: CGPoint
     var bounds: Polygon
     var scale: CGFloat
-    var lines: [Line]
+    var lines: [Arc]
     var goal: [CGPoint]
     var queue: [CGPoint]
     var invalids: [CompressedInvalid]
@@ -45,7 +45,7 @@ struct BuildSnapshot {
             bounds: bounds.applying(transform),
             //Some of the most heinous code ever written
             scale: (CGPoint(x: 0, y: 0).applying(transform) | CGPoint(x: 1, y: 1).applying(transform)) / sqrt(2.0),
-            lines: lines.map { Line(origin: $0.origin.applying(transform), outpost: $0.outpost.applying(transform)) },
+            lines: lines.map { Arc(origin: $0.origin.applying(transform), outpost: $0.outpost.applying(transform), control: $0.control.applying(transform), thickness: $0.thickness) },
             goal: goal.map { $0.applying(transform) },
             queue: queue.map { $0.applying(transform) },
             invalids: invalids.map { CompressedInvalid(origin: $0.origin.applying(transform), outpost: $0.outpost.applying(transform), intensity: $0.intensity ) },
@@ -121,8 +121,8 @@ class GraphicsHandler {
             position: position,
             bounds: bounds,
             scale: 1,
-            lines: level.compression.compress(with: level.matrix),
-            goal: level.goal.flatten(transform: level.matrix).vertices.map { $0.flatten() },
+            lines: level.arcs,
+            goal: level.goal.flatten(transform: level.matrix).curves.map { $0.origin.flatten() },
             queue: queue,
             invalids: invalids.map { CompressedInvalid(origin: (level.matrix * $0.origin).flatten(), outpost: (level.matrix * $0.outpost).flatten(), intensity: $0.intensity) },
             test: test,
@@ -142,8 +142,8 @@ class GraphicsHandler {
     
     func notifyStateChange(_ nstate: State) {
         switch nstate {
-        case.TRANSITION(let factory, _, let length):
-            compiler.setScaler(ScalerFactory.TRANSITING(factory(0.0), factory(1.0), level.region, state, length).build())
+        case.TRANSITION(let transition):
+            compiler.setScaler(ScalerFactory.TRANSITING(transition.source, transition.destination, level.region, state, transition.length).build())
         case .REST:
             compiler.setScaler(ScalerFactory.BOUNDED.build())
         default:
