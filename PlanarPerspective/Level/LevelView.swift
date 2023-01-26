@@ -45,7 +45,7 @@ class LevelView: UIView {
     //Display link to update view with each frame
     var display: CADisplayLink?
     var framerate: CGFloat = 30.0
-    var transit: Int = 20
+    var transit: Int = 15
     
     //Initialize from Level type
     init(frame: CGRect, level: Level) {
@@ -76,11 +76,13 @@ class LevelView: UIView {
     //Called before each frame to move the player (if applicable) and redraw the view
     @objc
     func loop() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1 / framerate) {
+            self.motion.move()
+            self.render()
+            self.loop()
+        }
         logic.propogate()
         compress()
-        motion.move()
-        render()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1 / framerate) { self.loop() }
     }
     
     //Called once the player reaches the goal to trigger success sequence and exit to menu

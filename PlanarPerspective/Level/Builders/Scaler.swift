@@ -33,8 +33,6 @@ enum ScalerFactory {
             return { (_ bounds: Polygon, _ frame: CGRect, _ state: Int) in
                 let lower = bind(region.flatten(transform: initial), frame, state)
                 let upper = bind(region.flatten(transform: final), frame, state)
-                print(state)
-                print(beginning)
                 return (CGFloat(state - beginning) / CGFloat(length)) * (upper - lower) + lower
             }
         }
