@@ -40,6 +40,7 @@ class RenderHandler {
             }
         }
         
+        
         //Iterates through priorities drawing higher priorities over lower ones
         for layer in layers.keys.sorted() {
             //Iterates through each item in a given layer

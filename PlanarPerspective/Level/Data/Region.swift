@@ -58,7 +58,7 @@ struct Region: Codable {
         center.z /= CGFloat(vertices.count)
 
         //Lol, get fucked future me
-        var raw = vertices.map { (angle: sweep(center: center, point: $0), vert: $0) }.sorted { $0.angle > $1.angle }
+        let raw = vertices.map { (angle: sweep(center: center, point: $0), vert: $0) }.sorted { $0.angle > $1.angle }
         var sorted = raw.map { $0.vert }
         var removes: [Int] = []
 

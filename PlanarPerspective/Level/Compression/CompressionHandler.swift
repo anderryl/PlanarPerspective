@@ -122,7 +122,7 @@ class CompressionHandler {
     //Compress the polygons using a given transform
     func compute(with transform: MatrixTransform) -> [Arc] {
         
-        //return polys.map { transform * $0 }.reduce([]) { $0 + $1.arcs() }
+        return polys.map { transform * $0 }.reduce([]) { $0 + $1.arcs() }
         
         
         //Transformed polygons as MetalPolygon wrapper types

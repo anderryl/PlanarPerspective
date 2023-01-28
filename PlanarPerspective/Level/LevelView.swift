@@ -76,20 +76,23 @@ class LevelView: UIView {
     //Called before each frame to move the player (if applicable) and redraw the view
     @objc
     func loop() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1 / framerate) {
+        let compute: DispatchGroup = DispatchGroup()
+        DispatchQueue.main.async(group: compute) {
+            self.logic.propogate()
+            self.compress()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0 / framerate) {
+            compute.wait()
             self.motion.move()
             self.render()
             self.loop()
         }
-        logic.propogate()
-        compress()
     }
     
     //Called once the player reaches the goal to trigger success sequence and exit to menu
     //NOTE: In progress
     func arrived() {
         state = .ARRIVED
-        print("Arrived")
     }
     
     //Marks the view as needing refresh before frame render, calling draw(_:)
