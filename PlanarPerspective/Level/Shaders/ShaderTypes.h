@@ -115,7 +115,7 @@ typedef struct {
     simd_float2 a;
     simd_float2 b;
     simd_float2 c;
-    simd_float4 bounds;
+    simd_float2x2 bounds;
     float intensity;
     float thickness;
     int polygon;

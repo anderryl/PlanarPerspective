@@ -39,23 +39,24 @@ class MetalDelegate {
     init(level: LevelView) throws {
         //Retreives the default device
         device = MTLCreateSystemDefaultDevice()!
+        
         //Builds a function library from all available metal files
         library = device.makeDefaultLibrary()!
         
         queue = device.makeCommandQueue()!
     }
     
-    func buildPipeline(called name: String, bounded potential: Int?) {
+    func buildPipeline<T>(called name: String, constant potential: T?, type: MTLDataType?) {
         let constants = MTLFunctionConstantValues()
         
-        if let bound = potential {
-            let up = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Int>.stride, alignment: MemoryLayout<Int>.alignment)
-            up.storeBytes(of: UInt(bound), as: UInt.self)
+        if let constant = potential {
+            let up = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<T>.stride, alignment: MemoryLayout<T>.alignment)
+            up.storeBytes(of: constant, as: T.self)
             let rp = UnsafeRawPointer(up)
-            constants.setConstantValue(rp, type: .uint, index: 0)
+            constants.setConstantValue(rp, type: type!, index: 0)
         }
         
-        let function = try! library.makeFunction(name: "cliplines", constantValues: constants)
+        let function = try! library.makeFunction(name: name, constantValues: constants)
         states[name] = try! device.makeComputePipelineState(function: function)
     }
     
@@ -119,8 +120,6 @@ class MetalDelegate {
         
         //Send off for compute pass
         buffer.commit()
-        
-        
         
         //Wait until computation is completed
         buffer.waitUntilCompleted()

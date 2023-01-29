@@ -182,6 +182,42 @@ class Arc: Tangential {
         return Arc(origin: origin, outpost: outpost, control: control, intensity: 0.3, thickness: 5.0)
     }
     
+    func harden() -> MetalArc {
+        var metal = MetalArc()
+        var i = 0
+        for tangent in tangents {
+            switch i {
+            case 0: metal.tangents.0 = tangent.harden()
+            case 1: metal.tangents.1 = tangent.harden()
+            case 2: metal.tangents.2 = tangent.harden()
+            case 3: metal.tangents.3 = tangent.harden()
+            case 4: metal.tangents.4 = tangent.harden()
+            case 5: metal.tangents.5 = tangent.harden()
+            case 6: metal.tangents.6 = tangent.harden()
+            case 7: metal.tangents.7 = tangent.harden()
+            case 8: metal.tangents.8 = tangent.harden()
+            case 9: metal.tangents.9 = tangent.harden()
+            case 10: metal.tangents.10 = tangent.harden()
+            case 11: metal.tangents.11 = tangent.harden()
+            case 12: metal.tangents.12 = tangent.harden()
+            case 13: metal.tangents.13 = tangent.harden()
+            case 14: metal.tangents.14 = tangent.harden()
+            case 15: metal.tangents.15 = tangent.harden()
+            default: break
+            }
+            i += 1
+        }
+        metal.count = Int32(tangents.count)
+        metal.thickness = Float(thickness)
+        metal.intensity = Float(intensity)
+        metal.bounds = simd_float2x2(columns:((SIMD2(x: Float(bounds.minX), y: Float(bounds.minY))), SIMD2(x: Float(bounds.maxX), y: Float(bounds.maxY))))
+        metal.a = SIMD2(x: Float(A.x), y: Float(A.y))
+        metal.b = SIMD2(x: Float(B.x), y: Float(B.y))
+        metal.c = SIMD2(x: Float(C.x), y: Float(C.y))
+        
+        return metal
+    }
+    
     static func +(_ lhs: Arc, _ rhs: CGPoint) -> Arc {
         return Arc(origin: lhs.origin + rhs, outpost: lhs.outpost + rhs, control: lhs.control + rhs, intensity: lhs.intensity, thickness: lhs.thickness)
     }

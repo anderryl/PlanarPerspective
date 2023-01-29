@@ -10,7 +10,7 @@
 #import "ShaderTypes.h"
 using namespace metal;
 
-constant float radius = 10.0;
+constant float radius [[ function_constant(0) ]];
 
 static simd_float2 tangentIntersect(MetalTangent first, MetalTangent second) {
     
@@ -22,7 +22,7 @@ static simd_float2 tangentIntersect(MetalTangent first, MetalTangent second) {
     
     //If the line is a point, return exit code zero
     if (deltasx == 0 && deltasy == 0) {
-        return {0};
+        return {-1, -1};
     }
     
     //Create a 2D matrix from the vectors and calculate the determinant
@@ -30,7 +30,7 @@ static simd_float2 tangentIntersect(MetalTangent first, MetalTangent second) {
     
     //If it is zero or very close, the lines are parallel
     if (abs(det) < 0.01) {
-        return simd_float2{-1, -1};
+        return {-1, -1};
     }
     
     //The percentage of the length along the segment the intersection occurs
@@ -40,75 +40,72 @@ static simd_float2 tangentIntersect(MetalTangent first, MetalTangent second) {
 }
 
 static simd_float2 intersect(MetalArc arc, MetalTangent player) {
-    bool last = false;
     for (int i = 0; i < arc.count; i++) {
-        simd_float2 intersect = tangentIntersect(arc.tangents[i], player);
+        MetalTangent tangent = arc.tangents[i];
+        simd_float2 intersect = tangentIntersect(player, tangent);
         if (intersect.x >= 0 && intersect.x <= 1 && intersect.y >= 0 && intersect.y <= 1) {
-            return intersect;
+            return {intersect.x, intersect.y * (tangent.end - tangent.start) + tangent.start};
         }
     }
     
     return {-1, -1};
 }
 
-static simd_float2 normal(thread MetalArc &arc, thread MetalTangent &tangent, float time, bool positive) {
-    simd_float2 base = arc.a * time * time + arc.b * time + arc.c;
-    simd_float2 t = 2 * arc.a * time + arc.b;
-    simd_float2 n = {-t[1], t[0]};
-    simd_float2 nunit = (positive ? 1 : -1) * radius * n / sqrt(n[0] * n[0] + n[1] * n[1]);
+static simd_float2 normal(MetalArc arc, MetalTangent tangent, float time, bool positive) {
+    simd_float2 base = time * time * arc.a + time * arc.b + arc.c;
+    simd_float2 t = 2 * time * arc.a + arc.b;
+    simd_float2 n = {-t.y, t.x};
+    simd_float2 nunit = (positive ? 1 : -1) * radius * n / sqrt(n.x * n.x + n.y * n.y);
     return nunit + base;
 }
 
-static void offset(thread MetalArc &arc, float radius, bool positive) {
-    thread MetalTangent &first = arc.tangents[0];
-    simd_float2 foff = normal(arc, first, first.start, positive);
-    first.origin = foff;
+static MetalArc offset(MetalArc arc, float radius, bool positive) {
+    return arc;
+    arc.tangents[0].origin = normal(arc, arc.tangents[0], arc.tangents[0].start, positive);
     
     for (int i = 0; i < arc.count; i++) {
-        thread MetalTangent &tangent = arc.tangents[i];
-        simd_float2 off = normal(arc, tangent, tangent.end, positive);
-        tangent.outpost = off;
+        simd_float2 off = normal(arc, arc.tangents[i], arc.tangents[i].end, positive);
+        arc.tangents[i].outpost = off;
         if (i < arc.count - 1) {
             arc.tangents[i + 1].origin = off;
         }
     }
     
-    thread MetalTangent &last = arc.tangents[arc.count - 1];
-    simd_float2 loff = normal(arc, last, last.end, positive);
-    last.outpost = loff;
+    arc.tangents[arc.count - 1].outpost = normal(arc, arc.tangents[arc.count - 1], arc.tangents[arc.count - 1].end, positive);
+    
+    return arc;
 }
 
 bool closer(simd_float2 first, simd_float2 second) {
-    float fdist = first[0] * first[0] + first[1] * first[1];
-    float sdist = second[0] * second[0] + second[1] * second[1];
+    float fdist = first.x * first.x + first.y * first.y;
+    float sdist = second.x * second.x + second.y * second.y;
     return fdist < sdist;
 }
 
 static simd_float2 guardrails(device const MetalArc &arc, device const MetalTangent &player) {
-    MetalArc left = arc;
-    offset(left, radius, true);
-    MetalArc right = arc;
-    offset(right, radius, false);
+    MetalArc left = offset(arc, radius, true);
+    MetalArc right = offset(arc, radius, false);
     
     simd_float2 linter = intersect(left, player);
     simd_float2 rinter = intersect(right, player);
     
-    if (linter[0] < 0) {
-        return rinter;
+    if (linter.x < 0) {
+        if (rinter.x < 0) {
+            return {-1, -1};
+        }
+        
+        return rinter.x * (player.outpost - player.origin) + player.origin;
     }
     
-    if (rinter[0] < 0) {
-        return linter;
+    if (rinter.x < 0) {
+        return linter.x * (player.outpost - player.origin) + player.origin;
     }
     
-    simd_float2 olinter = player.origin - linter;
-    simd_float2 orinter = player.origin - rinter;
-    
-    if (closer(olinter, orinter)) {
-        return linter;
+    if (linter.x < rinter.x) {
+        return linter.x * (player.outpost - player.origin) + player.origin;
     }
     
-    return rinter;
+    return rinter.x * (player.outpost - player.origin) + player.origin;
 }
 
 static simd_float2 ends(simd_float2 center, MetalTangent player) {
@@ -137,6 +134,7 @@ static simd_float2 ends(simd_float2 center, MetalTangent player) {
                 current = {x1 + center.x, y1 + center.y};
             }
         }
+        
         if (min(player.origin.x, player.outpost.x) <= x2 && max(player.origin.x, player.outpost.x) >= x2) {
             if (min(player.origin.y, player.outpost.y) <= y2 && max(player.origin.y, player.outpost.y) >= y2) {
                 if (closer(player.origin - (simd_float2{x2, y2}), player.origin - (simd_float2{x1, y1}))) {
@@ -145,7 +143,6 @@ static simd_float2 ends(simd_float2 center, MetalTangent player) {
             }
         }
         
-        //Return the list of collisions
         return current;
     }
     
@@ -153,45 +150,53 @@ static simd_float2 ends(simd_float2 center, MetalTangent player) {
 }
 
 static simd_float2 collision(device const MetalArc &arc, device const MetalTangent &player) {
-    simd_float2 guards = guardrails(arc, player);
+    //Do bounds checking
     simd_float2 origin = ends(arc.tangents[0].origin, player);
     simd_float2 outpost = ends(arc.tangents[arc.count - 1].outpost, player);
+    simd_float2 guards = guardrails(arc, player);
+    return guards;
     
-    if (closer(guards, origin)) {
+    if (closer(guards, origin) && guards.x != -1 && guards.y != -1) {
         if (closer(guards, outpost)) {
             return guards;
         }
+        
         else {
             return outpost;
         }
     }
+    
     else {
-        if (closer(origin, outpost)) {
+        if (closer(origin, outpost) && origin.x != -1 && origin.y != -1) {
             return origin;
         }
+        
         else {
             return outpost;
         }
     }
 }
 
-constant uint bound [[ function_constant(0) ]];
-
 kernel void collide(
     device const MetalArc *arcs [[ buffer(0) ]],
-    device const MetalTangent *player [[ buffer(1) ]],
-    device simd_float3 *output [[ buffer(2) ]],
+    device const MetalTangent &player [[ buffer(1) ]],
+    device const uint &bound [[ buffer(2) ]],
+    device simd_float3 *output [[ buffer(3) ]],
     uint index [[ thread_position_in_grid ]]
 ) {
     if (index >= bound) {
+        output[index] = {-1, -1, -1};
         return;
     }
     
     device const MetalArc &arc = arcs[index];
-    simd_float2 intersection = collision(arc, player[0]);
-    if (intersection[0] < 0) {
-        output[index] = {intersection[0], intersection[1], intersection[0] * intersection[0] + intersection[1] * intersection[1]};
+    simd_float2 intersection = collision(arc, player);
+    simd_float2 dist = intersection - player.origin;
+    
+    if (intersection.x != -1 && intersection.y != -1) {
+        output[index] = {intersection.x, intersection.y, dist.x * dist.x + dist.y * dist.y};
     }
+    
     else {
         output[index] = {-1, -1, -1};
     }

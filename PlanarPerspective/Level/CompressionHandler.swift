@@ -60,7 +60,7 @@ class CompressionHandler {
             })
         }
         
-        metal.buildPipeline(called: "cliplines", bounded: polygons.count)
+        metal.buildPipeline(called: "cliplines", constant: UInt(polygons.count), type: .uint)
     }
     
     func compress(transform: MatrixTransform) -> [Arc] {
@@ -110,7 +110,7 @@ class CompressionHandler {
     }
     
     func compute(with transform: MatrixTransform) -> [Arc] {
-        //return polygons.map { transform * $0 }.reduce([]) { $0 + $1.arcs() }
+        return polygons.map { transform * $0 }.reduce([]) { $0 + $1.arcs() }
         
         
         //Transformed polygons as MetalPolygon wrapper types
@@ -131,7 +131,7 @@ class CompressionHandler {
                     count: standards.count,
                     contents: standards,
                     index: 0,
-                    mode: .storageModeShared
+                    mode: .cpuCacheModeWriteCombined
                 ),
                 ClipperResourceSignature(
                     count: edges.count,

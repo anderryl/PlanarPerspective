@@ -21,6 +21,10 @@ struct Tangent {
         return CGRect(origin: origin, size: CGSize(width: offset.x, height: offset.y))
     }
     
+    func harden() -> MetalTangent {
+        return MetalTangent(origin: simd_float2(x: Float(origin.x), y: Float(origin.y)), outpost: simd_float2(x: Float(outpost.x), y: Float(outpost.y)), start: Float(start), end: Float(end))
+    }
+    
     static func ^^(_ first: Tangent, _ second: Tangent) -> CGPoint? {
         guard first.bounds.intersects(second.bounds) else {
             return nil
