@@ -168,7 +168,7 @@ class CompressionHandler {
         //Builds a buffer to store the edges for clipping
         let edges = device.makeBuffer(bytes: &edgeslist, length: edgeslist.count * MemoryLayout<MetalEdge>.stride, options: .storageModeShared)!
         
-        let resources = device.makeBuffer(length: amount * MemoryLayout<ThreadResource>.stride, options: .storageModePrivate)
+        let resources = device.makeBuffer(length: amount * MemoryLayout<ClipperResource>.stride, options: .storageModePrivate)
         
         encoder.setBuffer(polygons, offset: 0, index: 0)
         encoder.setBuffer(edges, offset: 0, index: 1)
