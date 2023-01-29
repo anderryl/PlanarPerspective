@@ -465,7 +465,12 @@ constant uint bound [[ function_constant(0) ]];
 /*
  Returns a list of segments spliced from clipping against the levels polygons
  */
-kernel void cliplines(device const MetalPolygon *clips [[ buffer(0) ]], device MetalEdge *lines [[ buffer(1) ]], device ClipperResource *resources [[ buffer(2) ]], uint index [[thread_position_in_grid]]) {
+kernel void cliplines(
+      device const MetalPolygon *clips [[ buffer(0) ]],
+      device MetalEdge *lines [[ buffer(1) ]],
+      device ClipperResource *resources [[ buffer(2) ]],
+      uint index [[thread_position_in_grid]]
+) {
     //The previous iteration for reference
     device MetalEdge &edge = lines[index];
     device MetalSegment &segment = edge.segments[0];

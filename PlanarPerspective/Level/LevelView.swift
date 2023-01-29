@@ -25,6 +25,7 @@ class LevelView: UIView {
     //The delegates that deal with varius tasks
     var graphics: GraphicsHandler!
     var renderer: RenderHandler!
+    var metal: MetalDelegate!
     var compression: CompressionHandler!
     var logic: LogicHandler!
     var input: InputHandler!
@@ -60,11 +61,12 @@ class LevelView: UIView {
         //Initialize and assign delegates
         graphics = GraphicsHandler(level: self)
         renderer = RenderHandler()
-        compression = try! CompressionHandler(level: self)
+        metal = try! MetalDelegate(level: self)
         logic = LogicHandler(level: self)
         input = InputHandler(level: self)
         motion = MotionHandler(level: self)
         contact = CollisionHandler(level: self, radius: 10)
+        compression = CompressionHandler(polygons: polygons, metal: metal)
         
         //Setup display link
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0 / framerate) { self.loop() }

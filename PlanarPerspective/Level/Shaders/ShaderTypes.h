@@ -10,6 +10,8 @@
 
 #include <simd/simd.h>
 
+//Clipper Types
+
 //Wrapper for Vertex
 typedef struct {
     float x;
@@ -96,5 +98,27 @@ typedef struct {
     MarkLine result;
     MetalEdge scaffold;
 } ClipperResource;
+
+
+//Collider Types
+
+typedef struct {
+    simd_float2 origin;
+    simd_float2 outpost;
+    float start;
+    float end;
+} MetalTangent;
+
+typedef struct {
+    MetalTangent tangents[16];
+    int count;
+    simd_float2 a;
+    simd_float2 b;
+    simd_float2 c;
+    simd_float4 bounds;
+    float intensity;
+    float thickness;
+    int polygon;
+} MetalArc;
 
 #endif /* ShaderTypes_h */

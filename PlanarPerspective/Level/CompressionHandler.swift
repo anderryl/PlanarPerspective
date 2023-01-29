@@ -1,76 +1,66 @@
 //
-//  ExpirimentalCompression.swift
+//  CompressionHandler.swift
 //  PlanarPerspective
 //
-//  Created by Rylie Anderson on 10/25/20.
-//  Copyright © 2020 Anderson, Todd W. All rights reserved.
+//  Created by Rylie Anderson on 1/28/23.
+//  Copyright © 2023 Anderson, Todd W. All rights reserved.
 //
 
 import Foundation
-import UIKit
-import MetalKit
+import Metal
 
-//Delegate class for compression based in Metal
+struct PolygonSignature: BufferSignature {
+    var type: MetalPolygon.Type = MetalPolygon.self
+    var count: Int
+    var contents: [MetalPolygon]
+    var stride: Int = MemoryLayout<MetalPolygon>.stride
+    var index: Int
+    var empty: Bool = false
+    var mode: MTLResourceOptions
+}
+
+struct EdgeSignature: BufferSignature {
+    var type: MetalEdge.Type = MetalEdge.self
+    var count: Int
+    var contents: [MetalEdge]
+    var stride: Int = MemoryLayout<MetalEdge>.stride
+    var index: Int
+    var empty: Bool = false
+    var mode: MTLResourceOptions
+}
+
+struct ClipperResourceSignature: BufferSignature {
+    var type: ClipperResource.Type = ClipperResource.self
+    var count: Int
+    var contents: [ClipperResource]
+    var stride: Int = MemoryLayout<ClipperResource>.stride
+    var index: Int
+    var empty: Bool = true
+    var mode: MTLResourceOptions
+}
+
 class CompressionHandler {
-    //Nessecary Metal types
-    var device: MTLDevice
-    var library: MTLLibrary
-    var queue: MTLCommandQueue
-    var state: MTLComputePipelineState
-    var polys: [Polygon]
-    var scope: MTLCaptureScope
-    var manager: MTLCaptureManager
-    var first: Bool = true
+    var polygons: [Polygon]
     
     //Cache to prevent redundant GPU calls
     var cache: [Int : [(transform: MatrixTransform, lines: [Arc])]] = [:]
     
-    //Initializes delegate with reference to supervisor
-    init(level: LevelView) throws {
-        //Retreives the default device
-        device = MTLCreateSystemDefaultDevice()!
-        //Builds a function library from all available metal files
-        library = device.makeDefaultLibrary()!
+    unowned var metal: MetalDelegate
+    
+    init(polygons: [Polygon], metal: MetalDelegate) {
+        self.metal = metal
         
-        //Finds function named clip
-        //let function = library.makeFunction(name: "cliplines")!
-        let constants = MTLFunctionConstantValues()
-        let up = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<Int>.stride, alignment: MemoryLayout<Int>.alignment)
-        up.storeBytes(of: UInt(level.polygons.count), as: UInt.self)
-        let rp = UnsafeRawPointer(up)
-        constants.setConstantValue(rp, type: .uint, index: 0)
-        let function = try! library.makeFunction(name: "cliplines", constantValues: constants)
-        
-        //Creates pipeline state
-        state = try! device.makeComputePipelineState(function: function)
-        
-        queue = device.makeCommandQueue()!
-        polys = level.polygons
         //Disturb the data by telling scary stories right before bed.
         let disturbance: CGFloat = 0.1
         let range = -disturbance ... disturbance
-        polys = polys.map { (polygon) -> Polygon in
+        self.polygons = polygons.map { (polygon) -> Polygon in
             return Polygon(curves: polygon.curves.map { (curve) -> Curve in
                 //...and the stack trace was coming from INSIDE the program.
                 return Curve(origin: curve.origin + Vertex.random(in: range), outpost: curve.outpost + Vertex.random(in: range), control: curve.control + Vertex.random(in: range), thickness: curve.thickness)
             })
         }
-        manager = MTLCaptureManager.shared()
         
-        let captureDescriptor = MTLCaptureDescriptor()
-        captureDescriptor.captureObject = self.device
-        captureDescriptor.destination = .developerTools
-        if #available(iOS 16.0, *) {
-            captureDescriptor.outputURL = .currentDirectory()
-        } else {
-            // Fallback on earlier versions
-        }
-         
-        scope = manager.makeCaptureScope(device: device)
-        // Add a label if you want to capture it from XCode's debug bar
-        scope.label = "Pls debug me"
-        // If you want to set this scope as the default debug scope, assign it to MTLCaptureManager's defaultCaptureScope
-        manager.defaultCaptureScope = scope
+        metal.buildPipeline(called: "cliplines", bounded: polygons.count)
     }
     
     func compress(transform: MatrixTransform) -> [Arc] {
@@ -119,94 +109,51 @@ class CompressionHandler {
         }
     }
     
-    //Compress the polygons using a given transform
     func compute(with transform: MatrixTransform) -> [Arc] {
-        
-        return polys.map { transform * $0 }.reduce([]) { $0 + $1.arcs() }
+        //return polygons.map { transform * $0 }.reduce([]) { $0 + $1.arcs() }
         
         
         //Transformed polygons as MetalPolygon wrapper types
-        let standards: [MetalPolygon] = polys.map { (transform * $0).harden() }
+        let standards: [MetalPolygon] = polygons.map { (transform * $0).harden() }
         
-        scope.begin()
-        
-        let buffer: MTLCommandBuffer
-        
-        if #available(iOS 14.0, *) {
-            let desc = MTLCommandBufferDescriptor()
-            desc.errorOptions = .encoderExecutionStatus
-            buffer = queue.makeCommandBuffer(descriptor: desc)!
-        } else {
-            buffer = queue.makeCommandBuffer()!
-        }
-        
-        //Creates transient buffer and encoder for the compute run
-        
-        let encoder: MTLComputeCommandEncoder = buffer.makeComputeCommandEncoder()!
-        encoder.setComputePipelineState(state)
-        
-        
-        //Builds an input buffer to hold the polygons
-        
-        let polygons = device.makeBuffer(bytes: standards, length: MemoryLayout<MetalPolygon>.stride * standards.count, options: .storageModeShared)!
-        
-        
-        
-        //Compiles list of MetalEdges for clipping
-        var edgeslist: [MetalEdge] = []
+        var edges: [MetalEdge] = []
         var i = 0
-        polys.forEach { (poly) in
-            edgeslist.append(contentsOf: (transform * poly).hardedges(id: i))
+        polygons.forEach { (poly) in
+            edges.append(contentsOf: (transform * poly).hardedges(id: i))
             i += 1
         }
-
-        //Calculates threadgrid parameters
-        let width = min(state.maxTotalThreadsPerThreadgroup, edgeslist.count)
-        let gheight = Int((Double(edgeslist.count) / Double(width)).rounded(.up))
-        let amount = width * gheight
-
-        //Builds a buffer to store the edges for clipping
-        let edges = device.makeBuffer(bytes: &edgeslist, length: edgeslist.count * MemoryLayout<MetalEdge>.stride, options: .storageModeShared)!
         
-        let resources = device.makeBuffer(length: amount * MemoryLayout<ClipperResource>.stride, options: .storageModePrivate)
-        
-        encoder.setBuffer(polygons, offset: 0, index: 0)
-        encoder.setBuffer(edges, offset: 0, index: 1)
-        encoder.setBuffer(resources, offset: 0, index: 2)
-        
-
-        //Dispath the threadgroups with the calculated configuration
-        encoder.dispatchThreadgroups(MTLSize(width: gheight, height: 1, depth: 1), threadsPerThreadgroup: MTLSize(width: width, height: 1, depth: 1))
-        
-        
-        //Dispath the threadgroups with the calculated configuration
-        encoder.endEncoding()
-        
-        //Send off for compute pass
-        buffer.commit()
-        
-        scope.end()
-        
-        
-        
-        //Wait until computation is completed
-        buffer.waitUntilCompleted()
-        if #available(iOS 14.0, *) {
-            if let error = buffer.error as NSError? {
-                print(error)
-            }
-        }
+        let signature = ShaderSignature(
+            name: "cliplines",
+            threads: edges.count,
+            inputs: [
+                PolygonSignature(
+                    count: standards.count,
+                    contents: standards,
+                    index: 0,
+                    mode: .storageModeShared
+                ),
+                ClipperResourceSignature(
+                    count: edges.count,
+                    contents: [],
+                    stride: MemoryLayout<ClipperResource>.stride,
+                    index: 2,
+                    mode: .storageModePrivate
+                ),
+            ],
+            outputs: [
+                "edges" : EdgeSignature(
+                    count: edges.count,
+                    contents: edges,
+                    stride: MemoryLayout<MetalEdge>.stride,
+                    index: 1,
+                    mode: .storageModeShared
+                )
+            ]
+        )
         
         //Unrefined wrappers to be processed
-        var unrefined: [MetalEdge] = []
-        
-        //Manually retreives function results from edge buffer
-        let pointer = edges.contents()
-
-        for i in 0 ..< edgeslist.count {
-            let new = pointer.load(fromByteOffset: i * MemoryLayout<MetalEdge>.stride, as: MetalEdge.self)
-            unrefined.append(new)
-        }
+        var unrefined: [MetalEdge] = metal.execute(signature)["edges"]! as! [MetalEdge]
         
         //Array to hold intermediate stage of processing as segment wrappers are retreived from edges
         var roughs: [MetalSegment] = []
@@ -258,8 +205,7 @@ class CompressionHandler {
                 }
             }
         }
-
-        //Final results are attained by converting wrapper types to normal swift types for return
+        
         let lines = roughs.map { Arc($0) }
         
         return lines
