@@ -60,6 +60,10 @@ struct Vertex: Codable, Hashable {
         return Vertex(x: lhs * rhs.x, y: lhs * rhs.y, z: lhs * rhs.z)
     }
     
+    static func /(_ lhs: Vertex, _ rhs: CGFloat) -> Vertex {
+        return Vertex(x: lhs.x / rhs, y: lhs.y / rhs, z: lhs.z / rhs)
+    }
+    
     static func random(in range: ClosedRange<CGFloat>) -> Vertex {
         return Vertex(x: CGFloat.random(in: range), y: CGFloat.random(in: range), z: CGFloat.random(in: range))
     }

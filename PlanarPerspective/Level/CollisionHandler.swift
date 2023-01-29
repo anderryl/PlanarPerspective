@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 //Utility delegate used to find collisions between player and environment
-class ContactHandler {
+class CollisionHandler {
     //Supervisor
     private unowned let level: LevelView
     private let radius: CGFloat
@@ -26,7 +26,9 @@ class ContactHandler {
         let transform = level.matrix
         //Allocates empty array for collisions
         var contacts: [CGPoint] = []
-        let player = Arc(origin: (transform * position).flatten(), outpost: (transform * point).flatten(), thickness: 0)
+        let start = (transform * position).flatten()
+        let end = (transform * point).flatten()
+        let player = Arc(origin: start, outpost: end, control: (start + end) / 2)
         //Compress the polygons onto the current plane
         let lines: [Arc] = level.arcs
         //Iterate through lines and find collisions
@@ -52,61 +54,34 @@ class ContactHandler {
     
     //Finds contacts between the player line and an individual environment line
     private func contact(between line: Arc, and player: Arc) -> [CGPoint] {
-        //Translate the line perpindicular to its own direction by one radius both ways
-        let lmag = line.origin | line.outpost
-        let lvecx = (line.outpost.x - line.origin.x) * radius / lmag
-        let lvecy = (line.outpost.y - line.origin.y) * radius / lmag
-        let translatedOne = Arc(origin: CGPoint(x: line.origin.x - lvecy, y: line.origin.y + lvecx), outpost: CGPoint(x: line.outpost.x - lvecy, y: line.outpost.y + lvecx), thickness: 0)
-        let translatedTwo = Arc(origin: CGPoint(x: line.origin.x + lvecy, y: line.origin.y - lvecx), outpost: CGPoint(x: line.outpost.x + lvecy, y: line.outpost.y - lvecx), thickness: 0)
+        if (line.origin == line.control && line.control == line.outpost) {
+            return []
+        }
+        
+        let left = line.normal(positive: true, radius: radius)
+        
+        let right = line.normal(positive: false, radius: radius)
         
         //Allocate empty array for collisions
         var ret: [CGPoint] = []
         
+        
         //Check translated lines against the player line and append any to the list
-        if let intersection = intersection(between: translatedOne, and: player) {
+        if let intersection = player ^^ left {
             ret.append(intersection)
         }
-        if let intersection = intersection(between: translatedTwo, and: player) {
+        
+        if let intersection = player ^^ right {
             ret.append(intersection)
         }
+        
+        
         
         //Check player line against the environment line's endpoints
         ret.append(contentsOf: caps(of: line.origin, against: player))
         ret.append(contentsOf: caps(of: line.outpost, against: player))
         //Return the collisions
         return ret
-    }
-    
-    //Finds the intersection between two lines
-    private func intersection(between first: Arc, and second: Arc) -> CGPoint? {
-        //Calculate line vector components
-        let delta1x = first.outpost.x - first.origin.x
-        let delta1y = first.outpost.y - first.origin.y
-        let delta2x = second.outpost.x - second.origin.x
-        let delta2y = second.outpost.y - second.origin.y
-
-        //Create a 2D matrix from the vectors and calculate the determinant
-        let determinant = delta1x * delta2y - delta2x * delta1y
-        
-        //If determinant is zero (or very close as approximation), the lines are parallel or colinear
-        if abs(determinant) < 0.0001 {
-            return nil
-        }
-
-        //If the coefficients are between 0 and 1 (meaning they occur between their beginnings and ends not off in the distance), there is an intersection
-        let ab = ((first.origin.y - second.origin.y) * delta2x - (first.origin.x - second.origin.x) * delta2y) / determinant
-        if ab > 0 && ab < 1 {
-            let cd = ((first.origin.y - second.origin.y) * delta1x - (first.origin.x - second.origin.x) * delta1y) / determinant
-            if cd > 0 && cd < 1 {
-                //Calculate exact intersection point
-                let intersectX = first.origin.x + ab * delta1x
-                let intersectY = first.origin.y + ab * delta1y
-                return CGPoint(x: intersectX, y: intersectY)
-            }
-        }
-        
-        //Lines don't cross
-        return nil
     }
     
     //Finds the collisions between an endcap and the player line

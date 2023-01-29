@@ -29,8 +29,14 @@ class RenderHandler {
         //Build layers based on priority
         for item in items {
             switch item {
-            case .ARC(_, _, _, _, _, let layer):
+            case .ARC(let origin, let outpost, let control, let color, let thickness, let layer):
                 append(item: item, at: layer)
+                //Cool ass outline effect
+//                let arc = Arc(origin: origin, outpost: outpost, control: control, intensity: 1.0, thickness: thickness)
+//                let left = arc.normal(positive: true, radius: 10)
+//                let right = arc.normal(positive: false, radius: 10)
+//                append(item: .ARC(left.at(0), left.at(1), left.at(0.5), color, thickness / 2, layer), at: layer)
+//                append(item: .ARC(right.at(0), right.at(1), right.at(0.5), color, thickness / 2, layer), at: layer)
             case .CIRCLE(_, _, _, let layer):
                 append(item: item, at: layer)
             case .RECTANGLE(_, _, _, let layer):

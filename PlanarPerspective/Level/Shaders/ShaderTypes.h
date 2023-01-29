@@ -95,6 +95,6 @@ typedef struct {
     MarkLine initial;
     MarkLine result;
     MetalEdge scaffold;
-} ThreadResource;
+} ClipperResource;
 
 #endif /* ShaderTypes_h */

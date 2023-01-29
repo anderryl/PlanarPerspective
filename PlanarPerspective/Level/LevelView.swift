@@ -29,7 +29,7 @@ class LevelView: UIView {
     var logic: LogicHandler!
     var input: InputHandler!
     var motion: MotionHandler!
-    var contact: ContactHandler!
+    var contact: CollisionHandler!
     
     //Level contents
     var polygons: [Polygon]!
@@ -64,7 +64,7 @@ class LevelView: UIView {
         logic = LogicHandler(level: self)
         input = InputHandler(level: self)
         motion = MotionHandler(level: self)
-        contact = ContactHandler(level: self, radius: 10)
+        contact = CollisionHandler(level: self, radius: 10)
         
         //Setup display link
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0 / framerate) { self.loop() }

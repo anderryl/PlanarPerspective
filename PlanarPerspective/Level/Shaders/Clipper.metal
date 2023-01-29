@@ -213,7 +213,7 @@ static void sort(device Mark *marks, int count) {
 /*
  Calculates the intersections with a given polygon and updates the markline with the new intersections
  */
-static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device ThreadResource &resource) {
+static MetalSegment clip(MetalSegment line, MetalPolygon polygon, device ClipperResource &resource) {
     
     //If there are only two vertices no clipping is nessecary
     int count = polygon.count;
@@ -465,11 +465,11 @@ constant uint bound [[ function_constant(0) ]];
 /*
  Returns a list of segments spliced from clipping against the levels polygons
  */
-kernel void cliplines(device const MetalPolygon *clips [[ buffer(0) ]], device MetalEdge *lines [[ buffer(1) ]], device ThreadResource *resources [[ buffer(2) ]], uint index [[thread_position_in_grid]]) {
+kernel void cliplines(device const MetalPolygon *clips [[ buffer(0) ]], device MetalEdge *lines [[ buffer(1) ]], device ClipperResource *resources [[ buffer(2) ]], uint index [[thread_position_in_grid]]) {
     //The previous iteration for reference
     device MetalEdge &edge = lines[index];
     device MetalSegment &segment = edge.segments[0];
-    device ThreadResource &resource = resources[index];
+    device ClipperResource &resource = resources[index];
     
     //Loop through the clipping polygons
     for (uint i = 0; i < bound; i++) {
