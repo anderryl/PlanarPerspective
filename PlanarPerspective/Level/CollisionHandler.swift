@@ -49,16 +49,6 @@ struct ArcSignature: BufferSignature {
     var mode: MTLResourceOptions
 }
 
-struct CollisionSignature: BufferSignature {
-    var type: simd_float3.Type = simd_float3.self
-    var count: Int
-    var contents: [simd_float3]
-    var stride: Int = MemoryLayout<simd_float3>.stride
-    var index: Int
-    var empty: Bool = true
-    var mode: MTLResourceOptions
-}
-
 //Utility delegate used to find collisions between player and environment
 class CollisionHandler {
     //Supervisor
@@ -117,7 +107,7 @@ class CollisionHandler {
                 )
             ],
             outputs: [
-                "collisions" : CollisionSignature(
+                "collisions" : FloatSignature(
                     count: arcs.count,
                     contents: [],
                     index: 4,
@@ -126,19 +116,12 @@ class CollisionHandler {
             ]
         )
         
-        let results = metal.execute(signature)["collisions"]! as! [simd_float3]
-        for i in 0 ..< arcs.count {
-            if results[i].z >= 0 {
-                print("Collision: ")
-                print(arcs[i])
-                print(results[i])
-                print("\n\n")
-            }
-        }
-        let collision = results.filter { $0.z >= 0 }.min { $0.z < $1.z }
-        
-        if let actual = collision {
-            return level.matrix.inverted() * Position(x: CGFloat(actual.x), y: CGFloat(actual.y), z: (level.matrix * position).z)
+        let results = metal.execute(signature)["collisions"]! as! [Float]
+        let collision = results.filter { $0 >= 0 && $0 <= 1 }.min { $0 < $1 }
+        if collision != nil {
+            let d = end - start
+            let c = CGFloat(collision!)
+            return level.matrix.inverted() * Position(x: c * d.x + start.x, y: c * d.y + start.y, z: (level.matrix * position).z)
         }
         
         return nil
