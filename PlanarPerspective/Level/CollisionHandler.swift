@@ -20,10 +20,20 @@ struct TangentSignature: BufferSignature {
 }
 
 struct UIntSignature: BufferSignature {
-    var type: UInt.Type = UInt.self
+    var type: uint.Type = uint.self
     var count: Int
-    var contents: [UInt]
-    var stride: Int = MemoryLayout<UInt>.stride
+    var contents: [uint]
+    var stride: Int = MemoryLayout<uint>.stride
+    var index: Int
+    var empty: Bool = false
+    var mode: MTLResourceOptions
+}
+
+struct FloatSignature: BufferSignature {
+    var type: Float.Type = Float.self
+    var count: Int
+    var contents: [Float]
+    var stride: Int = MemoryLayout<Float>.stride
     var index: Int
     var empty: Bool = false
     var mode: MTLResourceOptions
@@ -61,7 +71,7 @@ class CollisionHandler {
         self.level = level
         self.radius = radius
         self.metal = metal
-        metal.buildPipeline(called: "collide", constant: radius, type: .float)
+        metal.buildPipeline(called: "collide")
     }
     
     //Find contacts along player path with environment lines
@@ -76,12 +86,6 @@ class CollisionHandler {
         )
         
         let arcs: [MetalArc] = level.arcs.map { $0.harden() }
-        for arc in arcs {
-            print("origin: ", arc.c)
-            print("outpost: ", arc.a + arc.b + arc.c)
-            print("control: ", 0.25 * arc.a + 0.5 * arc.b + arc.c)
-            print("\n\n")
-        }
         
         let signature = ShaderSignature(
             name: "collide",
@@ -101,8 +105,14 @@ class CollisionHandler {
                 ),
                 UIntSignature(
                     count: 1,
-                    contents: [UInt(1)],
+                    contents: [uint(arcs.count)],
                     index: 2,
+                    mode: .cpuCacheModeWriteCombined
+                ),
+                FloatSignature(
+                    count: 1,
+                    contents: [Float(radius)],
+                    index: 3,
                     mode: .cpuCacheModeWriteCombined
                 )
             ],
@@ -110,13 +120,21 @@ class CollisionHandler {
                 "collisions" : CollisionSignature(
                     count: arcs.count,
                     contents: [],
-                    index: 3,
+                    index: 4,
                     mode: .storageModeShared
                 )
             ]
         )
         
-        let results = (metal.execute(signature)["collisions"]! as! [simd_float3])
+        let results = metal.execute(signature)["collisions"]! as! [simd_float3]
+        for i in 0 ..< arcs.count {
+            if results[i].z >= 0 {
+                print("Collision: ")
+                print(arcs[i])
+                print(results[i])
+                print("\n\n")
+            }
+        }
         let collision = results.filter { $0.z >= 0 }.min { $0.z < $1.z }
         
         if let actual = collision {

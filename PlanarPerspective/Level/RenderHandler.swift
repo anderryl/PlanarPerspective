@@ -57,9 +57,14 @@ class RenderHandler {
                     context?.setStrokeColor(color)
                     context?.setLineCap(.round)
                     context?.setLineWidth(thickness)
-                    context?.move(to: origin);
+                    /*context?.move(to: origin);
                     context?.addQuadCurve(to: outpost, control: control);
-                    context?.strokePath()
+                    context?.strokePath()*/
+                    for tangent in Arc(origin: origin, outpost: outpost, control: control).tangents {
+                        context?.move(to: tangent.origin)
+                        context?.addLine(to: tangent.outpost)
+                        context?.strokePath()
+                    }
                 case .CIRCLE(let position, let radius, let color, _):
                     context?.setFillColor(color)
                     context?.fillEllipse(in: CGRect(origin: CGPoint(x: position.x - radius, y: position.y - radius), size: CGSize(width: radius * 2, height: radius * 2)))

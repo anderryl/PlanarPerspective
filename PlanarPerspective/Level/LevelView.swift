@@ -66,6 +66,7 @@ class LevelView: UIView {
         input = InputHandler(level: self)
         motion = MotionHandler(level: self)
         contact = CollisionHandler(level: self, radius: 10, metal: metal)
+        //contact = CollisionHandlerOld(level: self, radius: 10)
         compression = CompressionHandler(polygons: polygons, metal: metal)
         
         //Setup display link

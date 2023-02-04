@@ -33,24 +33,52 @@ extension Tangential {
         
         let tolerance = 2.0
         
-        func partition(start: CGFloat, end: CGFloat) {
+        func partition(start: CGFloat, end: CGFloat, slots: Int, initial: Bool = true) {
+            func cost(from src: CGFloat, to dest: CGFloat) -> CGFloat {
+                let midtime = (src + dest) / 2
+                let midpoint = at(midtime)
+                let open = at(src)
+                let closed = at(dest)
+                let path = open - closed
+                let vector = midpoint - open
+                return ~(vector - (((vector <> path) / ~path) * path))
+            }
+            
             let mid = (start + end) / 2
-            let midpoint = at(mid)
-            let open = at(start)
-            let closed = at(end)
-            let path = open - closed
-            let vector = midpoint - open
-            let offset = ~(vector - (((vector <> path) / ~path) * path))
-            if (offset < tolerance) {
-                mutable.append(Tangent(origin: open, outpost: closed, start: start, end: end))
+            
+            if (cost(from: start, to: end) < tolerance || slots == 1) {
+                mutable.append(Tangent(origin: at(start), outpost: at(end), start: start, end: end))
+                return
+            }
+            
+            if (initial) {
+                if (cost(from: start, to: end) < tolerance) {
+                    mutable.append(Tangent(origin: at(start), outpost: at(end), start: start, end: end))
+                    return
+                }
+            }
+            
+            let corigin = cost(from: start, to: mid) > tolerance
+            let coutpost = cost(from: mid, to: end) > tolerance
+            if (corigin && coutpost) {
+                partition(start: start, end: mid, slots: slots / 2, initial: false)
+                partition(start: mid, end: end, slots: slots / 2, initial: false)
+            }
+            else if (corigin && !coutpost) {
+                mutable.append(Tangent(origin: at(mid), outpost: at(end), start: mid, end: end))
+                partition(start: start, end: mid, slots: slots - 1, initial: false)
+            }
+            else if (!corigin && coutpost) {
+                mutable.append(Tangent(origin: at(start), outpost: at(mid), start: start, end: mid))
+                partition(start: mid, end: end, slots: slots - 1, initial: false)
             }
             else {
-                partition(start: start, end: mid)
-                partition(start: mid, end: end)
+                mutable.append(Tangent(origin: at(start), outpost: at(mid), start: start, end: mid))
+                mutable.append(Tangent(origin: at(mid), outpost: at(end), start: mid, end: end))
             }
         }
         
-        partition(start: 0.0, end: 1.0)
+        partition(start: 0, end: 1, slots: 16)
         
         return mutable
     }
@@ -104,7 +132,7 @@ class Arc: Tangential {
         self.C = C
         self.origin = at(0)
         self.outpost = at(1)
-        self.control = at(0.5)
+        self.control = (B / 2) - C
     }
     
     convenience init(origin: CGPoint, outpost: CGPoint, control: CGPoint, thickness: CGFloat) {

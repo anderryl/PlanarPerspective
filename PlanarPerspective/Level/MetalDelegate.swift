@@ -46,18 +46,21 @@ class MetalDelegate {
         queue = device.makeCommandQueue()!
     }
     
-    func buildPipeline<T>(called name: String, constant potential: T?, type: MTLDataType?) {
+    func buildPipeline<T>(called name: String, constant potential: T, type: MTLDataType) {
         let constants = MTLFunctionConstantValues()
         
-        if let constant = potential {
-            let up = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<T>.stride, alignment: MemoryLayout<T>.alignment)
-            up.storeBytes(of: constant, as: T.self)
-            let rp = UnsafeRawPointer(up)
-            constants.setConstantValue(rp, type: type!, index: 0)
-        }
+        let up = UnsafeMutableRawPointer.allocate(byteCount: MemoryLayout<T>.stride, alignment: MemoryLayout<T>.alignment)
+        up.storeBytes(of: potential, as: T.self)
+        let rp = UnsafeRawPointer(up)
+        constants.setConstantValue(rp, type: type, index: 0)
         
         let function = try! library.makeFunction(name: name, constantValues: constants)
         states[name] = try! device.makeComputePipelineState(function: function)
+    }
+    
+    func buildPipeline(called name: String) {
+        let function = library.makeFunction(name: name)
+        states[name] = try! device.makeComputePipelineState(function: function!)
     }
     
     func buildBuffer<T: BufferSignature>(_ signature: T) -> MTLBuffer {
